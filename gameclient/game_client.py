@@ -1,3 +1,8 @@
+from languageparser.language_parser import LanguageParser
+from fileio.room_builder import RoomBuilder
+from stringresources.strings import *
+
+
 class GameClient:
     '''
     Main controller for the game's flow and logic
@@ -6,15 +11,30 @@ class GameClient:
         self.gamestate = GameState()
         self.gamestate.load_rooms_from_files()
         self.ui = UserInterface()
+        self.lp = LanguageParser()
+        self.rb = RoomBuilder()
+        self.command = ""
 
         # Initiate game loop
         self.main_loop()
 
     def main_loop(self):
-        user_input = ""
-        while user_input != 'quit':
-            print(self.ui.print_main_menu())
-            user_input = self.ui.user_prompt()
+        '''
+        Comments outline the flow of project and intended functions for now
+        based on game engine workflow graph
+        :return:
+        '''
+
+        # Load data from files (Specifically rooms, but can do other files as well)
+        self.gamestate.rooms = self.rb.load_room_data_from_file()
+
+
+
+        # This is not final logic, used for debug / testing purposes
+        while self.command != 'quit':
+            self.ui.print_main_menu()
+            self.command = self.ui.user_prompt()
+            print(self.lp.parse_command(self.command))
 
 
 
@@ -43,13 +63,17 @@ class UserInterface:
     def __init__(self):
         self.prompt_text = ">> "
 
+    def print_introduction(self):
+        print(INTRO_STRING)
 
     def print_main_menu(self):
-        print("Welcome to Hacker: The Movie: The Adventure Game: The Sequel")
-        print("This game is awesome! If you wanna start h4ck1nG the n3t, say 'begin hack'! Or be a sissy and 'quit'!" )
+        print(MAIN_MENU_1)
+        print(MAIN_MENU_2)
 
     def user_prompt(self):
-        return input(self.prompt_text)
+        user_input = ""
+        user_input = input(">> ")
+        return user_input
 
 
 
