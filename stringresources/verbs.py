@@ -14,11 +14,13 @@ LOAD_GAME = 'load game'
 QUIT_ALIASES = { 'quit', 'exit', 'bye'}
 QUIT = 'quit'
 
-
-
-
 # SAVE_GAME
+SAVE_GAME_ALIASES = [ 'savegame', 'save game', 'save_game']
+SAVE_GAME = 'save game'
 
+# HELP
+HELP_ALIASES = { 'help' }
+HELP = 'help'
 
 
 INVALID_INPUT = 'invalid command'

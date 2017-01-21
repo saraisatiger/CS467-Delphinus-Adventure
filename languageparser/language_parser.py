@@ -31,5 +31,7 @@ class LanguageParser:
             return NEW_GAME
         elif command in LOAD_GAME_ALIASES:
             return LOAD_GAME
+        elif command in HELP_ALIASES:
+            return HELP
         else:
             return INVALID_INPUT

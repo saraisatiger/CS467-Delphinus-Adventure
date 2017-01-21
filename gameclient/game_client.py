@@ -18,7 +18,7 @@ class GameClient:
         self.rb = RoomBuilder()
         self.user_input = ""
         self.command = INVALID_INPUT
-        self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME }
+        self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME , HELP }
 
         # Initiate game loop
         self.main_loop()
@@ -34,30 +34,56 @@ class GameClient:
         self.gamestate.rooms = self.rb.load_room_data_from_file()
 
         # Loop in main menu until a valid command is entered
-        self.main_menu_loop()
+
+        while self.command is not QUIT:
+            self.main_menu_loop()
+
+            if self.command is NEW_GAME:
+                self.start_new_game()
+            elif self.command is LOAD_GAME:
+                self.load_game()
+            elif self.command is QUIT:
+                print(EXIT_MESSAGE)
+                sys.exit()
+            elif self.command is HELP:
+                self.ui.print_help_menu()
+            else:
+                print(INVALID_MENU_COMMAND_MESSAGE)
 
     def main_menu_loop(self):
+        '''
+        Prints the main menu loop and sets self.command until command is set to a proper value
+        :return:
+        '''
         self.main_menu_prompt()
         self.command = self.lp.parse_command(self.user_input)
         while not self.is_valid_menu_command(self. command):
             logger.debug("Invalid command is: " + self.command)
             self.main_menu_loop()
 
-        print("Command is: " + self.command)
+
 
     def main_menu_prompt(self):
         self.ui.print_main_menu()
         self.user_input = self.ui.user_prompt()
 
     def is_valid_menu_command(self, command):
+        '''
+        Checks the command returned from language parser against a list of valid menu commands defined on the
+        GameClient class (which are in term constants defined in stringresources\verbs.py)
+        :param command: A constant defined in stringresources\verbs.py
+        :return: True or false depending on presence of the command in the list of valid commands
+        '''
         if command in self.valid_main_menu_commands:
             return True
         else:
             return False
 
+    def start_new_game(self):
+        print(NEW_GAME_MESSAGE)
 
-
-
+    def load_game(self):
+        print(LOAD_GAME_MESSAGE)
 
 
 class GameState:
@@ -94,6 +120,9 @@ class UserInterface:
         user_input = input(">> ")
         return user_input
 
+    def print_help_menu(self):
+        for line in HELP_MESSAGE:
+            print(line)
 
 
 class Player:
