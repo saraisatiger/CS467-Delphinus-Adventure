@@ -1,7 +1,10 @@
 from languageparser.language_parser import LanguageParser
 from fileio.room_builder import RoomBuilder
 from stringresources.strings import *
+from stringresources.verbs import *
 
+from debug.debug import *
+logger = logging.getLogger(__name__)
 
 class GameClient:
     '''
@@ -13,7 +16,9 @@ class GameClient:
         self.ui = UserInterface()
         self.lp = LanguageParser()
         self.rb = RoomBuilder()
-        self.command = ""
+        self.user_input = ""
+        self.command = INVALID_INPUT
+        self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME }
 
         # Initiate game loop
         self.main_loop()
@@ -28,13 +33,27 @@ class GameClient:
         # Load data from files (Specifically rooms, but can do other files as well)
         self.gamestate.rooms = self.rb.load_room_data_from_file()
 
+        # Loop in main menu until a valid command is entered
+        self.main_menu_loop()
 
+    def main_menu_loop(self):
+        self.main_menu_prompt()
+        self.command = self.lp.parse_command(self.user_input)
+        while not self.is_valid_menu_command(self. command):
+            logger.debug("Invalid command is: " + self.command)
+            self.main_menu_loop()
 
-        # This is not final logic, used for debug / testing purposes
-        while self.command != 'quit':
-            self.ui.print_main_menu()
-            self.command = self.ui.user_prompt()
-            print(self.lp.parse_command(self.command))
+        print("Command is: " + self.command)
+
+    def main_menu_prompt(self):
+        self.ui.print_main_menu()
+        self.user_input = self.ui.user_prompt()
+
+    def is_valid_menu_command(self, command):
+        if command in self.valid_main_menu_commands:
+            return True
+        else:
+            return False
 
 
 
@@ -67,8 +86,8 @@ class UserInterface:
         print(INTRO_STRING)
 
     def print_main_menu(self):
-        print(MAIN_MENU_1)
-        print(MAIN_MENU_2)
+        for line in MAIN_MENU_LINES:
+            print(line)
 
     def user_prompt(self):
         user_input = ""

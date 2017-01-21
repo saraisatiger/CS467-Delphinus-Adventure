@@ -1,3 +1,5 @@
+from stringresources.verbs import *
+
 from debug.debug import *
 logger = logging.getLogger(__name__)
 
@@ -12,8 +14,22 @@ class LanguageParser:
 
 
     def parse_command(self, command):
-        # Stub function
-        if isinstance(command, str):
-            return "Command is a string"
+        '''
+        Presently returning a constant defined in a stringresources/verbs.py file so that the
+        return values from parser can just be set. Thi is Shawn's temporary solution. Later on
+        we will need to send more than just the verb back (the subject etc. also needed)
+        '''
+
+        # Parse any command to all lowercase to reduce complexity of our parser.
+        # TODO: Might also want to strip trailing / leading whitespace (but not inner whitespace)
+        # l.strip() strips the left-side whitespace, not sure on right side whitespace
+        command = command.lower().lstrip()
+
+        if command in QUIT_ALIASES:
+            return QUIT
+        elif command in NEW_GAME_ALIASES:
+            return NEW_GAME
+        elif command in LOAD_GAME_ALIASES:
+            return LOAD_GAME
         else:
-            return "Command is not a string"
+            return INVALID_INPUT
