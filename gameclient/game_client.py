@@ -2,6 +2,7 @@ from languageparser.language_parser import LanguageParser
 from fileio.room_builder import RoomBuilder
 from stringresources.strings import *
 from stringresources.verbs import *
+from stringresources.status_codes import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)
@@ -39,14 +40,35 @@ class GameClient:
             self.main_menu_loop()
 
             if self.command is NEW_GAME:
-                self.start_new_game()
+                '''
+                Start new game will eventually terminate for one of the below reasons
+                We handle each case separately because if a player forfeits and does not save,
+                it can have different logic than if they quit and save, etc.
+                The constants are defined in stringresources\status_codes.py
+                '''
+                exit_code = self.start_new_game()
+                if exit_code is GAMEOVER_FORFEIT:
+                    print("Game over: Forfeit")
+                elif exit_code is GAMEOVER_WIN:
+                    print("Game over: Player won")
+                elif exit_code is GAMEOVER_LOSE:
+                    print("Game over: Player lost")
+                elif exit_code is GAMEOVER_SAVE:
+                    print("Game over: Player saved game")
+                elif exit_code is GAMEOVER_LOAD:
+                    print("Game over: Player loading game")
+                    self.load_game()
+
             elif self.command is LOAD_GAME:
                 self.load_game()
+
             elif self.command is QUIT:
                 print(EXIT_MESSAGE)
                 sys.exit()
+
             elif self.command is HELP:
                 self.ui.print_help_menu()
+
             else:
                 print(INVALID_MENU_COMMAND_MESSAGE)
 
@@ -92,6 +114,10 @@ class GameClient:
 
     def start_new_game(self):
         print(NEW_GAME_MESSAGE)
+
+        quit_reason = GAMEOVER_FORFEIT
+        return quit_reason
+
 
     def load_game(self):
         print(LOAD_GAME_MESSAGE)
