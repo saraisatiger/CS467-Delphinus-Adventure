@@ -243,3 +243,7 @@ class Object:
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
+    def get_environmental_description(self):
+        # TODO: Implement this
+        description = "You see a + " + self.name + " laying around."
