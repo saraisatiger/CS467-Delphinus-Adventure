@@ -50,20 +50,31 @@ class GameClient:
             else:
                 print(INVALID_MENU_COMMAND_MESSAGE)
 
+            # Set these back to default values to ensure we don't enter endless loop
+            self.command = INVALID_INPUT
+            self.user_input = ""
+
     def main_menu_loop(self):
         '''
         Prints the main menu loop and sets self.command until command is set to a proper value
         :return:
         '''
-        self.main_menu_prompt()
-        self.command = self.lp.parse_command(self.user_input)
+        firstPass = True
         while not self.is_valid_menu_command(self. command):
-            logger.debug("Invalid command is: " + self.command)
-            self.main_menu_loop()
+            if firstPass:
+                firstPass = False
+            else:
+                logger.debug(self.command + " : " + self.user_input)
+            self.main_menu_prompt()
+            self.command = self.lp.parse_command(self.user_input)
 
 
 
     def main_menu_prompt(self):
+        '''
+        Prints the main menu then prompts the user for input
+        :return: none
+        '''
         self.ui.print_main_menu()
         self.user_input = self.ui.user_prompt()
 
