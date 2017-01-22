@@ -15,8 +15,10 @@ class RoomBuilder:
         rooms = []
 
         with open('./gamedata/rooms/sample_room.json') as sample_room:
-            rooms.append(json.load(sample_room))
-        pprint(rooms)
+            room_properties = json.load(sample_room)
+            new_room = Room(room_properties)
+            rooms.append(new_room)
+        # pprint(rooms)
 
         return rooms
         # return self.build_rooms_from_code()

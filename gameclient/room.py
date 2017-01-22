@@ -7,13 +7,21 @@ class Room:
     def __init__(self, properties):
         logger.debug("Room initialized")
         if properties:
-            # self.name = properties['name']
+            self.name = properties['name']
             self.long_description = properties['long_description']
-            # self.long_description = str(properties['long_description'])
             self.short_description = properties['short_description']
             self.visited = properties['visited']
-            self.room_features = properties['room_features']
-            self.room_connections = properties['room_connections']
+
+            # Call constructors from features and append them to the Room
+            self.room_features = []
+            for feature_properties in properties['room_features']:
+                room_feature = RoomFeature(feature_properties)
+                self.room_features.append(room_feature)
+
+            self.room_connections = []
+            for room_connection_properties in properties['room_connections']:
+                room_connection = RoomConnection(room_connection_properties)
+                self.room_connections.append(room_connection)
 
     def get_long_description(self):
         full_description = self.long_description + "\n\n" + self.get_connection_string()

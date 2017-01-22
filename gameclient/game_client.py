@@ -6,6 +6,8 @@ from stringresources.status_codes import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)
+from pprint import pprint
+
 
 class GameClient:
     '''
@@ -33,6 +35,7 @@ class GameClient:
 
         # Load data from files (Specifically rooms, but can do other files as well)
         self.gamestate.rooms = self.rb.load_room_data_from_file()
+        print(self.gamestate.rooms[0])
 
         # Loop in main menu until a valid command is entered
 
