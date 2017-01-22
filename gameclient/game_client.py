@@ -6,7 +6,6 @@ from stringresources.status_codes import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)
-from pprint import pprint
 
 
 class GameClient:

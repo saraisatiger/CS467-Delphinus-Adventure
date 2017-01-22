@@ -1,3 +1,5 @@
+from stringresources.strings import *
+
 from debug.debug import *
 logger = logging.getLogger(__name__)
 
@@ -23,13 +25,20 @@ class Room:
                 room_connection = RoomConnection(room_connection_properties)
                 self.room_connections.append(room_connection)
 
+        # TODO: Determine if Objects located in rooms are set per the room JSON files or loaded programatically
+        self.objects = [] # Room starts with no objects
+
     def get_long_description(self):
-        full_description = self.long_description + "\n\n" + self.get_connection_string()
+        full_description = self.long_description + self.get_supplemental_description()
         return full_description
 
     def get_short_description(self):
-        full_description = self.short_description + "\n\n" +  self.get_connection_string()
+        full_description = self.short_description + self.get_supplemental_description()
         return full_description
+
+    def get_supplemental_description(self):
+        description = "\n\n" + self.get_connection_string() + "\n\n" + self.get_objects_string()
+        return description
 
     def get_connection_string(self):
         connection_string = ""
@@ -37,6 +46,22 @@ class Room:
             for connection in self.room_connections:
                 connection_string = connection_string + connection.get_connection_description()
         return connection_string
+
+    def get_objects_string(self):
+        '''
+        Returns a string that describes the interesting objects in the environment.
+        Called by get_long_description
+        :return:
+        '''
+        if self.objects:
+            objects_string = ""
+            for object in self.objects:
+                objects_string = objects_string + object.get_environmental_description()
+        else:
+            objects_string = NO_INTERESTING_OBJECTS_MESSAGE
+        return objects_string
+
+
 
     def set_visited(self):
         self.visited = True

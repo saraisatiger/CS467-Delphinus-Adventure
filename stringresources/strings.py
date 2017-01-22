@@ -4,7 +4,7 @@ These strings are used in the game_client.py to retreive strings from one centra
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
-
+NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing interesting laying around that you can pick up."
 
 # main menu related strings
 MAIN_MENU_1 = "MAIN MENU"
