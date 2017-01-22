@@ -14,11 +14,22 @@ class Room:
             self.room_connections = properties['room_connections']
 
     def get_long_description(self):
-        full_description = self.long_description
+        full_description = self.long_description + "\n\n" + self.get_connection_string()
+        return full_description
+
+    def get_short_description(self):
+        full_description = self.short_description + "\n\n" +  self.get_connection_string()
+        return full_description
+
+    def get_connection_string(self):
+        connection_string = ""
         if self.room_connections:
             for connection in self.room_connections:
-                full_description = full_description + connection.get_connection_description()
+                connection_string = connection_string + connection.get_connection_description()
+        return connection_string
 
+    def set_visited(self):
+        self.visited = True
 
 class RoomFeature:
     '''

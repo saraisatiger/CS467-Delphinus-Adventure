@@ -50,8 +50,8 @@ class RoomBuilder:
 
         street_properties = {
             'room_features' : [street_feature_1, street_feature_2],
-            'long_description' : 'This is a really long description of the Street and would be read from a file in the event of a real program',
-            'short_description' : "You're standing on the street",
+            'long_description' : 'Long description here... This is a really long description of the Street and would be read from a file in the event of a real program',
+            'short_description' : "Short description here... You're standing on the street",
             'visited' : False,
             'room_connections' : [street_connection_1]
         }

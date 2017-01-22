@@ -40,13 +40,26 @@ class GameClient:
             self.main_menu_loop()
 
             if self.command is NEW_GAME:
+                self.initialize_new_game()
+            elif self.command is LOAD_GAME:
+                self.load_game_menu()
+            elif self.command is QUIT:
+                print(EXIT_MESSAGE)
+                sys.exit()
+            elif self.command is HELP:
+                self.ui.print_help_menu()
+            else:
+                print(INVALID_MENU_COMMAND_MESSAGE)
+
+            # Player decided to play the game, gamestate has already been initialized in the if/else above
+            if self.command is NEW_GAME or self.command is LOAD_GAME:
                 '''
-                Start new game will eventually terminate for one of the below reasons
+                Actually playing the game will eventually terminate for one of the below reasons
                 We handle each case separately because if a player forfeits and does not save,
                 it can have different logic than if they quit and save, etc.
                 The constants are defined in stringresources\status_codes.py
                 '''
-                exit_code = self.start_new_game()
+                exit_code = self.play_game()
                 if exit_code is GAMEOVER_FORFEIT:
                     print("Game over: Forfeit")
                 elif exit_code is GAMEOVER_WIN:
@@ -57,20 +70,8 @@ class GameClient:
                     print("Game over: Player saved game")
                 elif exit_code is GAMEOVER_LOAD:
                     print("Game over: Player loading game")
-                    self.load_game()
+                    self.load_game_menu()
 
-            elif self.command is LOAD_GAME:
-                self.load_game()
-
-            elif self.command is QUIT:
-                print(EXIT_MESSAGE)
-                sys.exit()
-
-            elif self.command is HELP:
-                self.ui.print_help_menu()
-
-            else:
-                print(INVALID_MENU_COMMAND_MESSAGE)
 
             # Set these back to default values to ensure we don't enter endless loop
             self.command = INVALID_INPUT
@@ -112,15 +113,66 @@ class GameClient:
         else:
             return False
 
-    def start_new_game(self):
+
+
+    def play_game(self):
+        '''
+        Primary game loop that prints information to user, reads input, and reacts accordingly
+        :return:
+        '''
         print(NEW_GAME_MESSAGE)
 
-        quit_reason = GAMEOVER_FORFEIT
-        return quit_reason
+        status = GAME_CONTINUE
+
+        print_long_description = False  # Override for if user just typed the 'look' command
+
+        while status is GAME_CONTINUE:
+            # Check game status; if gameover, leave game
+            status = self.game_status()
+            if status in GAMEOVER_STATES:
+                return status
+
+            # Print appropriate description
+            if self.gamestate.current_location.visited is False or print_long_description is True:
+                print(self.gamestate.current_location.get_long_description())
+                self.gamestate.current_location.set_visited()
+                print_long_description = False
+            else:
+                print(self.gamestate.current_location.get_short_description())
+
+            # Prompt user for input
+            self.user_input = self.ui.user_prompt()
+            self.command = self.lp.parse_command(self.user_input)
 
 
-    def load_game(self):
+            # Conditionally handle each possible verb
+            if self.command is LOOK:
+                print_long_description = True
+            else:
+                print("Either that isn't implemented yet, or you typed gibberish!")
+
+            self.user_input = ""
+            self.command = INVALID_INPUT
+
+
+
+
+
+
+    def load_game_menu(self):
         print(LOAD_GAME_MESSAGE)
+
+    def initialize_new_game(self):
+        logger.debug("A new game would be initialized here")
+        self.gamestate.set_current_location(self.gamestate.rooms[0])
+
+    def game_status(self):
+        # TODO: Implement this properly. Status codes in stringresources\status_codes.py
+        # if self.gamestate.player.speed is 0:
+        #     return GAMEOVER_LOSE
+        #
+        # else:
+            return GAME_CONTINUE
 
 
 class GameState:
@@ -132,7 +184,10 @@ class GameState:
         self.player = Player()
 
     def load_rooms_from_files(self):
-        print("Loading rooms from files (This is a stub)")
+        logger.debug("Loading rooms from files (This is a stub)")
+
+    def set_current_location(self, room):
+        self.current_location = room
 
 
 

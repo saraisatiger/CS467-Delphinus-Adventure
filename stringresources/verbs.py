@@ -7,7 +7,7 @@ NEW_GAME_ALIASES = { 'newgame', 'new game', "hacktheplanet"}
 NEW_GAME = 'new game'
 
 # LOAD_GAME
-LOAD_GAME_ALIASES = { 'loadgame', 'load game', 'load_game'}
+LOAD_GAME_ALIASES = { 'loadgame', 'load game', 'load_game_menu'}
 LOAD_GAME = 'load game'
 
 # QUIT and its aliases
@@ -21,6 +21,10 @@ SAVE_GAME = 'save game'
 # HELP
 HELP_ALIASES = { 'help' }
 HELP = 'help'
+
+# LOOK
+LOOK_ALIASES = { 'look' }
+LOOK = 'look'
 
 
 INVALID_INPUT = 'invalid command'
