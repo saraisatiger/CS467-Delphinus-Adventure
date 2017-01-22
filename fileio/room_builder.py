@@ -8,12 +8,26 @@ from pprint import pprint
 
 
 class RoomBuilder:
+    '''
+    This class is designed to build a room or multiple rooms from files
+
+    Todo: Read all files from gamedata/rooms and append them to rooms before returning it
+    Game-engine presently assumes first room in the list is the starting room, this is probably
+    "bad" solution -- if order of file read changes, let Shawn know. Plan is to set current room to
+    "Street" room so I can just update the initialization to look up that room first. -- SSH
+    '''
     def __init__(self):
         logger.debug("RoomBuilder instantiated")
 
     def load_room_data_from_file(self):
+        '''
+        Called by GameEngine to instantiate all of the rooms. This is called whether the game is new
+        or loaded. Should return ALL rooms.
+        :return:
+        '''
         rooms = []
 
+        # Could refactor this out as a method that is then called on each file in the folder if desired
         with open('./gamedata/rooms/sample_room.json') as sample_room:
             room_properties = json.load(sample_room)
             new_room = Room(room_properties)
@@ -21,10 +35,14 @@ class RoomBuilder:
         # pprint(rooms)
 
         return rooms
-        # return self.build_rooms_from_code()
 
+
+
+    # TODO: DEPRECATED: Can probably just delete this build_rooms_from_code method now
     def build_rooms_from_code(self):
         '''
+        DEPRECATED
+
         Method for use in testing game engine and demonstrates how the features and rooms could be parsed
         from a file; would be useful if we were hard-coding the values. Could also convert to the real
         file loader by replacing static strings with information from various file-read operations
