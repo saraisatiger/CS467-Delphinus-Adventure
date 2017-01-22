@@ -9,6 +9,7 @@ class Room:
         if properties:
             self.room_features = properties['room_features']
             self.long_description = properties['long_description']
+            # self.long_description = str(properties['long_description'])
             self.short_description = properties['short_description']
             self.visited = properties['visited']
             self.room_connections = properties['room_connections']
@@ -39,7 +40,10 @@ class RoomFeature:
     def __init__(self, properties):
         self.name = properties['name']
         self.description = properties['description']
-        self.known_to_player = properties['known_to_player']
+        '''
+            TODO: I think known_to_player should be tracked either by a game state or player state dictionary
+        '''
+        # self.known_to_player = properties['known_to_player']
 
     def get_name(self):
         return self.name
