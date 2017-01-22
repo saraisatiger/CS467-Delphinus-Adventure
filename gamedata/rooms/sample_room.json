@@ -1,0 +1,24 @@
+{
+  "name" : "Sample",
+  "long_description" : "This sample room would probably have a much longer description",
+  "short_description" : "This sample room has a short description.",
+  "visited" : false,
+  "room_features" : [
+      {
+        "name" : "\"No Skateboarding\" sign",
+        "description" : "The sign states very clearly that skateboarding is prohibited in this area. Fine: $300"
+      },
+      {
+        "name" : "Guardrails",
+        "description" : "These guardrails look perfect for grinding on with a skateboard!"
+      }
+  ],
+  "room_connections" : [
+    {
+      "label": "Arcade",
+      "cardinal_direction": "North",
+      "description": "an exciting sign for an arcade",
+      "destination": "Arcade"
+    }
+  ]
+}

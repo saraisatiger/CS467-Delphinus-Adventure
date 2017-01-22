@@ -12,13 +12,14 @@ class RoomBuilder:
         logger.debug("RoomBuilder instantiated")
 
     def load_room_data_from_file(self):
-        # rooms = []
-        # room_properties = { 'to' : 'do '}
-        # rooms.append(Room(room_properties))
+        rooms = []
 
-        # return rooms
+        with open('./gamedata/rooms/sample_room.json') as sample_room:
+            rooms.append(json.load(sample_room))
+        pprint(rooms)
 
-        return self.build_rooms_from_code()
+        return rooms
+        # return self.build_rooms_from_code()
 
     def build_rooms_from_code(self):
         '''
@@ -72,3 +73,4 @@ class RoomBuilder:
         street = Room(street_properties)
         rooms =  [ street ]
         return rooms
+

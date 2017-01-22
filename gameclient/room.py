@@ -7,11 +7,12 @@ class Room:
     def __init__(self, properties):
         logger.debug("Room initialized")
         if properties:
-            self.room_features = properties['room_features']
+            # self.name = properties['name']
             self.long_description = properties['long_description']
             # self.long_description = str(properties['long_description'])
             self.short_description = properties['short_description']
             self.visited = properties['visited']
+            self.room_features = properties['room_features']
             self.room_connections = properties['room_connections']
 
     def get_long_description(self):
