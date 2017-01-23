@@ -1,3 +1,14 @@
+# DELPHINUS - ADVENTURE APP
+# CS 467 - Winter 2017
+# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+
+# room.py
+# Description: Room class and related / composite classes
+# Principal Author of this file per Project plan: Shawn Hillyer
+
+# CITATIONS
+# CITE:
+
 from stringresources.strings import *
 
 from debug.debug import *
@@ -117,10 +128,8 @@ class RoomFeature:
     def __init__(self, properties):
         self.name = properties['name']
         self.description = properties['description']
-        '''
-            TODO: I think known_to_player should be tracked either by a game state or player state dictionary
-            TODO: (SSH) Not sure we even need this variable?
-        '''
+        # TODO: I think known_to_player should be tracked either by a game state or player state dictionary
+        # TODO: (SSH) Not sure we even need this variable?
         # self.known_to_player = properties['known_to_player']
 
     def get_name(self):
@@ -129,7 +138,7 @@ class RoomFeature:
     def get_description(self):
         return self.description
 
-    # TODO: Delete these two methods related to known_to_player if not used
+    # TODO: Delete these two methods related to known_to_player if not used (SSH)
     # def is_known_to_player(self):
     #     return self.known_to_player
 

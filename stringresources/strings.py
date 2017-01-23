@@ -1,6 +1,15 @@
-'''
-These strings are used in the game_client.py to retreive strings from one central location
-'''
+# DELPHINUS - ADVENTURE APP
+# CS 467 - Winter 2017
+# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+#
+# strings.py
+# Description:  Used by game engine
+# Principal Author of this file per Project plan: Shawn Hillyer
+#
+# CITATIONS
+# CITE: Used a similar concept as seen in Android app development. Android uses an XML format; I just am localizing all
+# of the strings here to one file so we can easily modify things without having to dig through code to find strings. (SSH)
+
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"

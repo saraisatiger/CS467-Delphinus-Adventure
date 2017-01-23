@@ -9,6 +9,7 @@
 # CITATIONS
 # CITE:
 
+
 from languageparser.language_parser import LanguageParser
 from fileio.room_builder import RoomBuilder
 from stringresources.strings import *
@@ -77,12 +78,10 @@ class GameClient:
 
             # ONLY IF Player decided to play the game, gamestate has already been initialized in the if/else above
             if self.command is NEW_GAME or self.command is LOAD_GAME:
-                '''
-                Actually playing the game will eventually terminate for one of the below reasons
-                We handle each case separately because if a player forfeits and does not save,
-                it can have different logic than if they quit and save, etc.
-                The constants are defined in stringresources\status_codes.py
-                '''
+                # Actually playing the game will eventually terminate for one of the below reasons
+                # We handle each case separately because if a player forfeits and does not save,
+                # it can have different logic than if they quit and save, etc.
+                # The constants are defined in stringresources\status_codes.py
                 exit_code = self.play_game()
                 if exit_code is GAMEOVER_FORFEIT:
                     print("Game over: Forfeit")
@@ -95,7 +94,6 @@ class GameClient:
                 elif exit_code is GAMEOVER_LOAD:
                     print("Game over: Player loading game")
                     self.load_game_menu()
-
 
             # Set these back to default values to ensure we don't enter endless loop
             self.command = INVALID_INPUT
@@ -170,22 +168,22 @@ class GameClient:
 
             # Prompt user for input and parse the command
             self.user_input = self.ui.user_prompt()
-            '''
-                TODO: The language parser will have to return more than the verb. It will also need to identify the
-                 subject (feature or object) and appropriate prepositions and such. At a minimum I'd expect the LP to
-                 return a python dictionary of a verb that's being called and one or more subjects that are trying to
-                 be interacted. For example "use broom on dusty floor" might return:
 
-                {
-                    'verb' : 'use',
-                    'subject' : 'broom',
-                    'objects' : [
-                        'dusty floor'
-                    ]
-                }
+                # TODO: The language parser will have to return more than the verb. It will also need to identify the
+                #  subject (feature or object) and appropriate prepositions and such. At a minimum I'd expect the LP to
+                #  return a python dictionary of a verb that's being called and one or more subjects that are trying to
+                #  be interacted. For example "use broom on dusty floor" might return:
+                #
+                # {
+                #     'verb' : 'use',
+                #     'subject' : 'broom',
+                #     'objects' : [
+                #         'dusty floor'
+                #     ]
+                # }
+                #
+                # (SSH)
 
-                (SSH)
-            '''
             self.command = self.lp.parse_command(self.user_input)
 
 

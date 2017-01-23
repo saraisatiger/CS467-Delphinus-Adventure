@@ -1,6 +1,18 @@
-'''
-MAIN MENU COMMANDS
-'''
+# DELPHINUS - ADVENTURE APP
+# CS 467 - Winter 2017
+# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+#
+# verbs.py
+# Description:  Used by language parser - possibly a temporary solution to parsing the commands.
+# Principal Author of this file per Project plan: Shawn Hillyer (Shawn conceived this to help in developing the language
+#  parser enough to implement the game engine)
+#
+# CITATIONS
+# CITE: None
+
+
+# MAIN MENU COMMANDS
+
 
 # NEW_GAME
 NEW_GAME_ALIASES = { 'newgame', 'new game', "hacktheplanet"}
@@ -17,6 +29,10 @@ QUIT = 'quit'
 # SAVE_GAME
 SAVE_GAME_ALIASES = [ 'savegame', 'save game', 'save_game']
 SAVE_GAME = 'save game'
+
+
+# Other verbs used in gameplay
+
 
 # HELP
 HELP_ALIASES = { 'help' }
