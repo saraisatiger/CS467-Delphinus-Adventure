@@ -1,3 +1,14 @@
+# DELPHINUS - ADVENTURE APP
+# CS 467 - Winter 2017
+# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+
+# game_client.py
+# Description: GameClient class and closely-related classes
+# Principal Author of this file per Project plan: Shawn Hillyer
+
+# CITATIONS
+# CITE:
+
 from languageparser.language_parser import LanguageParser
 from fileio.room_builder import RoomBuilder
 from stringresources.strings import *
@@ -15,45 +26,56 @@ class GameClient:
     def __init__(self):
         self.gamestate = GameState()
         self.gamestate.load_rooms_from_files()
+
+        # Instantiate unenforced singleton-style instances of various components
         self.ui = UserInterface()
         self.lp = LanguageParser()
         self.rb = RoomBuilder()
+
+        # Variables used to store GameClient state
         self.user_input = ""
         self.command = INVALID_INPUT
         self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME , HELP }
 
-        # Initiate game loop
+        # Initiate main loop upon instantiation, as it should only ever be called once
         self.main_loop()
 
     def main_loop(self):
         '''
         Comments outline the flow of project and intended functions for now
         based on game engine workflow graph
-        :return:
+        :return: N/A
         '''
+
 
         # Load data from files (Specifically rooms, but can do other files as well)
         self.gamestate.rooms = self.rb.load_room_data_from_file()
         print(self.gamestate.rooms[0])
 
-        # Loop in main menu until a valid command is entered
-
+        # Outer loop makes game play until user decides to quit from the main menu
         while self.command is not QUIT:
+
+            # Inner loop runs the main menu and prompts until a valid command is entered
             self.main_menu_loop()
 
+            # After that, we can either initialize a new or loaded game into the GameState using GameClient Methods..
             if self.command is NEW_GAME:
                 self.initialize_new_game()
             elif self.command is LOAD_GAME:
                 self.load_game_menu()
+            # Or exit the game...
             elif self.command is QUIT:
                 print(EXIT_MESSAGE)
                 sys.exit()
+            # Or print the help menu
             elif self.command is HELP:
                 self.ui.print_help_menu()
+            # If the command was invalid, an error message will display and later on the command and input is cleared
             else:
                 print(INVALID_MENU_COMMAND_MESSAGE)
 
-            # Player decided to play the game, gamestate has already been initialized in the if/else above
+
+            # ONLY IF Player decided to play the game, gamestate has already been initialized in the if/else above
             if self.command is NEW_GAME or self.command is LOAD_GAME:
                 '''
                 Actually playing the game will eventually terminate for one of the below reasons
@@ -81,8 +103,8 @@ class GameClient:
 
     def main_menu_loop(self):
         '''
-        Prints the main menu loop and sets self.command until command is set to a proper value
-        :return:
+        Prints the main menu and sets self.command until command is set to a proper value
+        :return: indirectly - sets instance variable, self.command, to a valid command
         '''
         firstPass = True
         while not self.is_valid_menu_command(self. command):
@@ -97,8 +119,8 @@ class GameClient:
 
     def main_menu_prompt(self):
         '''
-        Prints the main menu then prompts the user for input
-        :return: none
+        Prints the main menu then prompts the user for input one time
+        :return: Indirectly - sets instance variable user_input to the string typed by user
         '''
         self.ui.print_main_menu()
         self.user_input = self.ui.user_prompt()
@@ -120,21 +142,25 @@ class GameClient:
     def play_game(self):
         '''
         Primary game loop that prints information to user, reads input, and reacts accordingly
-        :return:
+        :return: a status code as defined in stringresources\status_codes.py, used by gameclient to determine how
+        and/or why game ended.
         '''
-        print(NEW_GAME_MESSAGE)
 
-        status = GAME_CONTINUE
+        print(NEW_GAME_MESSAGE)         # Defined in stringresources\strings.py
 
-        print_long_description = False  # Override for if user just typed the 'look' command
+        status = GAME_CONTINUE          # Force entry into main loop
 
+        print_long_description = False  # Override for if user just typed the 'look' command. Reset within while loop
+
+        # Game will loop until a 'Gameover' condition is met
         while status is GAME_CONTINUE:
-            # Check game status; if gameover, leave game
+            # Check game status; if Gameover, leave game loop and return status code
             status = self.game_status()
-            if status in GAMEOVER_STATES:
+            if status in GAMEOVER_STATES:  # list as defined in stringresources\status_codes.py
                 return status
 
-            # Print appropriate description
+
+            # Print appropriate Room description. Long if room never visited or player used "look" command
             if self.gamestate.current_location.visited is False or print_long_description is True:
                 print(self.gamestate.current_location.get_long_description())
                 self.gamestate.current_location.set_visited()
@@ -142,16 +168,32 @@ class GameClient:
             else:
                 print(self.gamestate.current_location.get_short_description())
 
-            # Prompt user for input
+            # Prompt user for input and parse the command
             self.user_input = self.ui.user_prompt()
+            '''
+                TODO: The language parser will have to return more than the verb. It will also need to identify the
+                 subject (feature or object) and appropriate prepositions and such. At a minimum I'd expect the LP to
+                 return a python dictionary of a verb that's being called and one or more subjects that are trying to
+                 be interacted. For example "use broom on dusty floor" might return:
+
+                {
+                    'verb' : 'use',
+                    'subject' : 'broom',
+                    'objects' : [
+                        'dusty floor'
+                    ]
+                }
+
+                (SSH)
+            '''
             self.command = self.lp.parse_command(self.user_input)
 
 
-            # Conditionally handle each possible verb
+            # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 print_long_description = True
             else:
-                print("Either that isn't implemented yet, or you typed gibberish!")
+                print("Either that isn't implemented yet, or you typed gibberish!") # TODO: Define in strings.py (SSH)
 
             self.user_input = ""
             self.command = INVALID_INPUT
@@ -162,6 +204,11 @@ class GameClient:
 
 
     def load_game_menu(self):
+        '''
+        Sets appropriate variables in the GameClient's gamestate instance
+        :return:
+        '''
+        # TODO: Implement this function (SSH)
         print(LOAD_GAME_MESSAGE)
 
     def initialize_new_game(self):
@@ -186,9 +233,15 @@ class GameState:
         self.player = Player()
 
     def load_rooms_from_files(self):
+        # TODO: Possibly delete this method, the GameClient is currently responsible for calling its room builder instance
         logger.debug("Loading rooms from files (This is a stub)")
 
     def set_current_location(self, room):
+        '''
+        Update the location the player is in
+        :param room: The room the player is in
+        :return: N/A
+        '''
         self.current_location = room
 
 
@@ -200,6 +253,7 @@ class UserInterface:
     Primarily used to print information to the user's screen
     '''
     def __init__(self):
+        # TODO: why can't reference this inside input() call in user_prompt(), or just make a stringresource variable (SSH)
         self.prompt_text = ">> "
 
     def print_introduction(self):
@@ -210,7 +264,7 @@ class UserInterface:
             print(line)
 
     def user_prompt(self):
-        user_input = ""
+        user_input = ""  # TODO: Test if I can delete this line or not  (SSH)
         user_input = input(">> ")
         return user_input
 
@@ -245,5 +299,5 @@ class Object:
         self.description = description
 
     def get_environmental_description(self):
-        # TODO: Implement this
+        # TODO: Implement this function (SSH)
         description = "You see a + " + self.name + " laying around."

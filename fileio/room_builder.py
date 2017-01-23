@@ -1,3 +1,14 @@
+# DELPHINUS - ADVENTURE APP
+# CS 467 - Winter 2017
+# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+
+# room_builder.py
+# Description:
+# Principal Author of this file per Project plan: Sara Hashem
+
+# CITATIONS
+# CITE:
+
 from gameclient.room import *
 
 from debug.debug import *
