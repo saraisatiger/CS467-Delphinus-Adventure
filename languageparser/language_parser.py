@@ -61,11 +61,17 @@ class LanguageParser:
         object = None
         targets = None
 
-        # Hacky way to parse a "look at" command to find the object/feature player wants to examine
+        # Hacky way to parse a "look at" command to find the object/feature player wants to examine.
+        # NOTE: Doesn't parse aliases
         if 'look at' in command:
-            logger.debug("YO THIS EXECUTED")
             object = command.replace("look at ", "", 1) # replace "look at " with empty string - rest is the object
             command = "look at"
+
+        # hacky way to parse a 'take' command.
+        # NOTE: Doesn't parse aliases
+        if 'take' in command:
+            object = command.replace("take ", "", 1) # replace at most one instance of "take " with empty str
+            command = "take"
 
 
         # This simple code just checks if the string entered by user us in one of several Lists defined in the resource
@@ -86,6 +92,9 @@ class LanguageParser:
             command = LOOK
         elif command in LOOK_AT_ALIASES:
             command = LOOK_AT
+        elif command in TAKE_ALIASES:
+            command = TAKE
+
         else:
             command = INVALID_INPUT
 

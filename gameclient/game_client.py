@@ -223,8 +223,14 @@ class GameClient:
     def initialize_new_game(self):
         logger.debug("A new game would be initialized here")
         self.gamestate.set_current_location(self.gamestate.rooms[0])
+
         # TODO: Set player state / inventory
+
         # TODO: Set each room to have correct objects
+
+        # FOR TESTING PURPOSES:
+        skateboard = Object("Skateboard", "A trendy skateboard with the text 'Z3R0 C007' inked on its surface")
+        self.gamestate.current_location.add_object_to_room(skateboard)
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in stringresources\status_codes.py
@@ -386,7 +392,7 @@ class Inventory:
 
 class Object:
     '''
-    An object. Can be in a ROom or players inventory.
+    An object. Can be in a Room or players inventory.
      Can be picked up from a room, dropped in a room, used, 'look at'ed, and possibly other actions
     '''
     def __init__(self, name, description):
@@ -396,6 +402,11 @@ class Object:
     def get_description(self):
         return self.description
 
+    def get_name(self):
+        return self.name
+
     def get_environmental_description(self):
-        # TODO: Refine the output of this function somewhat? (SSH)
-        description = "You see a + " + self.name + " laying around."
+        # TODO: Refine the output of this function somewhat? Could give objects unique environmental descriptions but
+        # TODO: 1depending on the room they are in it wouldn't make sense once dropped somewhere else(SSH)
+        description = "You see a " + self.name + " laying around."
+        return description
