@@ -39,7 +39,7 @@ LOAD_GAME_MESSAGE = "Let's load saved game."
 # Prints when a user uses the 'help' verb
 HELP_MESSAGE_1 = "Here's the information on how to play the game..."
 HELP_MESSAGE_2 = "Type in a command. Valid commands are: "
-VALID_VERB_LIST = "[[TODO: Fill in this list in strings.py]]: newgame, loadgame, quit, help, look, look at <object>, inventory, etc"
+VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <object>, go <direction or description>, take <object>, \ndrop <object>, inventory, hack, steal <object>, buy <object>, spraypaint, use <object or feature>"
 HELP_MESSAGE = [
     HELP_MESSAGE_1,
     HELP_MESSAGE_2,

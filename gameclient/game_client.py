@@ -70,7 +70,7 @@ class GameClient:
                 sys.exit()
             # Or print the help menu
             elif self.command is HELP:
-                self.ui.print_help_menu()
+                self.ui.print_help_message()
             # If the command was invalid, an error message will display and later on the command and input is cleared
             else:
                 print(INVALID_MENU_COMMAND_MESSAGE)
@@ -202,6 +202,10 @@ class GameClient:
                 else:
                     print(PICKUP_FAILURE_PREFIX + self.object + PICKUP_FAILURE_SUFFIX)
 
+
+            elif self.command is HELP:
+                self.verb_help()
+
             else:
                 print(COMMAND_NOT_IMPLEMENTED_YET)
 
@@ -296,6 +300,9 @@ class GameClient:
         inventory_description = self.gamestate.player.get_inventory_string()
         print(inventory_description)
 
+    def verb_help(self):
+        self.ui.print_help_message()
+
 
 class GameState:
     '''
@@ -343,7 +350,7 @@ class UserInterface:
         user_input = input(">> ")
         return user_input
 
-    def print_help_menu(self):
+    def print_help_message(self):
         for line in HELP_MESSAGE:
             print(line)
 
