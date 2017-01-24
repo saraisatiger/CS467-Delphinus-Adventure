@@ -80,7 +80,7 @@ class Room:
         Get a string of all the connections and objects in the Room
         :return: string
         '''
-        description = "\n\n" + self.get_connection_string() + "\n\n" + self.get_objects_string()
+        description = "\n\n" + self.get_connection_string() + "\n\n" + self.get_object_list_string()
         return description
 
     def get_connection_string(self):
@@ -94,7 +94,7 @@ class Room:
                 connection_string = connection_string + connection.get_connection_description()
         return connection_string
 
-    def get_objects_string(self):
+    def get_object_list_string(self):
         '''
         Returns a string that describes the interesting objects in the environment.
         Called by get_long_description
@@ -133,7 +133,7 @@ class Room:
         # If the room does not have a feature with that name, return None
         return None
 
-    def get_object(self, object_name):
+    def get_object_by_name(self, object_name):
         '''
         Return reference to an object looked up by name if it exists in the room
         :param object_name:
@@ -143,6 +143,24 @@ class Room:
             if room_object.get_name().lower() == object_name.lower():
                 return room_object
         return None
+
+    def add_object_to_room(self, object):
+        # TODO: Test this function
+        self.objects.append(object)
+
+
+    def remove_object_from_room(self, object):
+        # TODO: Test this function
+        self.objects.remove(object)
+
+
+    def remove_object_from_room_by_name(self, object_name):
+        # TODO: Test this function
+        object_to_remove = self.get_object_by_name(object_name)
+        if object_to_remove is not None:
+            self.remove_object_from_room(object_to_remove)
+            return True
+        return False
 
 
 class RoomFeature:

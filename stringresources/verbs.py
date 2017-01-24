@@ -46,4 +46,8 @@ LOOK = 'look'
 LOOK_AT_ALIASES = { 'look at', 'examine' }
 LOOK_AT = 'look at'
 
+# TAKE
+TAKE_ALIASES = { 'take', 'pick up'}
+TAKE = 'take'
+
 INVALID_INPUT = 'invalid command'

@@ -191,7 +191,13 @@ class GameClient:
                 print_long_description = True
 
             elif self.command is LOOK_AT:
-                self.look_at(self.object)
+                self.verb_look_at(self.object)
+
+            elif self.command is TAKE:
+                if self.verb_take(self.object) is True:
+                    print(PICKUP_SUCCESS_PREFIX + self.object + PICKUP_SUCCESS_SUFFIX)
+                else:
+                    print(PICKUP_FAILURE_PREFIX + self.object + PICKUP_FAILURE_SUFFIX)
 
             else:
                 print(COMMAND_NOT_IMPLEMENTED_YET)
@@ -229,7 +235,7 @@ class GameClient:
         # else:
             return GAME_CONTINUE
 
-    def look_at(self, object_name):
+    def verb_look_at(self, object_name):
         '''
         Attempts to look at the subject
         :param object_name: Grammatical object at which player wishes to look. Could be a feature or an object in environment
@@ -244,19 +250,39 @@ class GameClient:
             return
 
         # If not, check if object_name in room
-        room_object = self.gamestate.current_location.get_object(object_name) # TODO: Implement get_object in Room class
+        room_object = self.gamestate.current_location.get_object_by_name(object_name) # TODO: Implement get_object_by_name in Room class
         if room_object is not None:
             print(room_object.get_description())
             return
 
         # If still not found, check player's inventory
-        player_object = self.gamestate.player.inventory.get_object(object_name)
+        player_object = self.gamestate.player.inventory.get_object_by_name(object_name)
         if player_object is not None:
             print(player_object.get_description)
             return
 
         # If not anywhere, must not be in this room - tell player they don't see it
         print(LOOK_AT_NOT_SEEN)
+
+    def verb_take(self, object_name):
+        '''
+        Evaluates a command to take object_name from the Room and if it exists (and is allowed by game rules) then
+        object placed in inventory for the player
+        :param object_name: string input by player in their command
+        :return: True (success), False ( fail, object_name not found in the room)
+        '''
+
+        # TODO: Test this function
+
+        # See if the room has the object before trying to update Room and player Inventory
+        room_object = self.gamestate.current_location.get_object_by_name(object_name)
+        if room_object is not None:
+            self.gamestate.current_location.remove_object_from_room(room_object)
+            self.gamestate.player.add_object_to_inventory(room_object)
+            return True
+        # TODO: if we have more complex objects player can take by stealing, this logic may be insufficient
+        return False
+
 
 
 
@@ -321,6 +347,14 @@ class Player:
         self.speed = 0
         self.inventory = Inventory()
 
+    def add_object_to_inventory(self, object):
+        self.inventory.add_object(object)
+
+    def remove_object_from_inventory(self, object):
+        self.inventory.remove_object(object)
+
+
+
 class Inventory:
     '''
     Objects and methods related to adding and removing them from inventory
@@ -328,14 +362,26 @@ class Inventory:
     def __init__(self):
         self.objects = []
 
-    def get_object(self, object_name):
+    def get_object_by_name(self, object_name):
         '''
         Finds an object in the inventory by name and returns a reference to it
         :param object_name:
         :return:
         '''
-        # TODO: Implement this function
-        pass
+        # TODO: Test function
+        for object in self.objects:
+            if object.name.lower() == object.name.lower():
+                return object
+
+        return None
+
+
+    def add_object(self, object):
+        self.objects.append(object)
+
+
+    def remove_object(self, object):
+        self.objects.remove(object)
 
 
 class Object:
