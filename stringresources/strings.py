@@ -56,6 +56,9 @@ PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."
 PICKUP_FAILURE_PREFIX = "You grasp for the non-existant "
 PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
 
+INVENTORY_LIST_HEADER = "Your backpack contains: "
+INVENTORY_EMPTY = "Absolutely nothing (say it again!)"
+
 INVALID_MENU_COMMAND_MESSAGE = "That is not a valid command at the main menu"
 COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
 

@@ -50,4 +50,8 @@ LOOK_AT = 'look at'
 TAKE_ALIASES = { 'take', 'pick up'}
 TAKE = 'take'
 
+# INVENTORY
+INVENTORY_ALIASES = { 'inventory', 'backpack', 'bag'}
+INVENTORY = 'inventory'
+
 INVALID_INPUT = 'invalid command'

@@ -193,6 +193,9 @@ class GameClient:
             elif self.command is LOOK_AT:
                 self.verb_look_at(self.object)
 
+            elif self.command is INVENTORY:
+                self.verb_inventory()
+
             elif self.command is TAKE:
                 if self.verb_take(self.object) is True:
                     print(PICKUP_SUCCESS_PREFIX + self.object + PICKUP_SUCCESS_SUFFIX)
@@ -264,7 +267,7 @@ class GameClient:
         # If still not found, check player's inventory
         player_object = self.gamestate.player.inventory.get_object_by_name(object_name)
         if player_object is not None:
-            print(player_object.get_description)
+            print(player_object.get_description())
             return
 
         # If not anywhere, must not be in this room - tell player they don't see it
@@ -289,7 +292,9 @@ class GameClient:
         # TODO: if we have more complex objects player can take by stealing, this logic may be insufficient
         return False
 
-
+    def verb_inventory(self):
+        inventory_description = self.gamestate.player.get_inventory_string()
+        print(inventory_description)
 
 
 class GameState:
@@ -359,6 +364,11 @@ class Player:
     def remove_object_from_inventory(self, object):
         self.inventory.remove_object(object)
 
+    def get_inventory_string(self):
+        list = self.inventory.get_inventory_string()
+        print(INVENTORY_LIST_HEADER)
+        print(list + "\n\n")
+
 
 
 class Inventory:
@@ -388,6 +398,28 @@ class Inventory:
 
     def remove_object(self, object):
         self.objects.remove(object)
+
+    def get_inventory_string(self):
+        '''
+        Get a comma-delineated list of the objects in the inventory
+        :return:
+        '''
+        if self.objects:
+            inventory_size = len(self.objects)
+            count = 0
+            inventory_string = ""
+            for object in self.objects:
+                count += 1
+                inventory_string += object.get_name()
+                if count is not inventory_size:
+                    inventory_string += ", "
+                else:
+                    inventory_string += "."
+            return inventory_string
+        return INVENTORY_EMPTY
+
+
+
 
 
 class Object:

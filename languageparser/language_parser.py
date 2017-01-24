@@ -94,6 +94,8 @@ class LanguageParser:
             command = LOOK_AT
         elif command in TAKE_ALIASES:
             command = TAKE
+        elif command in INVENTORY_ALIASES:
+            command = INVENTORY
 
         else:
             command = INVALID_INPUT
