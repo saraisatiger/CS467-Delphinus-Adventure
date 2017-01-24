@@ -133,9 +133,14 @@ class Room:
         # If the room does not have a feature with that name, return None
         return None
 
-    def get_object(self, object):
+    def get_object(self, object_name):
+        '''
+        Return reference to an object looked up by name if it exists in the room
+        :param object_name:
+        :return:
+        '''
         for room_object in self.objects:
-            if room_object.get_name().lower() == object.lower():
+            if room_object.get_name().lower() == object_name.lower():
                 return room_object
         return None
 

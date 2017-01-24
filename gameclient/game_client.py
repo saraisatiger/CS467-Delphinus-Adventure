@@ -189,11 +189,15 @@ class GameClient:
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 print_long_description = True
+
             elif self.command is LOOK_AT:
                 self.look_at(self.object)
-            else:
-                print(COMMAND_NOT_IMPLEMENTED_YET) # TODO: Define in strings.py (SSH)
 
+            else:
+                print(COMMAND_NOT_IMPLEMENTED_YET)
+
+
+            # Reset the input and command/object/targets from parser
             self.user_input = ""
             self.command, self.object, self.targets = INVALID_INPUT, None, None
 
@@ -213,9 +217,12 @@ class GameClient:
     def initialize_new_game(self):
         logger.debug("A new game would be initialized here")
         self.gamestate.set_current_location(self.gamestate.rooms[0])
+        # TODO: Set player state / inventory
+        # TODO: Set each room to have correct objects
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in stringresources\status_codes.py
+        # This function should/will check if player has won or lost(died/whatever)
         # if self.gamestate.player.speed is 0:
         #     return GAMEOVER_LOSE
         #
@@ -227,7 +234,7 @@ class GameClient:
         Attempts to look at the subject
         :param object_name: Grammatical object at which player wishes to look. Could be a feature or an object in environment
         or in their inventory
-        :return:
+        :return: None
         '''
 
         # Check of the 'object_name' is a feature of the room
@@ -268,9 +275,11 @@ class GameState:
     def set_current_location(self, room):
         '''
         Update the location the player is in
-        :param room: The room the player is in
+        :param room: The room the player is in (actual room)
         :return: N/A
         '''
+        # TODO: Decide if we should set this by reference or by doing a room.name lookup and then setting it to that room
+        # TODO: THis lookup would be done out of the GameState.rooms[] list of course
         self.current_location = room
 
 
@@ -320,11 +329,20 @@ class Inventory:
         self.objects = []
 
     def get_object(self, object_name):
+        '''
+        Finds an object in the inventory by name and returns a reference to it
+        :param object_name:
+        :return:
+        '''
+        # TODO: Implement this function
         pass
 
 
 class Object:
-
+    '''
+    An object. Can be in a ROom or players inventory.
+     Can be picked up from a room, dropped in a room, used, 'look at'ed, and possibly other actions
+    '''
     def __init__(self, name, description):
         self.name = name
         self.description = description
@@ -333,5 +351,5 @@ class Object:
         return self.description
 
     def get_environmental_description(self):
-        # TODO: Implement this function (SSH)
+        # TODO: Refine the output of this function somewhat? (SSH)
         description = "You see a + " + self.name + " laying around."
