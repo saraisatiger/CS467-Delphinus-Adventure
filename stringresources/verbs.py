@@ -42,5 +42,8 @@ HELP = 'help'
 LOOK_ALIASES = { 'look' }
 LOOK = 'look'
 
+# LOOK AT
+LOOK_AT_ALIASES = { 'look at', 'examine' }
+LOOK_AT = 'look at'
 
 INVALID_INPUT = 'invalid command'

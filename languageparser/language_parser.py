@@ -19,8 +19,8 @@
 #
 # {
 #     'verb' : 'use',
-#     'subject' : 'broom',
-#     'objects' : [
+#     'object' : 'broom',
+#     'targets' : [
 #         'dusty floor'
 #     ]
 # }
@@ -58,7 +58,14 @@ class LanguageParser:
         # TODO: Might also want to strip trailing / leading whitespace (but not inner whitespace)
         # l.strip() strips the left-side whitespace, not sure on right side whitespace
         command = command.lower().lstrip()
+        object = None
+        targets = None
 
+        # Hacky way to parse a "look at" command to find the object/feature player wants to examine
+        if 'look at' in command:
+            logger.debug("YO THIS EXECUTED")
+            object = command.replace("look at ", "", 1) # replace "look at " with empty string - rest is the object
+            command = "look at"
 
 
         # This simple code just checks if the string entered by user us in one of several Lists defined in the resource
@@ -68,14 +75,19 @@ class LanguageParser:
         # ends up being returned by the parser. -- (SSH)
 
         if command in QUIT_ALIASES:
-            return QUIT
+            command = QUIT
         elif command in NEW_GAME_ALIASES:
-            return NEW_GAME
+            command = NEW_GAME
         elif command in LOAD_GAME_ALIASES:
-            return LOAD_GAME
+            command = LOAD_GAME
         elif command in HELP_ALIASES:
-            return HELP
+            command = HELP
         elif command in LOOK_ALIASES:
-            return LOOK
+            command = LOOK
+        elif command in LOOK_AT_ALIASES:
+            command = LOOK_AT
         else:
-            return INVALID_INPUT
+            command = INVALID_INPUT
+
+        logger.debug("Returning: " + str(command) + ", " + str(object) + ", " + str(targets))
+        return (command, object, targets)

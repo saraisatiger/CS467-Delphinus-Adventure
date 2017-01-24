@@ -109,13 +109,36 @@ class Room:
         return objects_string
 
 
-
     def set_visited(self, visited = True):
         '''
         Sets whether the room has been visited or not
         :return:
         '''
         self.visited = visited
+
+    def get_feature(self, feature):
+        '''
+        If the feature is in the room, returns that Feature. Called by gameclient for 'look at' verb
+        :param feature: string. The name of the feature being searched for
+        :return: The feature itself or null
+        '''
+        for room_feature in self.room_features:
+            logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() +"...")
+            if room_feature.get_name().lower() == feature.lower():
+                logger.debug("Match found!")
+                return room_feature
+            else:
+                logger.debug("Not a match!")
+
+        # If the room does not have a feature with that name, return None
+        return None
+
+    def get_object(self, object):
+        for room_object in self.objects:
+            if room_object.get_name().lower() == object.lower():
+                return room_object
+        return None
+
 
 class RoomFeature:
     '''

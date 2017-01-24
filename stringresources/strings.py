@@ -8,7 +8,8 @@
 #
 # CITATIONS
 # CITE: Used a similar concept as seen in Android app development. Android uses an XML format; I just am localizing all
-# of the strings here to one file so we can easily modify things without having to dig through code to find strings. (SSH)
+# of the strings here to one file so we can easily modify things without having to dig through code to find strings (SSH)
+# CITE: Also this is similar to how our assembly programs stored strings in one spot and just referenced by name later
 
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
@@ -45,7 +46,11 @@ HELP_MESSAGE = [
     VALID_VERB_LIST
 ]
 
+# Message used when player tries to look at something that isn't in current room/inventory
+LOOK_AT_NOT_SEEN = "You do not see that here."
+
 
 INVALID_MENU_COMMAND_MESSAGE = "That is not a valid command at the main menu"
+COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
 
 EXIT_MESSAGE = "Exiting the game, bye."

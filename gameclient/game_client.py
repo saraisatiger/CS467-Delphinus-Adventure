@@ -50,8 +50,8 @@ class GameClient:
 
 
         # Load data from files (Specifically rooms, but can do other files as well)
+        # Gamestate level details will later be loaded in the main menu loop
         self.gamestate.rooms = self.rb.load_room_data_from_file()
-        print(self.gamestate.rooms[0])
 
         # Outer loop makes game play until user decides to quit from the main menu
         while self.command is not QUIT:
@@ -111,7 +111,7 @@ class GameClient:
             else:
                 logger.debug(self.command + " : " + self.user_input)
             self.main_menu_prompt()
-            self.command = self.lp.parse_command(self.user_input)
+            self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
 
 
 
@@ -148,7 +148,7 @@ class GameClient:
 
         status = GAME_CONTINUE          # Force entry into main loop
 
-        print_long_description = False  # Override for if user just typed the 'look' command. Reset within while loop
+        print_long_description = False  # Override  if user just typed the 'look' command
 
         # Game will loop until a 'Gameover' condition is met
         while status is GAME_CONTINUE:
@@ -176,25 +176,26 @@ class GameClient:
                 #
                 # {
                 #     'verb' : 'use',
-                #     'subject' : 'broom',
-                #     'objects' : [
+                #     'object' : 'broom',
+                #     'targets' : [
                 #         'dusty floor'
                 #     ]
                 # }
                 #
                 # (SSH)
 
-            self.command = self.lp.parse_command(self.user_input)
-
+            self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
 
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 print_long_description = True
+            elif self.command is LOOK_AT:
+                self.look_at(self.object)
             else:
-                print("Either that isn't implemented yet, or you typed gibberish!") # TODO: Define in strings.py (SSH)
+                print(COMMAND_NOT_IMPLEMENTED_YET) # TODO: Define in strings.py (SSH)
 
             self.user_input = ""
-            self.command = INVALID_INPUT
+            self.command, self.object, self.targets = INVALID_INPUT, None, None
 
 
 
@@ -220,6 +221,36 @@ class GameClient:
         #
         # else:
             return GAME_CONTINUE
+
+    def look_at(self, object_name):
+        '''
+        Attempts to look at the subject
+        :param object_name: Grammatical object at which player wishes to look. Could be a feature or an object in environment
+        or in their inventory
+        :return:
+        '''
+
+        # Check of the 'object_name' is a feature of the room
+        room_feature = self.gamestate.current_location.get_feature(object_name)
+        if room_feature is not None:
+            print(room_feature.get_description())
+            return
+
+        # If not, check if object_name in room
+        room_object = self.gamestate.current_location.get_object(object_name) # TODO: Implement get_object in Room class
+        if room_object is not None:
+            print(room_object.get_description())
+            return
+
+        # If still not found, check player's inventory
+        player_object = self.gamestate.player.inventory.get_object(object_name)
+        if player_object is not None:
+            print(player_object.get_description)
+            return
+
+        # If not anywhere, must not be in this room - tell player they don't see it
+        print(LOOK_AT_NOT_SEEN)
+
 
 
 class GameState:
@@ -288,6 +319,8 @@ class Inventory:
     def __init__(self):
         self.objects = []
 
+    def get_object(self, object_name):
+        pass
 
 
 class Object:
@@ -295,6 +328,9 @@ class Object:
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
+    def get_description(self):
+        return self.description
 
     def get_environmental_description(self):
         # TODO: Implement this function (SSH)
