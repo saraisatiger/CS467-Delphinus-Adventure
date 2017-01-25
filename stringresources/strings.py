@@ -53,8 +53,13 @@ LOOK_AT_NOT_SEEN = "You do not see that here."
 PICKUP_SUCCESS_PREFIX = "You pick up the "
 PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."
 
-PICKUP_FAILURE_PREFIX = "You grasp for the non-existant "
+PICKUP_FAILURE_PREFIX = "You grasp for the non-existent "
 PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
+
+DROP_SUCCESS_PREFIX = "You drop the "
+DROP_SUCCESS_SUFFIX = " on the ground."
+DROP_FAILURE_PREFIX = "Your attempt to drop a "
+DROP_FAILURE_SUFFIX = " fails because, alas, you do not have one."
 
 INVENTORY_LIST_HEADER = "Your backpack contains: "
 INVENTORY_EMPTY = "Absolutely nothing (say it again!)"

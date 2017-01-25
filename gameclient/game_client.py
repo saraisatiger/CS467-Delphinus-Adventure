@@ -169,20 +169,20 @@ class GameClient:
             # Prompt user for input and parse the command
             self.user_input = self.ui.user_prompt()
 
-                # TODO: The language parser will have to return more than the verb. It will also need to identify the
-                #  subject (feature or object) and appropriate prepositions and such. At a minimum I'd expect the LP to
-                #  return a python dictionary of a verb that's being called and one or more subjects that are trying to
-                #  be interacted. For example "use broom on dusty floor" might return:
-                #
-                # {
-                #     'verb' : 'use',
-                #     'object' : 'broom',
-                #     'targets' : [
-                #         'dusty floor'
-                #     ]
-                # }
-                #
-                # (SSH)
+            # TODO: The language parser will have to return more than the verb. It will also need to identify the
+            #  subject (feature or object) and appropriate prepositions and such. At a minimum I'd expect the LP to
+            #  return a python dictionary of a verb that's being called and one or more subjects that are trying to
+            #  be interacted. For example "use broom on dusty floor" might return:
+            #
+            # {
+            #     'verb' : 'use',
+            #     'object' : 'broom',
+            #     'targets' : [
+            #         'dusty floor'
+            #     ]
+            # }
+            #
+            # (SSH)
 
             self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
 
@@ -202,6 +202,11 @@ class GameClient:
                 else:
                     print(PICKUP_FAILURE_PREFIX + self.object + PICKUP_FAILURE_SUFFIX)
 
+            elif self.command is DROP:
+                if self.verb_drop(self.object) is True:
+                    print(DROP_SUCCESS_PREFIX + self.object + DROP_SUCCESS_SUFFIX)
+                else:
+                    print(DROP_FAILURE_PREFIX + self.object + DROP_FAILURE_SUFFIX)
 
             elif self.command is HELP:
                 self.verb_help()
@@ -246,7 +251,7 @@ class GameClient:
         #     return GAMEOVER_LOSE
         #
         # else:
-            return GAME_CONTINUE
+        return GAME_CONTINUE
 
     def verb_look_at(self, object_name):
         '''
@@ -296,12 +301,21 @@ class GameClient:
         # TODO: if we have more complex objects player can take by stealing, this logic may be insufficient
         return False
 
+    def verb_help(self):
+        self.ui.print_help_message()
+
     def verb_inventory(self):
         inventory_description = self.gamestate.player.get_inventory_string()
         print(inventory_description)
 
-    def verb_help(self):
-        self.ui.print_help_message()
+    def verb_drop(self, object_name):
+        inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
+        if inventory_object is not None:
+            self.gamestate.player.inventory.remove_object(inventory_object)
+            self.gamestate.current_location.add_object_to_room(inventory_object)
+            return True
+        return False
+
 
 
 class GameState:
