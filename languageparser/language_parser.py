@@ -79,6 +79,10 @@ class LanguageParser:
             object = command.replace("drop ", "", 1) # replace at most one instance of "drop " with empty str
             command = "drop"
 
+        # Same thing for go
+        if 'go' in command:
+            object = command.replace("go ", "", 1)
+            command = "go"
 
         # This simple code just checks if the string entered by user us in one of several Lists defined in the resource
         # file stringresources/verbs.py. Each list is a set of aliases for each verb and it returns a simple string that
@@ -98,6 +102,8 @@ class LanguageParser:
             command = LOOK
         elif command in LOOK_AT_ALIASES:
             command = LOOK_AT
+        elif command in GO_ALIASES:
+            command = GO
         elif command in TAKE_ALIASES:
             command = TAKE
         elif command in DROP_ALIASES:

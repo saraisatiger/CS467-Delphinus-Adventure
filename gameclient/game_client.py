@@ -208,6 +208,13 @@ class GameClient:
                 else:
                     print(DROP_FAILURE_PREFIX + self.object + DROP_FAILURE_SUFFIX)
 
+            elif self.command is GO:
+                destination = self.verb_go(self.object)
+                if destination:
+                    print(GO_SUCCESS_PREFIX + destination.get_name() + GO_SUCCESS_SUFFIX)
+                else:
+                    print(GO_FAILURE_PREFIX + self.object + GO_FAILURE_SUFFIX)
+
             elif self.command is HELP:
                 self.verb_help()
 
@@ -316,6 +323,18 @@ class GameClient:
             return True
         return False
 
+    def verb_go(self, destination):
+        # See if the destination is the cardinal direction OR the name of one of the room_connections
+        for connection in self.gamestate.current_location.room_connections:
+            if connection.label.lower() == destination.lower() \
+                    or connection.cardinal_direction.lower() == destination.lower():
+                new_room = self.gamestate.get_room_by_name(connection.destination.lower())
+                if new_room:
+                    self.gamestate.set_current_location(new_room)
+                    return new_room
+                else:
+                    logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
+        return None
 
 
 class GameState:
@@ -340,8 +359,11 @@ class GameState:
         # TODO: THis lookup would be done out of the GameState.rooms[] list of course
         self.current_location = room
 
-
-
+    def get_room_by_name(self, room_name):
+        for room in self.rooms:
+            if room.name.lower() == room_name.lower():
+                return room
+        return None
 
 
 class UserInterface:

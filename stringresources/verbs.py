@@ -58,7 +58,9 @@ DROP = 'drop'
 INVENTORY_ALIASES = {'inventory', 'backpack', 'bag'}
 INVENTORY = 'inventory'
 
-
+# GO
+GO_ALIASES = {'go'}
+GO = "go"
 
 
 INVALID_INPUT = 'invalid command'

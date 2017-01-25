@@ -64,6 +64,15 @@ DROP_FAILURE_SUFFIX = " fails because, alas, you do not have one."
 INVENTORY_LIST_HEADER = "Your backpack contains: "
 INVENTORY_EMPTY = "Absolutely nothing (say it again!)"
 
+
+# Movement related
+GO_SUCCESS_PREFIX = "You head off towards the "
+GO_SUCCESS_SUFFIX = " without a problem."
+GO_FAILURE_PREFIX = "You try to go to the "
+GO_FAILURE_SUFFIX = " but just can't find a way."
+
+
+
 INVALID_MENU_COMMAND_MESSAGE = "That is not a valid command at the main menu"
 COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
 
