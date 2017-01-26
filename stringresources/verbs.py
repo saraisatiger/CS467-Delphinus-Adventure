@@ -1,6 +1,6 @@
 # DELPHINUS - ADVENTURE APP
 # CS 467 - Winter 2017
-# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+# Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 #
 # verbs.py
 # Description:  Used by language parser - possibly a temporary solution to parsing the commands.

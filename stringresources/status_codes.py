@@ -1,6 +1,6 @@
 # DELPHINUS - ADVENTURE APP
 # CS 467 - Winter 2017
-# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+# Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 #
 # status_codes.py
 # Description:  Used by game engine

@@ -1,6 +1,6 @@
 # DELPHINUS - ADVENTURE APP
 # CS 467 - Winter 2017
-# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+# Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 
 # room.py
 # Description: Room class and related / composite classes
@@ -214,5 +214,5 @@ class RoomConnection:
         Get the sting as required per specifications for this particular connection
         :return: string
         '''
-        description = "To the " + self.cardinal_direction + " you see " + self.description + "."
+        description = "To the " + self.cardinal_direction + " you see " + self.description + ". "
         return description

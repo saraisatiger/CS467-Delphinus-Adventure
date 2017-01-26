@@ -1,6 +1,6 @@
 # DELPHINUS - ADVENTURE APP
 # CS 467 - Winter 2017
-# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+# Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 #
 # language_parser.py
 # Description: Class used to parse the language and return relevant components
@@ -91,10 +91,15 @@ class LanguageParser:
         # ends up being returned by the parser. -- (SSH)
 
         if command in QUIT_ALIASES:
-            command = QUIT
+            # TODO: Added this to avoid keyboard interrupts midgame (hashems)
+            # command = QUIT
+            # print(EXIT_MESSAGE)
+            sys.exit()
         elif command in NEW_GAME_ALIASES:
+            # TODO: Pass game_client.main_loop() to here? (hashems)
             command = NEW_GAME
         elif command in LOAD_GAME_ALIASES:
+            # TODO: Load game state from saved json here? (hashems)
             command = LOAD_GAME
         elif command in HELP_ALIASES:
             command = HELP
