@@ -92,9 +92,9 @@ class LanguageParser:
 
         if command in QUIT_ALIASES:
             # TODO: Added this to avoid keyboard interrupts midgame (hashems)
-            # command = QUIT
+            command = QUIT
             # print(EXIT_MESSAGE)
-            sys.exit()
+            # sys.exit()
         elif command in NEW_GAME_ALIASES:
             # TODO: Pass game_client.main_loop() to here? (hashems)
             command = NEW_GAME
