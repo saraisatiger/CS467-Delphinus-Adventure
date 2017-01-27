@@ -41,6 +41,9 @@ class GameClient:
         self.command = INVALID_INPUT
         self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME , HELP }
 
+        # Clear old console text before beginning game
+        self.ui.clear_screen()
+
         # Initiate main loop upon instantiation, as it should only ever be called once
         self.main_loop()
 
@@ -329,7 +332,7 @@ class GameClient:
 
     def verb_inventory(self):
         inventory_description = self.gamestate.player.get_inventory_string()
-        self.ui.print_status_header()
+        self.ui.print_status_header(self.gamestate)
         print(inventory_description)
         self.ui.user_prompt()
 
