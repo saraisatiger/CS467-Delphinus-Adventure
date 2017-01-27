@@ -7,8 +7,11 @@
 # Principal Author of this file per Project plan: Shawn Hillyer
 
 # CITATIONS
-# CITE:
+# CITE: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
+# CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
 
+import os
+import platform
 
 from languageparser.language_parser import LanguageParser
 from fileio.room_builder import RoomBuilder
@@ -406,20 +409,33 @@ class UserInterface:
     '''
     Primarily used to print information to the user's screen
     '''
+
     def __init__(self):
         # TODO: why can't reference this inside input() call in user_prompt(), or just make a stringresource variable (SSH)
-        self.prompt_text = ">> "
+        self.prompt_text = PROMPT_TEXT
+
+        # Determine OS and set variable to call correct system calls for clearing screen etc
+        # CITE: http://stackoverflow.com/questions/1854/how-to-check-what-os-am-i-running-on-in-python
+        operating_system = platform.system()
+        if operating_system == 'Linux':
+            logger.debug("System is Linux")
+            self.op_system = 'Linux'
+        elif operating_system == 'Windows':
+            logger.debug("System is Windows")
+            self.op_system = 'Windows'
+
 
     def print_introduction(self):
         print(INTRO_STRING)
 
     def print_main_menu(self):
+        self.clear_screen()
         for line in MAIN_MENU_LINES:
             print(line)
 
     def user_prompt(self):
         user_input = ""  # TODO: Test if I can delete this line or not  (SSH)
-        user_input = input(">> ")
+        user_input = input(self.prompt_text)
         return user_input
 
     def print_help_message(self):
@@ -429,6 +445,14 @@ class UserInterface:
     def print_quit_confirm(self, message):
         print(message)
 
+    def clear_screen(self):
+        # Cite: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
+        if self.op_system == "Windows":
+            os.system('cls')
+        elif self.op_system == "Linux":
+            os.system('clear')
+        else:
+            pass
 
 class Player:
     '''

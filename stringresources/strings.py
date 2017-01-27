@@ -31,6 +31,8 @@ MAIN_MENU_LINES = [
 ]
 
 
+PROMPT_TEXT = ">> "
+
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load saved game..."
 SAVE_GAME_MESSAGE = "This would be a menu to save the game..."
