@@ -186,6 +186,7 @@ class GameClient:
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 print_long_description = True
+                self.ui.clear_screen()
 
             elif self.command is LOOK_AT:
                 self.verb_look_at(self.object)
@@ -388,8 +389,6 @@ class GameClient:
         before. Used for 'look' command
         :return:
         '''
-
-        self.ui.clear_screen()
 
         if self.gamestate.current_location.visited is False or print_long_description is True:
             description= self.gamestate.current_location.get_long_description()
