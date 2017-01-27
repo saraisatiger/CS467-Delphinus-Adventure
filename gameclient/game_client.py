@@ -95,6 +95,8 @@ class GameClient:
                 elif exit_code is GAMEOVER_LOAD:
                     print("Game over: Player loading game")
                     self.load_game_menu()
+                    self.reset_input_and_command()
+                    self.play_game()
                 elif exit_code is GAMEOVER_QUIT:
                     print("Game over: Player quit")
                     self.reset_input_and_command()
@@ -207,6 +209,14 @@ class GameClient:
             elif self.command is HELP:
                 self.verb_help()
 
+            elif self.command is LOAD_GAME:
+                load_confirmed = self.verb_quit(LOAD_CONFIRM_PROMPT)
+                if load_confirmed == True:
+                    status = GAMEOVER_LOAD
+
+            elif self.command is SAVE_GAME:
+                self.save_game_menu()
+
             elif self.command is CHEATCODE_WIN:
                 status = self.verb_cheat_win()
 
@@ -214,7 +224,7 @@ class GameClient:
                 status = self.verb_cheat_lose()
 
             elif self.command is QUIT:
-                quit_confirmed = self.verb_quit()
+                quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
                 if quit_confirmed == True:
                     status = GAMEOVER_QUIT
 
@@ -346,8 +356,8 @@ class GameClient:
         print(GAMEOVER_CHEAT_LOSE_MESSAGE)
         return GAMEOVER_FORFEIT
 
-    def verb_quit(self):
-        self.ui.print_quit_confirm()
+    def verb_quit(self, message):
+        self.ui.print_quit_confirm(message)
         confirm = self.ui.user_prompt().lower()
         if confirm in YES_ALIASES:
             return True
@@ -357,6 +367,9 @@ class GameClient:
         # Reset the input and command/object/targets from parser
         self.user_input = ""
         self.command, self.object, self.targets = INVALID_INPUT, None, None
+
+    def save_game_menu(self):
+        print(SAVE_GAME_MESSAGE)
 
 
 class GameState:
@@ -412,8 +425,8 @@ class UserInterface:
         for line in HELP_MESSAGE:
             print(line)
 
-    def print_quit_confirm(self):
-        print(QUIT_CONFIRM_PROMPT)
+    def print_quit_confirm(self, message):
+        print(message)
 
 
 class Player:

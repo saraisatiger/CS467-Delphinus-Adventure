@@ -33,7 +33,9 @@ MAIN_MENU_LINES = [
 
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load saved game..."
-QUIT_CONFIRM_PROMPT = "Are you sure you wish to quit this game and go to the main menu? (Y)es or (N)o"
+SAVE_GAME_MESSAGE = "This would be a menu to save the game..."
+LOAD_CONFIRM_PROMPT = "Loading a game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
+QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
 YES_ALIASES = {'yes', 'y'}
 
 

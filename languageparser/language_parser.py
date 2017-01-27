@@ -96,11 +96,11 @@ class LanguageParser:
             # print(EXIT_MESSAGE)
             # sys.exit()
         elif command in NEW_GAME_ALIASES:
-            # TODO: Pass game_client.main_loop() to here? (hashems)
             command = NEW_GAME
         elif command in LOAD_GAME_ALIASES:
-            # TODO: Load game state from saved json here? (hashems)
             command = LOAD_GAME
+        elif command in SAVE_GAME_ALIASES:
+            command = SAVE_GAME
         elif command in HELP_ALIASES:
             command = HELP
         elif command in LOOK_ALIASES:
@@ -115,7 +115,6 @@ class LanguageParser:
             command = DROP
         elif command in INVENTORY_ALIASES:
             command = INVENTORY
-
         # cheat codes
         elif command == "mess with the best":
             command = CHEATCODE_LOSE
