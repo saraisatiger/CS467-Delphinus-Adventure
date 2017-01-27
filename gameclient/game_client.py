@@ -248,6 +248,8 @@ class GameClient:
         # TODO: Set each room to have correct objects
 
         # FOR TESTING PURPOSES:
+        # TODO: Need to make sure initialize new game clears ALL gamestate variables. At present, starting new game
+        # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there
         skateboard = Object("Skateboard", "A trendy skateboard with the text 'Z3R0 C007' inked on its surface")
         self.gamestate.current_location.add_object_to_room(skateboard)
 
