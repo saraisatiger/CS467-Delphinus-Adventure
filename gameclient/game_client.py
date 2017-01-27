@@ -207,10 +207,10 @@ class GameClient:
                 self.verb_help()
 
             elif self.command is CHEATCODE_WIN:
-                self.verb_cheat_win()
+                status = self.verb_cheat_win()
 
             elif self.command is CHEATCODE_LOSE:
-                self.verb_cheat_lose()
+                status = self.verb_cheat_lose()
 
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit()
@@ -336,10 +336,12 @@ class GameClient:
         return None
 
     def verb_cheat_win(self):
-        pass
+        print(GAMEOVER_CHEAT_WIN_MESSAGE)
+        return GAMEOVER_WIN
 
     def verb_cheat_lose(self):
-        pass
+        print(GAMEOVER_CHEAT_LOSE_MESSAGE)
+        return GAMEOVER_FORFEIT
 
     def verb_quit(self):
         self.ui.print_quit_confirm()

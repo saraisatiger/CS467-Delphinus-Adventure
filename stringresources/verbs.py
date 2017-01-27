@@ -64,8 +64,8 @@ GO = "go"
 
 # CHEAT CODES
 CHEATCODE_WIN_ALIASES = {'die like the rest'}
-CHEATCODE_WIN = 'cheatcode-win'
+CHEATCODE_WIN = 'cheatcode win'
 CHEATCODE_LOSE_ALIASES = {'mess with the best'}
-CHEATCODE_LOSE = 'cheatcode-win'
+CHEATCODE_LOSE = 'cheatcode lose'
 
 INVALID_INPUT = 'invalid command'

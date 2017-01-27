@@ -111,6 +111,12 @@ class LanguageParser:
         elif command in INVENTORY_ALIASES:
             command = INVENTORY
 
+        # cheat codes
+        elif command == "mess with the best":
+            command = CHEATCODE_LOSE
+        elif command == "die like the rest":
+            command = CHEATCODE_WIN
+
         else:
             command = INVALID_INPUT
 

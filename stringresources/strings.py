@@ -77,4 +77,8 @@ GO_FAILURE_SUFFIX = " but just can't find a way."
 INVALID_MENU_COMMAND_MESSAGE = "That is not a valid command at the main menu"
 COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
 
+# Gameover messages
+GAMEOVER_CHEAT_WIN_MESSAGE = "Too cool for this game, eh? Well, you win!"
+GAMEOVER_CHEAT_LOSE_MESSAGE = "Game too hard for you, script kiddie? L2Play, noob!"
+
 EXIT_MESSAGE = "Exiting the game, bye."
