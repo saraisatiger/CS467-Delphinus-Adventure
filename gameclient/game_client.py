@@ -329,7 +329,10 @@ class GameClient:
 
     def verb_inventory(self):
         inventory_description = self.gamestate.player.get_inventory_string()
+        self.ui.print_status_header()
         print(inventory_description)
+        self.ui.user_prompt()
+
 
     def verb_drop(self, object_name):
         inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
