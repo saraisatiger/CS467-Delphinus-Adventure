@@ -17,8 +17,26 @@
     {
       "label": "Arcade",
       "cardinal_direction": "North",
-      "description": "an exciting sign for an arcade",
+      "description": "an exciting sign for an Arcade",
       "destination": "Arcade"
+    },
+    {
+      "label": "Subway",
+      "cardinal_direction": "South",
+      "description": "the door to the alley leading to the Subway station",
+      "destination": "Subway"
+    },
+    {
+      "label": "Hall",
+      "cardinal_direction": "East",
+      "description": "the main hall of Central High",
+      "destination": "Hall"
+    },
+    {
+      "label": "Pawn Shop",
+      "cardinal_direction": "West",
+      "description": "a great place to buy and sell goods",
+      "destination": "Pawn Shop"
     }
   ]
 }

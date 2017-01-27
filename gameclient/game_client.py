@@ -1,6 +1,6 @@
 # DELPHINUS - ADVENTURE APP
 # CS 467 - Winter 2017
-# Team Members: Sara Hashem:, Shawn Hillyer, Niza Volair
+# Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 
 # game_client.py
 # Description: GameClient class and closely-related classes
@@ -65,6 +65,7 @@ class GameClient:
             elif self.command is LOAD_GAME:
                 self.load_game_menu()
             # Or exit the game...
+        # TODO: Exit program on quit
             elif self.command is QUIT:
                 print(EXIT_MESSAGE)
                 sys.exit()
