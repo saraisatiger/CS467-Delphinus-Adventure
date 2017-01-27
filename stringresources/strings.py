@@ -32,6 +32,8 @@ MAIN_MENU_LINES = [
 
 
 PROMPT_TEXT = ">> "
+STATUS_HEADER_BAR = "+----------------------------------------------------------------------+"
+
 
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load saved game..."

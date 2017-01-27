@@ -75,9 +75,11 @@ class GameClient:
             # Or print the help menu
             elif self.command is HELP:
                 self.ui.print_help_message()
-            # If the command was invalid, an error message will display and later on the command and input is cleared
-            else:
-                print(INVALID_MENU_COMMAND_MESSAGE)
+            ### I think this block of logic never executes, Commented block out. Delete before turning in midterm
+            # # If the command was invalid, an error message will display and later on the command and input is cleared
+            # else:
+            #     print(INVALID_MENU_COMMAND_MESSAGE)
+            ### END invalid block
 
 
             # ONLY IF Player decided to play the game, gamestate has already been initialized in the if/else above
@@ -116,6 +118,8 @@ class GameClient:
             if firstPass:
                 firstPass = False
             else:
+                self.ui.clear_screen()
+                print(INVALID_MENU_COMMAND_MESSAGE + "\n\n")
                 logger.debug(self.command + " : " + self.user_input)
             self.main_menu_prompt()
             self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
@@ -151,7 +155,9 @@ class GameClient:
         and/or why game ended.
         '''
 
-        print(NEW_GAME_MESSAGE)         # Defined in stringresources\strings.py
+        self.ui.new_game_splash_screen()
+
+
 
         status = GAME_CONTINUE          # Force entry into main loop
 
@@ -165,14 +171,8 @@ class GameClient:
             if status in GAMEOVER_STATES:  # list as defined in stringresources\status_codes.py
                 return status
 
-
-            # Print appropriate Room description. Long if room never visited or player used "look" command
-            if self.gamestate.current_location.visited is False or print_long_description is True:
-                print(self.gamestate.current_location.get_long_description())
-                self.gamestate.current_location.set_visited()
-                print_long_description = False
-            else:
-                print(self.gamestate.current_location.get_short_description())
+            # Print the current room's appropriate description
+            self.print_room_description(print_long_description)
 
             # Prompt user for input and parse the command
             self.user_input = self.ui.user_prompt()
@@ -375,6 +375,26 @@ class GameClient:
     def save_game_menu(self):
         print(SAVE_GAME_MESSAGE)
 
+    def print_room_description(self, print_long_description):
+        '''
+        First clear the screen then determine correct version to print.
+        :param print_long_description: If set to true, forces long description to print even if user has been in room
+        before. Used for 'look' command
+        :return:
+        '''
+
+        self.ui.clear_screen()
+
+        if self.gamestate.current_location.visited is False or print_long_description is True:
+            description= self.gamestate.current_location.get_long_description()
+        else:
+            description = self.gamestate.current_location.get_short_description()
+
+        self.ui.print_status_header(self.gamestate)
+        print(description)
+        self.gamestate.current_location.set_visited()
+        print_long_description = False
+
 
 class GameState:
     '''
@@ -429,7 +449,6 @@ class UserInterface:
         print(INTRO_STRING)
 
     def print_main_menu(self):
-        self.clear_screen()
         for line in MAIN_MENU_LINES:
             print(line)
 
@@ -453,6 +472,18 @@ class UserInterface:
             os.system('clear')
         else:
             pass
+
+    def new_game_splash_screen(self):
+        self.clear_screen()
+        print(NEW_GAME_MESSAGE)  # Defined in stringresources\strings.py
+
+    def print_status_header(self, gamestate):
+        print(STATUS_HEADER_BAR)
+        print("|\tSPEED: " + str(gamestate.player.speed))
+        print("|\tCOOLNESS: " + str(gamestate.player.coolness))
+        print("|\tCURRENT LOCATION: " + gamestate.current_location.get_name())
+        print(STATUS_HEADER_BAR)
+
 
 class Player:
     '''
