@@ -251,7 +251,8 @@ class GameClient:
 
     def initialize_new_game(self):
         logger.debug("A new game would be initialized here")
-        self.gamestate.set_current_location(self.gamestate.rooms[0])
+        street = self.gamestate.get_room_by_name("Street")
+        self.gamestate.set_current_location(street)
 
         # TODO: Set player state / inventory
 

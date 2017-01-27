@@ -36,12 +36,12 @@ class RoomBuilder:
         or loaded. Returns ALL rooms as a list.
         '''
         rooms = []
-        roomsDir = './gamedata/rooms/*.json'
-        roomsFiles =  glob.glob(roomsDir)
+        rooms_dir = './gamedata/rooms/*.json'
+        rooms_files =  glob.glob(rooms_dir)
 
         # Load room content from directory
         # TODO: Determine logical order; for now, based on Project Plan (hashems)
-        for room in roomsFiles:
+        for room in rooms_files:
             with open(room) as room:
                 room_properties = json.load(room)
                 new_room = Room(room_properties)
