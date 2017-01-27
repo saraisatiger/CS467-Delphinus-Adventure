@@ -32,8 +32,9 @@ MAIN_MENU_LINES = [
 
 
 NEW_GAME_MESSAGE = "Starting a new game."
-LOAD_GAME_MESSAGE = "Let's load saved game."
-
+LOAD_GAME_MESSAGE = "Let's load saved game..."
+QUIT_CONFIRM_PROMPT = "Are you sure you wish to quit this game and go to the main menu? (Y)es or (N)o"
+YES_ALIASES = {'yes', 'y'}
 
 
 # Prints when a user uses the 'help' verb
@@ -75,5 +76,9 @@ GO_FAILURE_SUFFIX = " but just can't find a way."
 
 INVALID_MENU_COMMAND_MESSAGE = "That is not a valid command at the main menu"
 COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
+
+# Gameover messages
+GAMEOVER_CHEAT_WIN_MESSAGE = "Too cool for this game, eh? Well, you win!"
+GAMEOVER_CHEAT_LOSE_MESSAGE = "Game too hard for you, script kiddie? L2Play, noob!"
 
 EXIT_MESSAGE = "Exiting the game, bye."

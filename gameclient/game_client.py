@@ -94,10 +94,11 @@ class GameClient:
                 elif exit_code is GAMEOVER_LOAD:
                     print("Game over: Player loading game")
                     self.load_game_menu()
+                elif exit_code is GAMEOVER_QUIT:
+                    print("Game over: Player quit")
+                    self.reset_input_and_command()
 
-            # Set these back to default values to ensure we don't enter endless loop
-            self.command = INVALID_INPUT
-            self.user_input = ""
+            self.reset_input_and_command()
 
     def main_menu_loop(self):
         '''
@@ -148,12 +149,13 @@ class GameClient:
 
         status = GAME_CONTINUE          # Force entry into main loop
 
-        print_long_description = False  # Override  if user just typed the 'look' command
+        print_long_description = False  # Override if user just typed the 'look' command
 
         # Game will loop until a 'Gameover' condition is met
         while status is GAME_CONTINUE:
             # Check game status; if Gameover, leave game loop and return status code
             status = self.game_status()
+
             if status in GAMEOVER_STATES:  # list as defined in stringresources\status_codes.py
                 return status
 
@@ -169,21 +171,7 @@ class GameClient:
             # Prompt user for input and parse the command
             self.user_input = self.ui.user_prompt()
 
-            # TODO: The language parser will have to return more than the verb. It will also need to identify the
-            #  subject (feature or object) and appropriate prepositions and such. At a minimum I'd expect the LP to
-            #  return a python dictionary of a verb that's being called and one or more subjects that are trying to
-            #  be interacted. For example "use broom on dusty floor" might return:
-            #
-            # {
-            #     'verb' : 'use',
-            #     'object' : 'broom',
-            #     'targets' : [
-            #         'dusty floor'
-            #     ]
-            # }
-            #
-            # (SSH)
-
+            # TODO: Update this once languageparser fully implemented
             self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
 
             # Conditionally handle each possible verb / command
@@ -218,13 +206,24 @@ class GameClient:
             elif self.command is HELP:
                 self.verb_help()
 
+            elif self.command is CHEATCODE_WIN:
+                status = self.verb_cheat_win()
+
+            elif self.command is CHEATCODE_LOSE:
+                status = self.verb_cheat_lose()
+
+            elif self.command is QUIT:
+                quit_confirmed = self.verb_quit()
+                if quit_confirmed == True:
+                    status = GAMEOVER_QUIT
+
             else:
                 print(COMMAND_NOT_IMPLEMENTED_YET)
 
 
-            # Reset the input and command/object/targets from parser
-            self.user_input = ""
-            self.command, self.object, self.targets = INVALID_INPUT, None, None
+            self.reset_input_and_command()
+        return status
+
 
 
 
@@ -336,6 +335,26 @@ class GameClient:
                     logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
         return None
 
+    def verb_cheat_win(self):
+        print(GAMEOVER_CHEAT_WIN_MESSAGE)
+        return GAMEOVER_WIN
+
+    def verb_cheat_lose(self):
+        print(GAMEOVER_CHEAT_LOSE_MESSAGE)
+        return GAMEOVER_FORFEIT
+
+    def verb_quit(self):
+        self.ui.print_quit_confirm()
+        confirm = self.ui.user_prompt().lower()
+        if confirm in YES_ALIASES:
+            return True
+        return False
+
+    def reset_input_and_command(self):
+        # Reset the input and command/object/targets from parser
+        self.user_input = ""
+        self.command, self.object, self.targets = INVALID_INPUT, None, None
+
 
 class GameState:
     '''
@@ -389,6 +408,9 @@ class UserInterface:
     def print_help_message(self):
         for line in HELP_MESSAGE:
             print(line)
+
+    def print_quit_confirm(self):
+        print(QUIT_CONFIRM_PROMPT)
 
 
 class Player:
