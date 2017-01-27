@@ -62,5 +62,10 @@ INVENTORY = 'inventory'
 GO_ALIASES = {'go'}
 GO = "go"
 
+# CHEAT CODES
+CHEATCODE_WIN_ALIASES = {'die like the rest'}
+CHEATCODE_WIN = 'cheatcode-win'
+CHEATCODE_LOSE_ALIASES = {'mess with the best'}
+CHEATCODE_LOSE = 'cheatcode-win'
 
 INVALID_INPUT = 'invalid command'
