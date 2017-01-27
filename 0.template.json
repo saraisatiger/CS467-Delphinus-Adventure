@@ -1,0 +1,42 @@
+{
+  "name" : "",
+  "long_description" : "",
+  "short_description" : "",
+  "visited" : false,
+  "room_features" : [
+      {
+        "name" : "",
+        "description" : ""
+      },
+      {
+        "name" : "",
+        "description" : ""
+      }
+  ],
+  "room_connections" : [
+    {
+      "label": "",
+      "cardinal_direction": "North",
+      "description": "",
+      "destination": ""
+    },
+    {
+      "label": "",
+      "cardinal_direction": "South",
+      "description": "",
+      "destination": ""
+    },
+    {
+      "label": "",
+      "cardinal_direction": "East",
+      "description": "",
+      "destination": ""
+    },
+    {
+      "label": "",
+      "cardinal_direction": "West",
+      "description": "",
+      "destination": ""
+    }
+  ]
+}
