@@ -148,17 +148,14 @@ class Room:
         return None
 
     def add_object_to_room(self, object):
-        # TODO: Test this function
         self.objects.append(object)
 
 
     def remove_object_from_room(self, object):
-        # TODO: Test this function
         self.objects.remove(object)
 
 
     def remove_object_from_room_by_name(self, object_name):
-        # TODO: Test this function
         object_to_remove = self.get_object_by_name(object_name)
         if object_to_remove is not None:
             self.remove_object_from_room(object_to_remove)
