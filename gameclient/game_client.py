@@ -287,7 +287,6 @@ class GameClient:
         :return: None
         '''
 
-
         # Check of the 'object_name' is a feature of the room
         room_feature = self.gamestate.current_location.get_feature(object_name)
         room_object = self.gamestate.current_location.get_object_by_name(object_name)
@@ -330,7 +329,8 @@ class GameClient:
 
     def verb_inventory(self):
         inventory_description = self.gamestate.player.get_inventory_string()
-        print(inventory_description)
+        print(INVENTORY_LIST_HEADER)
+        print(inventory_description + "\n\n")
         self.ui.wait_for_enter()
 
 
@@ -516,9 +516,8 @@ class Player:
         self.inventory.remove_object(object)
 
     def get_inventory_string(self):
-        list = self.inventory.get_inventory_string()
-        print(INVENTORY_LIST_HEADER)
-        print(list + "\n\n")
+        return self.inventory.get_inventory_string()
+
 
 
 
@@ -536,10 +535,9 @@ class Inventory:
         :return:
         '''
         # TODO: Test function
-        for object in self.objects:
-            if object.name.lower() == object.name.lower():
-                return object
-
+        for inventory_object in self.objects:
+            if inventory_object.name.lower() == object_name.lower():
+                return inventory_object
         return None
 
 
