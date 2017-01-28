@@ -14,6 +14,8 @@ import os
 import platform
 
 from languageparser.language_parser import LanguageParser
+from gameclient.player import *
+from gameclient.object import *
 from fileio.room_builder import RoomBuilder
 from stringresources.strings import *
 from stringresources.verbs import *
@@ -510,95 +512,3 @@ class UserInterface:
 
     def print_inventory_footer(self):
         print(INVENTORY_LIST_FOOTER)
-
-
-class Player:
-    '''
-    Player stats and methods
-    '''
-    def __init__(self):
-        self.cash = 0
-        self.coolness = 0
-        self.speed = 0
-        self.inventory = Inventory()
-
-    def add_object_to_inventory(self, object):
-        self.inventory.add_object(object)
-
-    def remove_object_from_inventory(self, object):
-        self.inventory.remove_object(object)
-
-    def get_inventory_string(self):
-        return self.inventory.get_inventory_string()
-
-
-
-
-class Inventory:
-    '''
-    Objects and methods related to adding and removing them from inventory
-    '''
-    def __init__(self):
-        self.objects = []
-
-    def get_object_by_name(self, object_name):
-        '''
-        Finds an object in the inventory by name and returns a reference to it
-        :param object_name:
-        :return:
-        '''
-        # TODO: Test function
-        for inventory_object in self.objects:
-            if inventory_object.name.lower() == object_name.lower():
-                return inventory_object
-        return None
-
-
-    def add_object(self, object):
-        self.objects.append(object)
-
-
-    def remove_object(self, object):
-        self.objects.remove(object)
-
-    def get_inventory_string(self):
-        '''
-        Get a comma-delineated list of the objects in the inventory
-        :return:
-        '''
-        if self.objects:
-            inventory_size = len(self.objects)
-            count = 0
-            inventory_string = ""
-            for object in self.objects:
-                count += 1
-                inventory_string += object.get_name()
-                if count is not inventory_size:
-                    inventory_string += "\n"
-            return inventory_string
-        return INVENTORY_EMPTY
-
-
-
-
-
-class Object:
-    '''
-    An object. Can be in a Room or players inventory.
-     Can be picked up from a room, dropped in a room, used, 'look at'ed, and possibly other actions
-    '''
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-
-    def get_description(self):
-        return self.description
-
-    def get_name(self):
-        return self.name
-
-    def get_environmental_description(self):
-        # TODO: Refine the output of this function somewhat? Could give objects unique environmental descriptions but
-        # TODO: 1depending on the room they are in it wouldn't make sense once dropped somewhere else(SSH)
-        description = "You see a " + self.name + " laying around."
-        return description
