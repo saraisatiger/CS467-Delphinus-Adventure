@@ -7,8 +7,11 @@
 # Principal Author of this file per Project plan: Shawn Hillyer
 
 # CITATIONS
-# CITE:
+# CITE: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
+# CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
 
+import os
+import platform
 
 from languageparser.language_parser import LanguageParser
 from fileio.room_builder import RoomBuilder
@@ -37,6 +40,9 @@ class GameClient:
         self.user_input = ""
         self.command = INVALID_INPUT
         self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME , HELP }
+
+        # Clear old console text before beginning game
+        self.ui.clear_screen()
 
         # Initiate main loop upon instantiation, as it should only ever be called once
         self.main_loop()
@@ -72,9 +78,11 @@ class GameClient:
             # Or print the help menu
             elif self.command is HELP:
                 self.ui.print_help_message()
-            # If the command was invalid, an error message will display and later on the command and input is cleared
-            else:
-                print(INVALID_MENU_COMMAND_MESSAGE)
+            ### I think this block of logic never executes, Commented block out. Delete before turning in midterm
+            # # If the command was invalid, an error message will display and later on the command and input is cleared
+            # else:
+            #     print(INVALID_MENU_COMMAND_MESSAGE)
+            ### END invalid block
 
 
             # ONLY IF Player decided to play the game, gamestate has already been initialized in the if/else above
@@ -113,6 +121,8 @@ class GameClient:
             if firstPass:
                 firstPass = False
             else:
+                self.ui.clear_screen()
+                print(INVALID_MENU_COMMAND_MESSAGE + "\n\n")
                 logger.debug(self.command + " : " + self.user_input)
             self.main_menu_prompt()
             self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
@@ -148,7 +158,9 @@ class GameClient:
         and/or why game ended.
         '''
 
-        print(NEW_GAME_MESSAGE)         # Defined in stringresources\strings.py
+        self.ui.new_game_splash_screen()
+
+
 
         status = GAME_CONTINUE          # Force entry into main loop
 
@@ -162,14 +174,9 @@ class GameClient:
             if status in GAMEOVER_STATES:  # list as defined in stringresources\status_codes.py
                 return status
 
-
-            # Print appropriate Room description. Long if room never visited or player used "look" command
-            if self.gamestate.current_location.visited is False or print_long_description is True:
-                print(self.gamestate.current_location.get_long_description())
-                self.gamestate.current_location.set_visited()
-                print_long_description = False
-            else:
-                print(self.gamestate.current_location.get_short_description())
+            # Print the current room's appropriate description
+            self.verb_look(print_long_description)
+            print_long_description = False # Reset this to false after printing
 
             # Prompt user for input and parse the command
             self.user_input = self.ui.user_prompt()
@@ -180,9 +187,11 @@ class GameClient:
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 print_long_description = True
+                self.ui.clear_screen()
 
             elif self.command is LOOK_AT:
                 self.verb_look_at(self.object)
+
 
             elif self.command is INVENTORY:
                 self.verb_inventory()
@@ -194,10 +203,7 @@ class GameClient:
                     print(PICKUP_FAILURE_PREFIX + self.object + PICKUP_FAILURE_SUFFIX)
 
             elif self.command is DROP:
-                if self.verb_drop(self.object) is True:
-                    print(DROP_SUCCESS_PREFIX + self.object + DROP_SUCCESS_SUFFIX)
-                else:
-                    print(DROP_FAILURE_PREFIX + self.object + DROP_FAILURE_SUFFIX)
+                self.verb_drop(self.object)
 
             elif self.command is GO:
                 destination = self.verb_go(self.object)
@@ -281,26 +287,24 @@ class GameClient:
         :return: None
         '''
 
+
         # Check of the 'object_name' is a feature of the room
         room_feature = self.gamestate.current_location.get_feature(object_name)
-        if room_feature is not None:
-            print(room_feature.get_description())
-            return
-
-        # If not, check if object_name in room
-        room_object = self.gamestate.current_location.get_object_by_name(object_name) # TODO: Implement get_object_by_name in Room class
-        if room_object is not None:
-            print(room_object.get_description())
-            return
-
-        # If still not found, check player's inventory
+        room_object = self.gamestate.current_location.get_object_by_name(object_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(object_name)
-        if player_object is not None:
-            print(player_object.get_description())
-            return
 
-        # If not anywhere, must not be in this room - tell player they don't see it
-        print(LOOK_AT_NOT_SEEN)
+        if room_feature is not None:
+            description = room_feature.get_description()
+        elif room_object is not None:
+            description = room_object.get_description()
+        elif player_object is not None:
+            description = player_object.get_description()
+        else:
+            description = LOOK_AT_NOT_SEEN
+
+        print(description)
+        self.ui.wait_for_enter()
+
 
     def verb_take(self, object_name):
         '''
@@ -310,31 +314,37 @@ class GameClient:
         :return: True (success), False ( fail, object_name not found in the room)
         '''
 
-        # TODO: Test this function
-
         # See if the room has the object before trying to update Room and player Inventory
         room_object = self.gamestate.current_location.get_object_by_name(object_name)
         if room_object is not None:
             self.gamestate.current_location.remove_object_from_room(room_object)
             self.gamestate.player.add_object_to_inventory(room_object)
+            print(TAKE_MESSAGE_PREFIX + room_object.get_name() + TAKE_MESSAGE_SUFFIX)
+            self.ui.wait_for_enter()
             return True
-        # TODO: if we have more complex objects player can take by stealing, this logic may be insufficient
         return False
 
     def verb_help(self):
         self.ui.print_help_message()
+        self.ui.wait_for_enter()
 
     def verb_inventory(self):
         inventory_description = self.gamestate.player.get_inventory_string()
         print(inventory_description)
+        self.ui.wait_for_enter()
+
 
     def verb_drop(self, object_name):
         inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
         if inventory_object is not None:
             self.gamestate.player.inventory.remove_object(inventory_object)
             self.gamestate.current_location.add_object_to_room(inventory_object)
-            return True
-        return False
+            print(DROP_SUCCESS_PREFIX + self.object + DROP_SUCCESS_SUFFIX)
+        else:
+            print(DROP_FAILURE_PREFIX + self.object + DROP_FAILURE_SUFFIX)
+            return False
+        self.ui.wait_for_enter()
+
 
     def verb_go(self, destination):
         # See if the destination is the cardinal direction OR the name of one of the room_connections
@@ -350,14 +360,17 @@ class GameClient:
         return None
 
     def verb_cheat_win(self):
+        self.ui.clear_screen()
         print(GAMEOVER_CHEAT_WIN_MESSAGE)
         return GAMEOVER_WIN
 
     def verb_cheat_lose(self):
+        self.ui.clear_screen()
         print(GAMEOVER_CHEAT_LOSE_MESSAGE)
         return GAMEOVER_FORFEIT
 
     def verb_quit(self, message):
+        self.ui.clear_screen()
         self.ui.print_quit_confirm(message)
         confirm = self.ui.user_prompt().lower()
         if confirm in YES_ALIASES:
@@ -371,6 +384,26 @@ class GameClient:
 
     def save_game_menu(self):
         print(SAVE_GAME_MESSAGE)
+        self.ui.wait_for_enter()
+
+    def verb_look(self, print_long_description):
+        '''
+        First clear the screen then determine correct version to print.
+        :param print_long_description: If set to true, forces long description to print even if user has been in room
+        before. Used for 'look' command
+        :return:
+        '''
+        self.ui.clear_screen()
+
+        if self.gamestate.current_location.visited is False or print_long_description is True:
+            description= self.gamestate.current_location.get_long_description()
+        else:
+            description = self.gamestate.current_location.get_short_description()
+
+        self.ui.print_status_header(self.gamestate)
+        print(description)
+        self.gamestate.current_location.set_visited()
+
 
 
 class GameState:
@@ -406,9 +439,21 @@ class UserInterface:
     '''
     Primarily used to print information to the user's screen
     '''
+
     def __init__(self):
         # TODO: why can't reference this inside input() call in user_prompt(), or just make a stringresource variable (SSH)
-        self.prompt_text = ">> "
+        self.prompt_text = PROMPT_TEXT
+
+        # Determine OS and set variable to call correct system calls for clearing screen etc
+        # CITE: http://stackoverflow.com/questions/1854/how-to-check-what-os-am-i-running-on-in-python
+        operating_system = platform.system()
+        if operating_system == 'Linux':
+            logger.debug("System is Linux")
+            self.op_system = 'Linux'
+        elif operating_system == 'Windows':
+            logger.debug("System is Windows")
+            self.op_system = 'Windows'
+
 
     def print_introduction(self):
         print(INTRO_STRING)
@@ -419,7 +464,7 @@ class UserInterface:
 
     def user_prompt(self):
         user_input = ""  # TODO: Test if I can delete this line or not  (SSH)
-        user_input = input(">> ")
+        user_input = input(self.prompt_text)
         return user_input
 
     def print_help_message(self):
@@ -428,6 +473,30 @@ class UserInterface:
 
     def print_quit_confirm(self, message):
         print(message)
+
+    def clear_screen(self):
+        # Cite: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
+        if self.op_system == "Windows":
+            os.system('cls')
+        elif self.op_system == "Linux":
+            os.system('clear')
+        else:
+            pass
+
+    def new_game_splash_screen(self):
+        self.clear_screen()
+        print(NEW_GAME_MESSAGE)  # Defined in stringresources\strings.py
+
+    def print_status_header(self, gamestate):
+        print(STATUS_HEADER_BAR)
+        print("|\tSPEED: " + str(gamestate.player.speed))
+        print("|\tCOOLNESS: " + str(gamestate.player.coolness))
+        print("|\tCURRENT LOCATION: " + gamestate.current_location.get_name())
+        print(STATUS_HEADER_BAR)
+
+    def wait_for_enter(self):
+        input(PRESS_KEY_TO_CONTINUE_MSG)
+        self.clear_screen()
 
 
 class Player:
