@@ -329,8 +329,9 @@ class GameClient:
 
     def verb_inventory(self):
         inventory_description = self.gamestate.player.get_inventory_string()
-        print(INVENTORY_LIST_HEADER)
-        print(inventory_description + "\n\n")
+        self.ui.print_inventory_header()
+        print(inventory_description)
+        self.ui.print_inventory_footer()
         self.ui.wait_for_enter()
 
 
@@ -400,7 +401,9 @@ class GameClient:
         else:
             description = self.gamestate.current_location.get_short_description()
 
+        # We print the status header using the gamestate information, then the description
         self.ui.print_status_header(self.gamestate)
+        self.ui.print_description_header()
         print(description)
         self.gamestate.current_location.set_visited()
 
@@ -486,6 +489,7 @@ class UserInterface:
     def new_game_splash_screen(self):
         self.clear_screen()
         print(NEW_GAME_MESSAGE)  # Defined in stringresources\strings.py
+        self.wait_for_enter()
 
     def print_status_header(self, gamestate):
         print(STATUS_HEADER_BAR)
@@ -497,6 +501,15 @@ class UserInterface:
     def wait_for_enter(self):
         input(PRESS_KEY_TO_CONTINUE_MSG)
         self.clear_screen()
+
+    def print_description_header(self):
+        print(DESCRIPTION_HEADER)
+
+    def print_inventory_header(self):
+        print(INVENTORY_LIST_HEADER)
+
+    def print_inventory_footer(self):
+        print(INVENTORY_LIST_FOOTER)
 
 
 class Player:
@@ -561,9 +574,7 @@ class Inventory:
                 count += 1
                 inventory_string += object.get_name()
                 if count is not inventory_size:
-                    inventory_string += ", "
-                else:
-                    inventory_string += "."
+                    inventory_string += "\n"
             return inventory_string
         return INVENTORY_EMPTY
 
