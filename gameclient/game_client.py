@@ -36,8 +36,6 @@ class GameClient:
         # Instantiate unenforced singleton-style instances of various components
         self.ui = UserInterface()
         self.lp = LanguageParser()
-        self.ob = ObjectBuilder()
-        self.rb = RoomBuilder()
 
         # Variables used to store GameClient state
         self.user_input = ""
@@ -60,7 +58,7 @@ class GameClient:
 
         # Load data from files (Specifically rooms, but can do other files as well)
         # Gamestate level details will later be loaded in the main menu loop
-        self.gamestate.rooms = self.rb.load_room_data_from_file()
+        self.gamestate.rooms = self.gamestate.rb.load_room_data_from_file()
 
         # Outer loop makes game play until user decides to quit from the main menu
         while self.command is not QUIT:
@@ -70,7 +68,7 @@ class GameClient:
 
             # After that, we can either initialize a new or loaded game into the GameState using GameClient Methods..
             if self.command is NEW_GAME:
-                self.initialize_new_game()
+                self.gamestate.initialize_new_game()
             elif self.command is LOAD_GAME:
                 self.load_game_menu()
             # Or exit the game...
@@ -81,12 +79,6 @@ class GameClient:
             # Or print the help menu
             elif self.command is HELP:
                 self.ui.print_help_message()
-            ### I think this block of logic never executes, Commented block out. Delete before turning in midterm
-            # # If the command was invalid, an error message will display and later on the command and input is cleared
-            # else:
-            #     print(INVALID_MENU_COMMAND_MESSAGE)
-            ### END invalid block
-
 
             # ONLY IF Player decided to play the game, gamestate has already been initialized in the if/else above
             if self.command is NEW_GAME or self.command is LOAD_GAME:
@@ -130,8 +122,6 @@ class GameClient:
             self.main_menu_prompt()
             self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
 
-
-
     def main_menu_prompt(self):
         '''
         Prints the main menu then prompts the user for input one time
@@ -152,8 +142,6 @@ class GameClient:
         else:
             return False
 
-
-
     def play_game(self):
         '''
         Primary game loop that prints information to user, reads input, and reacts accordingly
@@ -172,7 +160,7 @@ class GameClient:
         # Game will loop until a 'Gameover' condition is met
         while status is GAME_CONTINUE:
             # Check game status; if Gameover, leave game loop and return status code
-            status = self.game_status()
+            status = self.gamestate.game_status()
 
             if status in GAMEOVER_STATES:  # list as defined in stringresources\status_codes.py
                 return status
@@ -250,44 +238,20 @@ class GameClient:
         Sets appropriate variables in the GameClient's gamestate instance
         :return:
         '''
-        # TODO: Implement this function (SSH)
+        # TODO: Implement this function ((SSH))
         print(LOAD_GAME_MESSAGE)
 
-    def initialize_new_game(self):
-        logger.debug("A new game would be initialized here")
-        street = self.gamestate.get_room_by_name("Street")
-        self.gamestate.set_current_location(street)
+        # TODO: This should ultimately result in a self.gamestate.load_game(filename) call (not implemented ((SSH))
 
-        # TODO: Set player state / inventory
-
-        # Let ObjectBuilder return list of all games and default locations, then iterate through those objects
-        # and populate the rooms with those objects
-        game_objects = self.ob.get_game_objects()
-
-        for object in game_objects:
-            room_name = object.get_default_location_name()
-            room = self.gamestate.get_room_by_name(room_name)
-            room.add_object_to_room(object)
-
-        # FOR TESTING PURPOSES:
-        # TODO: Need to make sure initialize new game clears ALL gamestate variables. At present, starting new game
-        # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there
-
-
-    def game_status(self):
-        # TODO: Implement this properly. Status codes in stringresources\status_codes.py
-        # This function should/will check if player has won or lost(died/whatever)
-        # if self.gamestate.player.speed is 0:
-        #     return GAMEOVER_LOSE
-        #
-        # else:
-        return GAME_CONTINUE
+    def save_game_menu(self):
+        print(SAVE_GAME_MESSAGE)
+        self.ui.wait_for_enter()
 
     def verb_look_at(self, object_name):
         '''
         Attempts to look at the subject
-        :param object_name: Grammatical object at which player wishes to look. Could be a feature or an object in environment
-        or in their inventory
+        :param object_name: Grammatical object at which player wishes to look.
+                            Could be a feature or an object in environment or in their inventory
         :return: None
         '''
 
@@ -387,9 +351,7 @@ class GameClient:
         self.user_input = ""
         self.command, self.object, self.targets = INVALID_INPUT, None, None
 
-    def save_game_menu(self):
-        print(SAVE_GAME_MESSAGE)
-        self.ui.wait_for_enter()
+
 
     def verb_look(self, print_long_description):
         '''
@@ -420,6 +382,9 @@ class GameState:
     def __init__(self):
         self.rooms = []
         self.player = Player()
+        self.ob = ObjectBuilder()
+        self.rb = RoomBuilder()
+
 
     def load_rooms_from_files(self):
         # TODO: Possibly delete this method, the GameClient is currently responsible for calling its room builder instance
@@ -440,6 +405,36 @@ class GameState:
             if room.name.lower() == room_name.lower():
                 return room
         return None
+
+    def initialize_new_game(self):
+        logger.debug("A new game would be initialized here")
+        street = self.get_room_by_name("Street")
+        self.set_current_location(street)
+
+        # TODO: Set player state / inventory
+
+        # Let ObjectBuilder return list of all games and default locations, then iterate through those objects
+        # and populate the rooms with those objects
+        game_objects = self.ob.get_game_objects()
+
+        for object in game_objects:
+            room_name = object.get_default_location_name()
+            room = self.get_room_by_name(room_name)
+            room.add_object_to_room(object)
+
+        # FOR TESTING PURPOSES:
+        # TODO: Need to make sure initialize new game clears ALL gamestate variables. At present, starting new game
+        # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there
+
+
+    def game_status(self):
+        # TODO: Implement this properly. Status codes in stringresources\status_codes.py
+        # This function should/will check if player has won or lost(died/whatever)
+        # if self.gamestate.player.speed is 0:
+        #     return GAMEOVER_LOSE
+        #
+        # else:
+        return GAME_CONTINUE
 
 
 class UserInterface:
