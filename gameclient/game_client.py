@@ -36,6 +36,7 @@ class GameClient:
         # Instantiate unenforced singleton-style instances of various components
         self.ui = UserInterface()
         self.lp = LanguageParser()
+        self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
 
         # Variables used to store GameClient state
@@ -244,11 +245,6 @@ class GameClient:
         return status
 
 
-
-
-
-
-
     def load_game_menu(self):
         '''
         Sets appropriate variables in the GameClient's gamestate instance
@@ -264,13 +260,19 @@ class GameClient:
 
         # TODO: Set player state / inventory
 
-        # TODO: Set each room to have correct objects
+        # Let ObjectBuilder return list of all games and default locations, then iterate through those objects
+        # and populate the rooms with those objects
+        game_objects = self.ob.get_game_objects()
+
+        for object in game_objects:
+            room_name = object.get_default_location_name()
+            room = self.gamestate.get_room_by_name(room_name)
+            room.add_object_to_room(object)
 
         # FOR TESTING PURPOSES:
         # TODO: Need to make sure initialize new game clears ALL gamestate variables. At present, starting new game
         # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there
-        skateboard = Object("Skateboard", "A trendy skateboard with the text 'Z3R0 C007' inked on its surface")
-        self.gamestate.current_location.add_object_to_room(skateboard)
+
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in stringresources\status_codes.py
