@@ -32,6 +32,7 @@ MAIN_MENU_LINES = [
 
 
 PROMPT_TEXT = ">> "
+PRESS_KEY_TO_CONTINUE_MSG = ">>>> Press [Enter] to continue. <<<<"
 STATUS_HEADER_BAR = "+----------------------------------------------------------------------+"
 
 
@@ -67,6 +68,9 @@ DROP_SUCCESS_PREFIX = "You drop the "
 DROP_SUCCESS_SUFFIX = " on the ground."
 DROP_FAILURE_PREFIX = "Your attempt to drop a "
 DROP_FAILURE_SUFFIX = " fails because, alas, you do not have one."
+
+TAKE_MESSAGE_PREFIX = "You take the "
+TAKE_MESSAGE_SUFFIX = " and placed it in your backpack.\n\n"
 
 INVENTORY_LIST_HEADER = "Your backpack contains: "
 INVENTORY_EMPTY = "Absolutely nothing (say it again!)"
