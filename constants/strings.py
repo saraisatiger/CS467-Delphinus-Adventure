@@ -61,7 +61,6 @@ LOOK_AT_NOT_SEEN = "You do not see that here."
 # Inventory-related strings
 PICKUP_SUCCESS_PREFIX = "You pick up the "
 PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."
-
 PICKUP_FAILURE_PREFIX = "You grasp for the non-existent "
 PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
 
@@ -69,9 +68,6 @@ DROP_SUCCESS_PREFIX = "You drop the "
 DROP_SUCCESS_SUFFIX = " on the ground."
 DROP_FAILURE_PREFIX = "Your attempt to drop a "
 DROP_FAILURE_SUFFIX = " fails because, alas, you do not have one."
-
-TAKE_MESSAGE_PREFIX = "You take the "
-TAKE_MESSAGE_SUFFIX = " and placed it in your backpack."
 
 INVENTORY_LIST_HEADER = "========================================\nBackpack Contents\n----------------------------------------"
 INVENTORY_LIST_FOOTER = "========================================"

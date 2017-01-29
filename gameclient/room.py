@@ -9,7 +9,7 @@
 # CITATIONS
 # CITE:
 
-from stringresources.strings import *
+from constants.strings import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class Room:
         Get the "long description" version of the room's description
         :return: string representing full length description
         '''
-        full_description = self.long_description + self.get_supplemental_description()
+        full_description = self.long_description + "\n" +  self.get_supplemental_description()
         return full_description
 
     def get_short_description(self):
