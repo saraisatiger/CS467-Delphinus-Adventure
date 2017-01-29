@@ -34,7 +34,7 @@ class Object:
     def get_environmental_description(self):
         # TODO: Refine the output of this function somewhat? Could give objects unique environmental descriptions but
         # TODO: 1depending on the room they are in it wouldn't make sense once dropped somewhere else(SSH)
-        description = "You see a " + self.name + " laying around."
+        description = "You see a " + self.name + " in the area."
         return description
 
 class ObjectBuilder:

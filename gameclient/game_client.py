@@ -31,7 +31,6 @@ class GameClient:
     '''
     def __init__(self):
         self.gamestate = GameState()
-        self.gamestate.load_rooms_from_files()
 
         # Instantiate unenforced singleton-style instances of various components
         self.ui = UserInterface()
@@ -66,13 +65,12 @@ class GameClient:
             # Inner loop runs the main menu and prompts until a valid command is entered
             self.main_menu_loop()
 
-            # After that, we can either initialize a new or loaded game into the GameState using GameClient Methods..
+            # Branch initializes a new game or ends up loading a game, quits, or just prints the help and loops
             if self.command is NEW_GAME:
                 self.gamestate.initialize_new_game()
             elif self.command is LOAD_GAME:
                 self.load_game_menu()
             # Or exit the game...
-        # TODO: Exit program on quit
             elif self.command is QUIT:
                 print(EXIT_MESSAGE)
                 sys.exit()
@@ -80,7 +78,7 @@ class GameClient:
             elif self.command is HELP:
                 self.ui.print_help_message()
 
-            # ONLY IF Player decided to play the game, gamestate has already been initialized in the if/else above
+            # This logic exits ONLY IF Player decided to play game. GameState initialized in the if/elif structure above
             if self.command is NEW_GAME or self.command is LOAD_GAME:
                 # Actually playing the game will eventually terminate for one of the below reasons
                 # We handle each case separately because if a player forfeits and does not save,
@@ -111,14 +109,15 @@ class GameClient:
         Prints the main menu and sets self.command until command is set to a proper value
         :return: indirectly - sets instance variable, self.command, to a valid command
         '''
-        firstPass = True
-        while not self.is_valid_menu_command(self. command):
-            if firstPass:
-                firstPass = False
+        # first_pass logic is to ensure we don't print invalid command to the user unless it's their second attempt
+        first_pass = True
+        while not self.is_valid_menu_command(self.command):
+            if first_pass:
+                first_pass = False
             else:
                 self.ui.clear_screen()
-                print(INVALID_MENU_COMMAND_MESSAGE + "\n\n")
-                logger.debug(self.command + " : " + self.user_input)
+                print(self.user_input + INVALID_MENU_COMMAND_MESSAGE + "\n\n")
+                self.ui.wait_for_enter()
             self.main_menu_prompt()
             self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
 
@@ -151,8 +150,6 @@ class GameClient:
 
         self.ui.new_game_splash_screen()
 
-
-
         status = GAME_CONTINUE          # Force entry into main loop
 
         print_long_description = False  # Override if user just typed the 'look' command
@@ -177,12 +174,12 @@ class GameClient:
 
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
+                # The verb_look() method is called at the top of each loop, so not explicitly called here
                 print_long_description = True
                 self.ui.clear_screen()
 
             elif self.command is LOOK_AT:
                 self.verb_look_at(self.object)
-
 
             elif self.command is INVENTORY:
                 self.verb_inventory()
@@ -224,11 +221,11 @@ class GameClient:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
                 if quit_confirmed == True:
                     status = GAMEOVER_QUIT
-
             else:
+                # TODO: This should be a different string once every verb is implemented
                 print(COMMAND_NOT_IMPLEMENTED_YET)
 
-
+            # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
             self.reset_input_and_command()
         return status
 
@@ -244,6 +241,7 @@ class GameClient:
         # TODO: This should ultimately result in a self.gamestate.load_game(filename) call (not implemented ((SSH))
 
     def save_game_menu(self):
+        # TODO: Implement the save game menu and logic ((SSH))
         print(SAVE_GAME_MESSAGE)
         self.ui.wait_for_enter()
 
@@ -297,9 +295,7 @@ class GameClient:
 
     def verb_inventory(self):
         inventory_description = self.gamestate.player.get_inventory_string()
-        self.ui.print_inventory_header()
-        print(inventory_description)
-        self.ui.print_inventory_footer()
+        self.ui.print_inventory(inventory_description)
         self.ui.wait_for_enter()
 
 
@@ -385,19 +381,14 @@ class GameState:
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
 
-
-    def load_rooms_from_files(self):
-        # TODO: Possibly delete this method, the GameClient is currently responsible for calling its room builder instance
-        logger.debug("Loading rooms from files (This is a stub)")
-
     def set_current_location(self, room):
         '''
         Update the location the player is in
         :param room: The room the player is in (actual room)
         :return: N/A
         '''
-        # TODO: Decide if we should set this by reference or by doing a room.name lookup and then setting it to that room
-        # TODO: THis lookup would be done out of the GameState.rooms[] list of course
+        # TODO: Decide if we should set this by reference or by doing a room.name lookup and then setting it to that room ((SSH))
+        # TODO: THis lookup would be done out of the GameState.rooms[] list of course ((SSH))
         self.current_location = room
 
     def get_room_by_name(self, room_name):
@@ -407,28 +398,34 @@ class GameState:
         return None
 
     def initialize_new_game(self):
-        logger.debug("A new game would be initialized here")
+        # TODO: Need to make sure initialize new game clears ALL gamestate variables. At present, starting new game ((SSH))
+        # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there ((SSH))
+        # TODO: Set player state ((SSH))
+
+        # Clear out the objects and set visited status == false for every room
+        for room in self.rooms:
+            room.set_visited(False)
+            room.objects = []
+
+        # Get reference to the starting room and set it as current location
         street = self.get_room_by_name("Street")
         self.set_current_location(street)
 
-        # TODO: Set player state / inventory
-
-        # Let ObjectBuilder return list of all games and default locations, then iterate through those objects
-        # and populate the rooms with those objects
+        # Get a list of every object in game. Each object has a default location so we can put in each room or inventory
         game_objects = self.ob.get_game_objects()
 
         for object in game_objects:
             room_name = object.get_default_location_name()
-            room = self.get_room_by_name(room_name)
-            room.add_object_to_room(object)
+            if room_name.lower() == "inventory":
+                self.player.add_object_to_inventory(object)
+            else:
+                room = self.get_room_by_name(room_name)
+                room.add_object_to_room(object)
 
-        # FOR TESTING PURPOSES:
-        # TODO: Need to make sure initialize new game clears ALL gamestate variables. At present, starting new game
-        # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there
 
 
     def game_status(self):
-        # TODO: Implement this properly. Status codes in stringresources\status_codes.py
+        # TODO: Implement this properly. Status codes in stringresources\status_codes.py  ((SSH))
         # This function should/will check if player has won or lost(died/whatever)
         # if self.gamestate.player.speed is 0:
         #     return GAMEOVER_LOSE
@@ -504,8 +501,7 @@ class UserInterface:
     def print_description_header(self):
         print(DESCRIPTION_HEADER)
 
-    def print_inventory_header(self):
+    def print_inventory(self, inventory_description):
         print(INVENTORY_LIST_HEADER)
-
-    def print_inventory_footer(self):
+        print(inventory_description)
         print(INVENTORY_LIST_FOOTER)

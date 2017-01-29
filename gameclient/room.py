@@ -17,24 +17,16 @@ logger = logging.getLogger(__name__)
 
 class Room:
     '''
-    A room has at least 2 features, a long and short description, and has either been visited or not
+    Specifications: A room has at least 2 features, a long and short description, and has either been visited or not
 
     Each room can have 0 or more room connections, each of which must be able to be accessed by typing
-    the .name for that connection, the cardinal direction, and various combination of either and the verb go,
-    so the connections are encapsulated in their own class
+    the .name for that connection, the cardinal direction, and various combination of either. 'go' in front optional
 
     The room features are encapsulated as they can be examined by typing in their name and this gives a
     description.
 
     Rooms can also have objects in them that can be picked up or dropped by the player.
 
-    TODO: Implement methods to get a list of valid objects, features, and "exits" (connections). This would be
-     used in order to check the command (noun and verb, for example) that is returned by the langauge parser
-     and determine if the player's command is valid.
-
-     TODO: Implement method to pick up objects in the room
-
-     TODO: (Possibly) Subclasses for room-specific functionality
     '''
     def __init__(self, properties):
         logger.debug("Room initialized")
@@ -56,8 +48,9 @@ class Room:
                 room_connection = RoomConnection(room_connection_properties)
                 self.room_connections.append(room_connection)
 
-        # TODO: Determine if Objects located in rooms are set per the room JSON files or loaded programatically elsewhere
-        self.objects = [] # Room starts with no objects
+        # Room starts with no objects. The ObjectBuilder class makes the objects, the new game or load game initializers
+        # are responsible for populating the rooms/inventory with objects
+        self.objects = []
 
     def get_name(self):
         return self.name
@@ -174,22 +167,12 @@ class RoomFeature:
     def __init__(self, properties):
         self.name = properties['name']
         self.description = properties['description']
-        # TODO: I think known_to_player should be tracked either by a game state or player state dictionary
-        # TODO: (SSH) Not sure we even need this variable?
-        # self.known_to_player = properties['known_to_player']
 
     def get_name(self):
         return self.name
 
     def get_description(self):
         return self.description
-
-    # TODO: Delete these two methods related to known_to_player if not used (SSH)
-    # def is_known_to_player(self):
-    #     return self.known_to_player
-
-    # def discover(self):
-    #     self.known_to_player = True
 
 
 class RoomConnection:

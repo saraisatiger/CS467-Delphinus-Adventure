@@ -85,7 +85,7 @@ GO_FAILURE_SUFFIX = " but just can't find a way."
 
 
 
-INVALID_MENU_COMMAND_MESSAGE = "That is not a valid command at the main menu"
+INVALID_MENU_COMMAND_MESSAGE = " is not a valid command at the main menu"
 COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
 
 # Gameover messages
