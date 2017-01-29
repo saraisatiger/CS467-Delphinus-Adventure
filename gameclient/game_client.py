@@ -16,6 +16,7 @@ import platform
 from languageparser.language_parser import LanguageParser
 from gameclient.player import *
 from gameclient.object import *
+from fileio.save_game import *
 from fileio.room_builder import RoomBuilder
 from stringresources.strings import *
 from stringresources.verbs import *
@@ -254,8 +255,8 @@ class GameClient:
         '''
 
         # Check of the 'object_name' is a feature of the room
-        room_feature = self.gamestate.current_location.get_feature(object_name)
-        room_object = self.gamestate.current_location.get_object_by_name(object_name)
+        room_feature = self.gamestate.get_current_room().get_feature(object_name)
+        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(object_name)
 
         if room_feature is not None:
@@ -280,9 +281,9 @@ class GameClient:
         '''
 
         # See if the room has the object before trying to update Room and player Inventory
-        room_object = self.gamestate.current_location.get_object_by_name(object_name)
+        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
         if room_object is not None:
-            self.gamestate.current_location.remove_object_from_room(room_object)
+            self.gamestate.get_current_room().remove_object_from_room(room_object)
             self.gamestate.player.add_object_to_inventory(room_object)
             print(TAKE_MESSAGE_PREFIX + room_object.get_name() + TAKE_MESSAGE_SUFFIX)
             self.ui.wait_for_enter()
@@ -303,7 +304,7 @@ class GameClient:
         inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
         if inventory_object is not None:
             self.gamestate.player.inventory.remove_object(inventory_object)
-            self.gamestate.current_location.add_object_to_room(inventory_object)
+            self.gamestate.get_current_room().add_object_to_room(inventory_object)
             print(DROP_SUCCESS_PREFIX + self.object + DROP_SUCCESS_SUFFIX)
         else:
             print(DROP_FAILURE_PREFIX + self.object + DROP_FAILURE_SUFFIX)
@@ -313,7 +314,7 @@ class GameClient:
 
     def verb_go(self, destination):
         # See if the destination is the cardinal direction OR the name of one of the room_connections
-        for connection in self.gamestate.current_location.room_connections:
+        for connection in self.gamestate.get_current_room().room_connections:
             if connection.label.lower() == destination.lower() \
                     or connection.cardinal_direction.lower() == destination.lower():
                 new_room = self.gamestate.get_room_by_name(connection.destination.lower())
@@ -358,16 +359,16 @@ class GameClient:
         '''
         self.ui.clear_screen()
 
-        if self.gamestate.current_location.visited is False or print_long_description is True:
-            description= self.gamestate.current_location.get_long_description()
+        if self.gamestate.get_current_room().visited is False or print_long_description is True:
+            description= self.gamestate.get_current_room().get_long_description()
         else:
-            description = self.gamestate.current_location.get_short_description()
+            description = self.gamestate.get_current_room().get_short_description()
 
         header_info = self.gamestate.get_header_info()
         self.ui.print_status_header(header_info)
 
         self.ui.print_room_description(description)
-        self.gamestate.current_location.set_visited()
+        self.gamestate.get_current_room().set_visited()
 
 
 
@@ -389,7 +390,7 @@ class GameState:
         '''
         # TODO: Decide if we should set this by reference or by doing a room.name lookup and then setting it to that room ((SSH))
         # TODO: THis lookup would be done out of the GameState.rooms[] list of course ((SSH))
-        self.current_location = room
+        self.current_room = room
 
     def get_room_by_name(self, room_name):
         for room in self.rooms:
@@ -410,29 +411,39 @@ class GameState:
         self.place_objects_in_rooms(game_objects)
 
 
-# TODO: Finish fleshing out these ideas; I think loading/saving should be one of the last things to implement as it's
-# TODO: hard to know what we will need to save etc.   FOR NOW: I'm just building a SaveGame class to store all the data
-# and will keep expanding it
-    # def initialize_load_game(self, filename):
-    #     self.set_room_vars_to_default()
-    #
-    #     save_game = SaveGame(filename)
-    #
-    #     # Set each room's visited status
-    #     visited_rooms = save_game.get_visited_rooms()
-    #     for room in visited_rooms:
-    #         room.set_visited(True)
-    #
-    #     rooms_objects = save_game.get_objects_in_rooms()
-    #     for room_object in room_objects:
-    #         room_object.
-    #
-    #
-    #     self.set_current_room()
-    #     game_objects = self.ob.load_objects_from_savegame(filename)
-    #
-    #     # Get a list of every object in game. Each object has a default location so we can put in each room or inventory
-    #     self.place_objects_in_rooms(game_objects)
+    def initialize_load_game(self, filename):
+        # TODO: Finish fleshing out these ideas and test this function. Will require constant tweaking of this and the SaveGame
+        # TODO: class because of the interdependence, unless better plan is developed ((SSH))
+        # TODO: Write UNIT TESTS for this code, entirely untested
+        self.set_room_vars_to_default()
+
+        save_game = SaveGame(None)
+        save_game.load_from_file(filename)
+
+        # Set each room's visited status
+        visited_rooms_list = save_game.get_visited_rooms_list()
+        for room_name in visited_rooms_list:
+            room = self.get_room_by_name(room_name)
+            room.set_visited(True)
+
+        # Retrieve the dictionary of room_name : [object_list] pairs and iterate through, setting each room's objects
+        # to the list in the SaveGame object
+        room_objects_dictionary = save_game.get_objects_in_rooms()
+        for room_name in room_objects_dictionary:
+            room = self.get_room_by_name(room_name)
+            if room:
+                for room_objects in room_objects_dictionary[room_name]:
+                    room.set_objects(room_objects)
+            else:
+                logger.debug("Error finding the room stored in a SaveGame object")
+
+        # Also set the current_room
+        current_room_name = save_game.get_current_room()
+        current_room = self.get_room_by_name(current_room_name)
+        self.set_current_room(current_room)
+
+
+
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in stringresources\status_codes.py  ((SSH))
@@ -447,7 +458,7 @@ class GameState:
         header_info = {
             'speed' : self.player.speed,
             'coolness' : self.player.coolness,
-            'current_location' : self.current_location.get_name()
+            'current_room' : self.current_room.get_name()
         }
         return header_info
 
@@ -469,6 +480,8 @@ class GameState:
                 room = self.get_room_by_name(room_name)
                 room.add_object_to_room(object)
 
+    def get_current_room(self):
+        return self.current_room
 
 class UserInterface:
     '''
@@ -526,7 +539,7 @@ class UserInterface:
         print(STATUS_HEADER_BAR)
         print("|\tSPEED: " + str(info['speed']))
         print("|\tCOOLNESS: " + str(info['coolness']) )
-        print("|\tCURRENT LOCATION: " + str(info['current_location']))
+        print("|\tCURRENT LOCATION: " + str(info['current_room']))
         print(STATUS_HEADER_BAR)
 
     def wait_for_enter(self):

@@ -154,6 +154,11 @@ class Room:
             return True
         return False
 
+    def set_objects(self, object_list):
+        # Used by initialize_new_game() method in GameState class
+        self.objects = object_list
+
+
 
 class RoomFeature:
     '''
