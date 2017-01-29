@@ -29,7 +29,6 @@ class Room:
 
     '''
     def __init__(self, properties):
-        logger.debug("Room initialized")
         # Ensure the properites exist then read them into instance of Room object
         if properties:
             self.name = properties['name']

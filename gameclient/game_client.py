@@ -238,7 +238,7 @@ class GameClient:
         # TODO: Implement this function ((SSH))
         print(LOAD_GAME_MESSAGE)
 
-        # TODO: This should ultimately result in a self.gamestate.load_game(filename) call (not implemented ((SSH))
+        # TODO: This should ultimately result in a self.gamestate.initialize_load_game(filename) call (not implemented ((SSH))
 
     def save_game_menu(self):
         # TODO: Implement the save game menu and logic ((SSH))
@@ -318,7 +318,7 @@ class GameClient:
                     or connection.cardinal_direction.lower() == destination.lower():
                 new_room = self.gamestate.get_room_by_name(connection.destination.lower())
                 if new_room:
-                    self.gamestate.set_current_location(new_room)
+                    self.gamestate.set_current_room(new_room)
                     return new_room
                 else:
                     logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
@@ -363,10 +363,10 @@ class GameClient:
         else:
             description = self.gamestate.current_location.get_short_description()
 
-        # We print the status header using the gamestate information, then the description
-        self.ui.print_status_header(self.gamestate)
-        self.ui.print_description_header()
-        print(description)
+        header_info = self.gamestate.get_header_info()
+        self.ui.print_status_header(header_info)
+
+        self.ui.print_room_description(description)
         self.gamestate.current_location.set_visited()
 
 
@@ -381,7 +381,7 @@ class GameState:
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
 
-    def set_current_location(self, room):
+    def set_current_room(self, room):
         '''
         Update the location the player is in
         :param room: The room the player is in (actual room)
@@ -402,27 +402,37 @@ class GameState:
         # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there ((SSH))
         # TODO: Set player state ((SSH))
 
-        # Clear out the objects and set visited status == false for every room
-        for room in self.rooms:
-            room.set_visited(False)
-            room.objects = []
-
-        # Get reference to the starting room and set it as current location
-        street = self.get_room_by_name("Street")
-        self.set_current_location(street)
+        self.set_room_vars_to_default()
+        self.set_default_room("Street")
 
         # Get a list of every object in game. Each object has a default location so we can put in each room or inventory
         game_objects = self.ob.get_game_objects()
-
-        for object in game_objects:
-            room_name = object.get_default_location_name()
-            if room_name.lower() == "inventory":
-                self.player.add_object_to_inventory(object)
-            else:
-                room = self.get_room_by_name(room_name)
-                room.add_object_to_room(object)
+        self.place_objects_in_rooms(game_objects)
 
 
+# TODO: Finish fleshing out these ideas; I think loading/saving should be one of the last things to implement as it's
+# TODO: hard to know what we will need to save etc.   FOR NOW: I'm just building a SaveGame class to store all the data
+# and will keep expanding it
+    # def initialize_load_game(self, filename):
+    #     self.set_room_vars_to_default()
+    #
+    #     save_game = SaveGame(filename)
+    #
+    #     # Set each room's visited status
+    #     visited_rooms = save_game.get_visited_rooms()
+    #     for room in visited_rooms:
+    #         room.set_visited(True)
+    #
+    #     rooms_objects = save_game.get_objects_in_rooms()
+    #     for room_object in room_objects:
+    #         room_object.
+    #
+    #
+    #     self.set_current_room()
+    #     game_objects = self.ob.load_objects_from_savegame(filename)
+    #
+    #     # Get a list of every object in game. Each object has a default location so we can put in each room or inventory
+    #     self.place_objects_in_rooms(game_objects)
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in stringresources\status_codes.py  ((SSH))
@@ -433,6 +443,32 @@ class GameState:
         # else:
         return GAME_CONTINUE
 
+    def get_header_info(self):
+        header_info = {
+            'speed' : self.player.speed,
+            'coolness' : self.player.coolness,
+            'current_location' : self.current_location.get_name()
+        }
+        return header_info
+
+    def set_room_vars_to_default(self):
+        for room in self.rooms:
+            room.set_visited(False)
+            room.objects = []
+
+    def set_default_room(self, room_name):
+        default_room = self.get_room_by_name(room_name)
+        self.set_current_room(default_room)
+
+    def place_objects_in_rooms(self, game_objects):
+        for object in game_objects:
+            room_name = object.get_default_location_name()
+            if room_name.lower() == "inventory":
+                self.player.add_object_to_inventory(object)
+            else:
+                room = self.get_room_by_name(room_name)
+                room.add_object_to_room(object)
+
 
 class UserInterface:
     '''
@@ -440,7 +476,6 @@ class UserInterface:
     '''
 
     def __init__(self):
-        # TODO: why can't reference this inside input() call in user_prompt(), or just make a stringresource variable (SSH)
         self.prompt_text = PROMPT_TEXT
 
         # Determine OS and set variable to call correct system calls for clearing screen etc
@@ -462,13 +497,13 @@ class UserInterface:
             print(line)
 
     def user_prompt(self):
-        user_input = ""  # TODO: Test if I can delete this line or not  (SSH)
         user_input = input(self.prompt_text)
         return user_input
 
     def print_help_message(self):
         for line in HELP_MESSAGE:
             print(line)
+        self.wait_for_enter()
 
     def print_quit_confirm(self, message):
         print(message)
@@ -487,19 +522,21 @@ class UserInterface:
         print(NEW_GAME_MESSAGE)  # Defined in stringresources\strings.py
         self.wait_for_enter()
 
-    def print_status_header(self, gamestate):
+    def print_status_header(self, info):
         print(STATUS_HEADER_BAR)
-        print("|\tSPEED: " + str(gamestate.player.speed))
-        print("|\tCOOLNESS: " + str(gamestate.player.coolness))
-        print("|\tCURRENT LOCATION: " + gamestate.current_location.get_name())
+        print("|\tSPEED: " + str(info['speed']))
+        print("|\tCOOLNESS: " + str(info['coolness']) )
+        print("|\tCURRENT LOCATION: " + str(info['current_location']))
         print(STATUS_HEADER_BAR)
 
     def wait_for_enter(self):
         input(PRESS_KEY_TO_CONTINUE_MSG)
         self.clear_screen()
 
-    def print_description_header(self):
+    def print_room_description(self, description):
         print(DESCRIPTION_HEADER)
+        print(description)
+        print(DESCRIPTION_FOOTER)
 
     def print_inventory(self, inventory_description):
         print(INVENTORY_LIST_HEADER)

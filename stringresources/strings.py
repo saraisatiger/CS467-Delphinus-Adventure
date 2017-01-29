@@ -35,6 +35,7 @@ PROMPT_TEXT = ">> "
 PRESS_KEY_TO_CONTINUE_MSG = "\n>>>> Press [Enter] to continue. <<<<"
 STATUS_HEADER_BAR = "+----------------------------------------------------------------------+"
 DESCRIPTION_HEADER = "DESCRIPTION:"
+DESCRIPTION_FOOTER = "\n"
 
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load saved game..."
