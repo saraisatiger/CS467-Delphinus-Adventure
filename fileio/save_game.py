@@ -33,7 +33,7 @@ class SaveGame:
             # * The player's various stats (speed, coolness, etc.)
 
             for room in gamestate.rooms:
-                if room.visited():
+                if room.is_visited():
                     self.visited_rooms.append(room.get_name())
 
                 # Grab all the objects for *this specific room* and add to a list, then append that to dictionary
@@ -43,7 +43,7 @@ class SaveGame:
                 self.objects_in_rooms[room.get_name()] = room_objects
 
             # Read the player's inventory
-            for inventory_object in gamestate.player.inventory:
+            for inventory_object in gamestate.player.get_inventory_objects():
                 self.player_inventory.append(inventory_object)
 
 

@@ -158,6 +158,8 @@ class Room:
         # Used by initialize_new_game() method in GameState class
         self.objects = object_list
 
+    def is_visited(self):
+        return self.visited
 
 
 class RoomFeature:

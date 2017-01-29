@@ -45,9 +45,6 @@ class GameClient:
         # Clear old console text before beginning game
         self.ui.clear_screen()
 
-        # Initiate main loop upon instantiation, as it should only ever be called once
-        self.main_loop()
-
     def main_loop(self):
         '''
         Comments outline the flow of project and intended functions for now

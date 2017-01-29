@@ -30,6 +30,9 @@ class Player:
     def get_inventory_string(self):
         return self.inventory.get_inventory_string()
 
+    def get_inventory_objects(self):
+        return self.inventory.objects
+
 
 
 
