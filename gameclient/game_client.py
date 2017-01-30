@@ -161,7 +161,7 @@ class GameClient:
             if status in GAMEOVER_STATES:  # list as defined in constants\status_codes.py
                 return status
 
-            # Print the current room's appropriate description
+            # Print the current room's appropriate long_description
             self.verb_look(print_long_description)
             print_long_description = False # Reset this to false after printing
 
@@ -246,7 +246,7 @@ class GameClient:
     def verb_look(self, print_long_description):
         '''
         First clear the screen then determine correct version to print.
-        :param print_long_description: If set to true, forces long description to print even if user has been in room
+        :param print_long_description: If set to true, forces long_description to print even if user has been in room
         before. Used for 'look' command
         :return:
         '''
@@ -278,9 +278,9 @@ class GameClient:
         if room_feature is not None:
             description = room_feature.get_description()
         elif room_object is not None:
-            description = room_object.get_description()
+            description = room_object.get_long_description()
         elif player_object is not None:
-            description = player_object.get_description()
+            description = player_object.get_long_description()
         else:
             description = LOOK_AT_NOT_SEEN
 
