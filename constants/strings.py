@@ -14,7 +14,9 @@
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
-NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing interesting laying around that you can pick up."
+
+INVALID_MENU_COMMAND_MESSAGE = " is not a valid command at the main menu"
+COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
 
 # main menu related strings
 MAIN_MENU_1 = "MAIN MENU"
@@ -36,7 +38,11 @@ PRESS_KEY_TO_CONTINUE_MSG = "\n>>>> Press [Enter] to continue. <<<<"
 STATUS_HEADER_BAR = "+----------------------------------------------------------------------+"
 DESCRIPTION_HEADER = "DESCRIPTION:"
 DESCRIPTION_FOOTER = "\n"
+EXITS_HEADER = "EXITS:"
+OBJECTS_HEADER = "OBJECTS:"
 
+
+# Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load saved game..."
 SAVE_GAME_MESSAGE = "This would be a menu to save the game..."
@@ -45,7 +51,8 @@ QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress
 YES_ALIASES = {'yes', 'y'}
 
 
-# Prints when a user uses the 'help' verb
+# The HELP message
+# TODO: Make this a lot more extensive
 HELP_MESSAGE_1 = "Here's the information on how to play the game..."
 HELP_MESSAGE_2 = "Type in a command. Valid commands are: "
 VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <object>, go <direction or description>, take <object>, \ndrop <object>, inventory, hack, steal <object>, buy <object>, spraypaint, use <object or feature>\n"
@@ -55,38 +62,39 @@ HELP_MESSAGE = [
     VALID_VERB_LIST
 ]
 
-# Message used when player tries to look at something that isn't in current room/inventory
-LOOK_AT_NOT_SEEN = "You do not see that here."
 
-# Inventory-related strings
-PICKUP_SUCCESS_PREFIX = "You pick up the "
-PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."
-PICKUP_FAILURE_PREFIX = "You grasp for the non-existent "
-PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
-
+# 'drop' strings
 DROP_SUCCESS_PREFIX = "You drop the "
 DROP_SUCCESS_SUFFIX = " on the ground."
 DROP_FAILURE_PREFIX = "Your attempt to drop a "
 DROP_FAILURE_SUFFIX = " fails because, alas, you do not have one."
 
-INVENTORY_LIST_HEADER = "========================================\nBackpack Contents\n----------------------------------------"
-INVENTORY_LIST_FOOTER = "========================================"
-INVENTORY_EMPTY = "Empty... not even a floppy disk"
-
-
-# Movement related
+# 'go' strings
 GO_SUCCESS_PREFIX = "You head off towards the "
 GO_SUCCESS_SUFFIX = " without a problem."
 GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
 
+# 'Inventory' related strings
+INVENTORY_LIST_HEADER = "========================================\nBackpack Contents\n----------------------------------------"
+INVENTORY_LIST_FOOTER = "========================================"
+INVENTORY_EMPTY = "Empty... not even a floppy disk"
 
+# 'look' strings
+NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing else laying about worth taking."
 
-INVALID_MENU_COMMAND_MESSAGE = " is not a valid command at the main menu"
-COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
+# 'Look at' strings
+LOOK_AT_NOT_SEEN = "You do not see that here."
 
-# Gameover messages
+# 'take' strings
+PICKUP_SUCCESS_PREFIX = "You pick up the "
+PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."
+PICKUP_FAILURE_PREFIX = "You grasp for the non-existent "
+PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
+
+# Gameover cheating messages
 GAMEOVER_CHEAT_WIN_MESSAGE = "Too cool for this game, eh? Well, you win!"
 GAMEOVER_CHEAT_LOSE_MESSAGE = "Game too hard for you, script kiddie? L2Play, noob!"
 
+# 'exit' messages
 EXIT_MESSAGE = "Exiting the game, bye."

@@ -75,7 +75,7 @@ class Room:
         Get a string of all the connections and objects in the Room
         :return: string
         '''
-        description = "\nEXITS:\n" + self.get_connection_string() + "\nOBJECTS: \n" + self.get_object_list_string()
+        description = "\n" + OBJECTS_HEADER + "\n" + self.get_object_list_string() + "\n\n" + EXITS_HEADER + "\n" + self.get_connection_string()
         return description
 
     def get_connection_string(self):
