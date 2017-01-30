@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 
 class Room:
     '''
-    Specifications: A room has at least 2 features, a long and short description, and has either been visited or not
+    Specifications: A room has at least 2 features, a long and short long_description, and has either been visited or not
 
     Each room can have 0 or more room connections, each of which must be able to be accessed by typing
     the .name for that connection, the cardinal direction, and various combination of either. 'go' in front optional
 
     The room features are encapsulated as they can be examined by typing in their name and this gives a
-    description.
+    long_description.
 
     Rooms can also have objects in them that can be picked up or dropped by the player.
 
@@ -56,16 +56,16 @@ class Room:
 
     def get_long_description(self):
         '''
-        Get the "long description" version of the room's description
-        :return: string representing full length description
+        Get the "long long_description" version of the room's long_description
+        :return: string representing full length long_description
         '''
         full_description = self.long_description + "\n" +  self.get_supplemental_description()
         return full_description
 
     def get_short_description(self):
         '''
-        Get the "short description" version of the room's description
-        :return: string representing shortened description used after a room has been visited (visited is True)
+        Get the "short long_description" version of the room's long_description
+        :return: string representing shortened long_description used after a room has been visited (visited is True)
         '''
         full_description = self.short_description + self.get_supplemental_description()
         return full_description

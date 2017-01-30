@@ -17,19 +17,29 @@ class Object:
     def __init__(self, properties):
         if properties['name']:
             self.name = properties['name']
-        if properties['description']:
-            self.description = properties['description']
+        if properties['long_description']:
+            self.long_description = properties['long_description']
+        if properties['short_description']:
+            self.short_description = properties['short_description']
         if properties['default_location']:
             self.default_location = properties['default_location']
+        if properties['cost']:
+            self.cost = properties['cost']
 
-    def get_description(self):
-        return self.description
+    def get_long_description(self):
+        return self.long_description
+
+    def get_short_description(self):
+        return self.short_description
 
     def get_name(self):
         return self.name
 
     def get_default_location_name(self):
         return self.default_location
+
+    def get_cost(self):
+        return self.cost
 
     def get_environmental_description(self):
         # TODO: Refine the output of this function somewhat? Could give objects unique environmental descriptions but
@@ -49,7 +59,8 @@ class ObjectBuilder:
 
         skateboard = Object({
             'name' : 'Skateboard',
-            'description' : 'A trendy skateboard with the text \'Z3R0 C007\' inked on its surface',
+            'long_description' : 'A trendy skateboard with the text \'Z3R0 C007\' inked on its surface',
+            'short_description' : 'Skateboard is good',
             'default_location' : 'Street'
         })
 
