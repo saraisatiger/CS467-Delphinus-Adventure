@@ -9,6 +9,15 @@
 # CITATIONS
 # CITE:
 
+from gameclient.room import *
+
+from debug.debug import *
+logger = logging.getLogger(__name__)
+
+import json
+import glob
+
+
 class Object:
     '''
     An object. Can be in a Room or players inventory.
@@ -36,7 +45,9 @@ class Object:
         return self.name
 
     def get_default_location_name(self):
-        return self.default_location
+        if self.default_location:
+            return self.default_location
+        return None
 
     def get_cost(self):
         return self.cost
@@ -68,3 +79,26 @@ class ObjectBuilder:
         all_objects.append(skateboard)
 
         return all_objects
+
+    def load_object_data_from_file(self):
+        '''
+        Called by GameClient to instantiate all of the objects. This is called whether the game is new
+        or loaded. Returns ALL objects as a list.
+        '''
+        object_list = []
+        objects_dir = './gamedata/objects/*.json'
+        objects_files =  glob.glob(objects_dir)
+
+        # Load room content from directory
+        # TODO: Determine logical order; for now, based on Project Plan (hashems)
+        for object in objects_files:
+            with open(object) as object:
+                object_properties = json.load(object)
+                new_object = Object(object_properties)
+                object_list.append(new_object)
+
+        # DEBUG
+        # for i in rooms:
+        #     print(i.name)
+
+        return object_list

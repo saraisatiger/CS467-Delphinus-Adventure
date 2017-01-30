@@ -1,8 +1,8 @@
 {
-  "name" : "",
-  "long_description" : "",
-  "short_description" : "",
-  "default_location" : "",
-  "details" : "",
+  "name" : "template",
+  "long_description" : "template",
+  "short_description" : "template",
+  "default_location" : "template",
+  "details" : "template",
   "cost" : 0
 }

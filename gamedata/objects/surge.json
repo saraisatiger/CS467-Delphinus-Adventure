@@ -2,7 +2,7 @@
   "name" : "Surge",
   "long_description" : "neon green fizz encased in a plastic receptacle. Bright orange letter herald promise to 'Increase Output by Maximum Parameters!!' This seems legit.",
   "short_description" : "A can of caffeinated drink",
-  "default_location" : "",
+  "default_location" : "Street",
   "details" : "increases speed",
   "cost" : 0
 }

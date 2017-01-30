@@ -57,6 +57,7 @@ class GameClient:
         # Load data from files (Specifically rooms, but can do other files as well)
         # Gamestate level details will later be loaded in the main menu loop
         self.gamestate.rooms = self.gamestate.rb.load_room_data_from_file()
+        self.gamestate.objects = self.gamestate.ob.load_object_data_from_file() # Being done in the initialize_new_game()
 
         # Outer loop makes game play until user decides to quit from the main menu
         while self.command is not QUIT:
@@ -389,6 +390,7 @@ class GameState:
     '''
     def __init__(self):
         self.rooms = []
+        self.objects = []
         self.player = Player()
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
@@ -418,10 +420,7 @@ class GameState:
         self.set_room_vars_to_default()
         self.set_default_room("Street")
         self.time_left = STARTING_TIME
-
-        # Get a list of every object in game. Each object has a default location so we can put in each room or inventory
-        game_objects = self.ob.get_game_objects()
-        self.place_objects_in_rooms(game_objects)
+        self.place_objects_in_rooms(self.objects)
 
     def initialize_load_game(self, filename):
         # TODO: Finish fleshing out these ideas and test this function. Will require constant tweaking of this and the SaveGame
@@ -486,13 +485,15 @@ class GameState:
         self.set_current_room(default_room)
 
     def place_objects_in_rooms(self, game_objects):
-        for object in game_objects:
-            room_name = object.get_default_location_name()
-            if room_name.lower() == "inventory":
-                self.player.add_object_to_inventory(object)
-            else:
-                room = self.get_room_by_name(room_name)
-                room.add_object_to_room(object)
+        for game_object in game_objects:
+            room_name = game_object.get_default_location_name()
+            if room_name:
+                if room_name.lower() == "inventory":
+                    self.player.add_object_to_inventory(game_object)
+                else:
+                    room = self.get_room_by_name(room_name)
+                    if room:
+                        room.add_object_to_room(game_object)
 
     def get_current_room(self):
         return self.current_room
