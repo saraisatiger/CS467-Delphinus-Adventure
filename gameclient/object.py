@@ -23,6 +23,8 @@ class Object:
             self.short_description = properties['short_description']
         if properties['default_location']:
             self.default_location = properties['default_location']
+        if properties['cost']:
+            self.cost = properties['cost']
 
     def get_long_description(self):
         return self.long_description
@@ -35,6 +37,9 @@ class Object:
 
     def get_default_location_name(self):
         return self.default_location
+
+    def get_cost(self):
+        return self.cost
 
     def get_environmental_description(self):
         # TODO: Refine the output of this function somewhat? Could give objects unique environmental descriptions but
