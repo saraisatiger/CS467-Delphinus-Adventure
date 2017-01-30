@@ -122,7 +122,7 @@ class GameClient:
 
     def main_menu_prompt(self):
         '''
-        Prints the main menu then prompts the user for input one time
+        Prints the main menu then prompts the user for input one time_left
         :return: Indirectly - sets instance variable user_input to the string typed by user
         '''
         self.ui.print_main_menu()
@@ -175,7 +175,7 @@ class GameClient:
             if self.command is LOOK:
                 # The verb_look() method is called at the top of each loop, so not explicitly called here
                 print_long_description = True
-                self.gamestate.update_time(LOOK_COST)
+                self.gamestate.update_time_left(LOOK_COST)
                 self.ui.clear_screen()
 
             elif self.command is LOOK_AT:
@@ -259,7 +259,6 @@ class GameClient:
 
         header_info = self.gamestate.get_header_info()
         self.ui.print_status_header(header_info)
-
         self.ui.print_room_description(description)
         self.gamestate.get_current_room().set_visited()
 
@@ -285,7 +284,7 @@ class GameClient:
         else:
             description = LOOK_AT_NOT_SEEN
 
-        self.gamestate.update_time(LOOK_AT_COST)
+        self.gamestate.update_time_left(LOOK_AT_COST)
         print(description)
         self.ui.wait_for_enter()
 
@@ -304,7 +303,7 @@ class GameClient:
             self.gamestate.get_current_room().remove_object_from_room(room_object)
             self.gamestate.player.add_object_to_inventory(room_object)
             print(PICKUP_SUCCESS_PREFIX + self.object + PICKUP_SUCCESS_SUFFIX)
-            self.gamestate.update_time(TAKE_COST)
+            self.gamestate.update_time_left(TAKE_COST)
             self.ui.wait_for_enter()
             return True
         print(PICKUP_FAILURE_PREFIX + self.object + PICKUP_FAILURE_SUFFIX)
@@ -312,12 +311,12 @@ class GameClient:
 
 
     def verb_help(self):
-        self.gamestate.update_time(HELP_COST)
+        self.gamestate.update_time_left(HELP_COST)
         self.ui.print_help_message()
         self.ui.wait_for_enter()
 
     def verb_inventory(self):
-        self.gamestate.update_time(INVENTORY_COST)
+        self.gamestate.update_time_left(INVENTORY_COST)
         inventory_description = self.gamestate.player.get_inventory_string()
         self.ui.print_inventory(inventory_description)
         self.ui.wait_for_enter()
@@ -329,7 +328,7 @@ class GameClient:
             self.gamestate.player.inventory.remove_object(inventory_object)
             self.gamestate.get_current_room().add_object_to_room(inventory_object)
             print(DROP_SUCCESS_PREFIX + self.object + DROP_SUCCESS_SUFFIX)
-            self.gamestate.update_time(DROP_COST)
+            self.gamestate.update_time_left(DROP_COST)
             self.ui.wait_for_enter()
             successful = True
         else:
@@ -347,7 +346,7 @@ class GameClient:
                 if new_room:
                     self.gamestate.set_current_room(new_room)
                     print(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
-                    self.gamestate.update_time(GO_COST)
+                    self.gamestate.update_time_left(GO_COST)
                     self.ui.wait_for_enter()
                     return True
                 else:
@@ -393,7 +392,7 @@ class GameState:
         self.player = Player()
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
-        self.time = STARTING_TIME
+        self.time_left = STARTING_TIME
 
     def set_current_room(self, room):
         '''
@@ -418,6 +417,7 @@ class GameState:
 
         self.set_room_vars_to_default()
         self.set_default_room("Street")
+        self.time_left = STARTING_TIME
 
         # Get a list of every object in game. Each object has a default location so we can put in each room or inventory
         game_objects = self.ob.get_game_objects()
@@ -449,10 +449,14 @@ class GameState:
             else:
                 logger.debug("Error finding the room stored in a SaveGame object")
 
-        # Also set the current_room
+        # Set the current_room
         current_room_name = save_game.get_current_room()
         current_room = self.get_room_by_name(current_room_name)
         self.set_current_room(current_room)
+
+        # Set the time_left
+        self.time_left = save_game.get_time_left()
+
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\status_codes.py  ((SSH))
@@ -467,7 +471,8 @@ class GameState:
         header_info = {
             'speed' : self.player.speed,
             'coolness' : self.player.coolness,
-            'current_room' : self.current_room.get_name()
+            'current_room' : self.current_room.get_name(),
+            'time_left' : self.time_left
         }
         return header_info
 
@@ -492,13 +497,16 @@ class GameState:
     def get_current_room(self):
         return self.current_room
 
-    def update_time(self, time_change):
+    def update_time_left(self, time_change):
         '''
-        Update the amount of time left.
-        :param time_change: Positive --> Increases time available. Negative --> Decreases time available
+        Update the amount of time_left left.
+        :param time_change: Positive --> Increases time_left available. Negative --> Decreases time_left available
         :return: N/A
         '''
-        self.time += time_change
+        self.time_left += time_change
+
+    def get_time_left(self):
+        return self.time_left
 
 
 class UserInterface:
@@ -555,7 +563,7 @@ class UserInterface:
 
     def print_status_header(self, info):
         print(STATUS_HEADER_BAR)
-        print("|\tSPEED: " + str(info['speed']))
+        print("|\tSPEED: " + str(info['speed']) + "\tTIME LEFT: " + str(info['time_left']))
         print("|\tCOOLNESS: " + str(info['coolness']) )
         print("|\tCURRENT LOCATION: " + str(info['current_room']))
         print(STATUS_HEADER_BAR)
@@ -567,7 +575,7 @@ class UserInterface:
     def print_room_description(self, description):
         print(DESCRIPTION_HEADER)
         print(description)
-        print(DESCRIPTION_FOOTER)
+        # print(DESCRIPTION_FOOTER)
 
     def print_inventory(self, inventory_description):
         print(INVENTORY_LIST_HEADER)
