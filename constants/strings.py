@@ -55,13 +55,20 @@ YES_ALIASES = {'yes', 'y'}
 # TODO: Make this a lot more extensive
 HELP_MESSAGE_1 = "Here's the information on how to play the game..."
 HELP_MESSAGE_2 = "Type in a command. Valid commands are: "
-VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <object>, go <direction or description>, take <object>, \ndrop <object>, inventory, hack, steal <object>, buy <object>, spraypaint, use <object or feature>\n"
+VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <verb_object>, go <direction or description>, take <verb_object>, \ndrop <verb_object>, inventory, hack, steal <verb_object>, buy <verb_object>, spraypaint, use <verb_object or feature>\n"
 HELP_MESSAGE = [
     HELP_MESSAGE_1,
     HELP_MESSAGE_2,
     VALID_VERB_LIST
 ]
 
+# 'buy' strings
+BUY_NOT_IN_ROOM = "That doesn't seem to be something you can buy here."
+BUY_FREE_ITEM = "You don't have to buy that. Just take it!"
+BUY_INSUFFICIENT_CASH_PREFIX = "You lack the necessary funds to make that purchase. It would cost $"
+BUY_INSUFFICIENT_CASH_SUFFIX = " to buy that."
+BUY_SUCCESS_PREFIX = "You hand over the cash and purchase the "
+BUY_SUCCESS_SUFFIX = ", then carefully place it in your bag."
 
 # 'drop' strings
 DROP_SUCCESS_PREFIX = "You drop the "
@@ -91,6 +98,7 @@ PICKUP_SUCCESS_PREFIX = "You pick up the "
 PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."
 PICKUP_FAILURE_PREFIX = "You grasp for the non-existent "
 PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
+PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, just steal it!"
 
 # Gameover cheating messages
 GAMEOVER_CHEAT_WIN_MESSAGE = "Too cool for this game, eh? Well, you win!"

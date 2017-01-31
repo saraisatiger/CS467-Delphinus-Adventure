@@ -40,6 +40,7 @@ class GameClient:
 
         # Variables used to store GameClient state
         self.user_input = ""
+        self.verb_object = ""
         self.command = INVALID_INPUT
         self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME , HELP }
 
@@ -119,7 +120,7 @@ class GameClient:
                 print(self.user_input + INVALID_MENU_COMMAND_MESSAGE + "\n\n")
                 self.ui.wait_for_enter()
             self.main_menu_prompt()
-            self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
+            self.command, self.verb_object, self.targets = self.lp.parse_command(self.user_input)
 
     def main_menu_prompt(self):
         '''
@@ -140,6 +141,11 @@ class GameClient:
             return True
         else:
             return False
+
+    def reset_input_and_command(self):
+        # Reset the input and command/verb_object/targets from parser
+        self.user_input = ""
+        self.command, self.verb_object, self.targets = INVALID_INPUT, None, None
 
     def play_game(self):
         '''
@@ -170,7 +176,7 @@ class GameClient:
             self.user_input = self.ui.user_prompt()
 
             # TODO: Update this once languageparser fully implemented
-            self.command, self.object, self.targets = self.lp.parse_command(self.user_input)
+            self.command, self.verb_object, self.targets = self.lp.parse_command(self.user_input)
 
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
@@ -180,15 +186,15 @@ class GameClient:
                 self.ui.clear_screen()
 
             elif self.command is LOOK_AT:
-                self.verb_look_at(self.object)
+                self.verb_look_at(self.verb_object)
             elif self.command is INVENTORY:
                 self.verb_inventory()
             elif self.command is TAKE:
-                self.verb_take(self.object)
+                self.verb_take(self.verb_object)
             elif self.command is DROP:
-                self.verb_drop(self.object)
+                self.verb_drop(self.verb_object)
             elif self.command is GO:
-                self.verb_go(self.object)
+                self.verb_go(self.verb_object)
             elif self.command is HACK:
                 # TODO: Implement HACK
                 logger.debug("Hack is not yet implemented.")
@@ -197,10 +203,13 @@ class GameClient:
                 logger.debug("Steal is not yet implemented.")
             elif self.command is BUY:
                 # TODO: Implement BUY
+                self.verb_buy(self.verb_object)
                 logger.debug("Buy is not yet implemented.")
             elif self.command is SPRAYPAINT:
                 # TODO: Implement SPRAYPAINT
                 logger.debug("Spraypaint is not yet implemented.")
+            elif self.command is USE:
+                self.verb_use(self.verb_object)
             elif self.command is HELP:
                 self.verb_help()
             elif self.command is LOAD_GAME:
@@ -224,6 +233,7 @@ class GameClient:
             else:
                 # TODO: This should be a different string once every verb is implemented
                 print(COMMAND_NOT_IMPLEMENTED_YET)
+                self.ui.wait_for_enter()
 
             # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
             self.reset_input_and_command()
@@ -242,6 +252,88 @@ class GameClient:
     def save_game_menu(self):
         # TODO: Implement the save game menu and logic ((SSH))
         print(SAVE_GAME_MESSAGE)
+        self.ui.wait_for_enter()
+
+    def verb_buy(self, object_name):
+        '''
+        :param object_name: string, name of the object desired
+        :return: True if player bought object_name, false otherwise
+        '''
+        object = self.gamestate.get_current_room().get_object_by_name(object_name)
+        player_cash = self.gamestate.player.get_cash()
+        buy_succeeded = False
+
+        if object is None:
+            print(BUY_NOT_IN_ROOM)
+        elif object.get_cost() is 0:
+            print(BUY_FREE_ITEM)
+        elif object.is_owned_by_player() is True:
+            print(BUY_FREE_ITEM)
+        elif object.get_cost() > player_cash:
+            print(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
+        else:
+            self.gamestate.player.add_object_to_inventory(object)
+            self.gamestate.player.update_cash(object.get_cost() * -1 ) # Send in cost as negative to reduce cash
+            buy_succeeded = True
+            print(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
+            self.gamestate.update_time_left(BUY_COST)
+
+        self.ui.wait_for_enter()
+        return buy_succeeded
+
+    def verb_cheat_win(self):
+        self.ui.clear_screen()
+        print(GAMEOVER_CHEAT_WIN_MESSAGE)
+        return GAMEOVER_WIN
+
+    def verb_cheat_lose(self):
+        self.ui.clear_screen()
+        print(GAMEOVER_CHEAT_LOSE_MESSAGE)
+        return GAMEOVER_FORFEIT
+
+    def verb_drop(self, object_name):
+        inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
+        if inventory_object is not None:
+            self.gamestate.player.inventory.remove_object(inventory_object)
+            self.gamestate.get_current_room().add_object_to_room(inventory_object)
+            print(DROP_SUCCESS_PREFIX + self.verb_object + DROP_SUCCESS_SUFFIX)
+            self.gamestate.update_time_left(DROP_COST)
+            self.ui.wait_for_enter()
+            successful = True
+        else:
+            print(DROP_FAILURE_PREFIX + self.verb_object + DROP_FAILURE_SUFFIX)
+            successful = False
+        self.ui.wait_for_enter()
+        return successful
+
+    def verb_go(self, destination):
+        # See if the destination is the cardinal direction OR the name of one of the room_connections
+        for connection in self.gamestate.get_current_room().room_connections:
+            if connection.label.lower() == destination.lower() \
+                    or connection.cardinal_direction.lower() == destination.lower():
+                new_room = self.gamestate.get_room_by_name(connection.destination.lower())
+                if new_room:
+                    self.gamestate.set_current_room(new_room)
+                    print(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
+                    self.gamestate.update_time_left(GO_COST)
+                    self.ui.wait_for_enter()
+                    return True
+                else:
+                    logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
+
+        # If go failed to find the room / direction desired, print a failure message
+        print(GO_FAILURE_PREFIX + self.verb_object + GO_FAILURE_SUFFIX)
+        return False
+
+    def verb_help(self):
+        self.gamestate.update_time_left(HELP_COST)
+        self.ui.print_help_message()
+        self.ui.wait_for_enter()
+
+    def verb_inventory(self):
+        self.gamestate.update_time_left(INVENTORY_COST)
+        inventory_description = self.gamestate.player.get_inventory_string()
+        self.ui.print_inventory(inventory_description)
         self.ui.wait_for_enter()
 
     def verb_look(self, print_long_description):
@@ -266,8 +358,8 @@ class GameClient:
     def verb_look_at(self, object_name):
         '''
         Attempts to look at the subject
-        :param object_name: Grammatical object at which player wishes to look.
-                            Could be a feature or an object in environment or in their inventory
+        :param object_name: Grammatical verb_object at which player wishes to look.
+                            Could be a feature or an verb_object in environment or in their inventory
         :return: None
         '''
 
@@ -289,84 +381,6 @@ class GameClient:
         print(description)
         self.ui.wait_for_enter()
 
-
-    def verb_take(self, object_name):
-        '''
-        Evaluates a command to take object_name from the Room and if it exists (and is allowed by game rules) then
-        object placed in inventory for the player
-        :param object_name: string input by player in their command
-        :return: True (success), False ( fail, object_name not found in the room)
-        '''
-
-        # See if the room has the object before trying to update Room and player Inventory
-        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
-        if room_object is not None:
-            self.gamestate.get_current_room().remove_object_from_room(room_object)
-            self.gamestate.player.add_object_to_inventory(room_object)
-            print(PICKUP_SUCCESS_PREFIX + self.object + PICKUP_SUCCESS_SUFFIX)
-            self.gamestate.update_time_left(TAKE_COST)
-            self.ui.wait_for_enter()
-            return True
-        print(PICKUP_FAILURE_PREFIX + self.object + PICKUP_FAILURE_SUFFIX)
-        return False
-
-
-    def verb_help(self):
-        self.gamestate.update_time_left(HELP_COST)
-        self.ui.print_help_message()
-        self.ui.wait_for_enter()
-
-    def verb_inventory(self):
-        self.gamestate.update_time_left(INVENTORY_COST)
-        inventory_description = self.gamestate.player.get_inventory_string()
-        self.ui.print_inventory(inventory_description)
-        self.ui.wait_for_enter()
-
-
-    def verb_drop(self, object_name):
-        inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
-        if inventory_object is not None:
-            self.gamestate.player.inventory.remove_object(inventory_object)
-            self.gamestate.get_current_room().add_object_to_room(inventory_object)
-            print(DROP_SUCCESS_PREFIX + self.object + DROP_SUCCESS_SUFFIX)
-            self.gamestate.update_time_left(DROP_COST)
-            self.ui.wait_for_enter()
-            successful = True
-        else:
-            print(DROP_FAILURE_PREFIX + self.object + DROP_FAILURE_SUFFIX)
-            successful = False
-        self.ui.wait_for_enter()
-        return successful
-
-    def verb_go(self, destination):
-        # See if the destination is the cardinal direction OR the name of one of the room_connections
-        for connection in self.gamestate.get_current_room().room_connections:
-            if connection.label.lower() == destination.lower() \
-                    or connection.cardinal_direction.lower() == destination.lower():
-                new_room = self.gamestate.get_room_by_name(connection.destination.lower())
-                if new_room:
-                    self.gamestate.set_current_room(new_room)
-                    print(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
-                    self.gamestate.update_time_left(GO_COST)
-                    self.ui.wait_for_enter()
-                    return True
-                else:
-                    logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
-
-        # If go failed to find the room / direction desired, print a failure message
-        print(GO_FAILURE_PREFIX + self.object + GO_FAILURE_SUFFIX)
-        return False
-
-    def verb_cheat_win(self):
-        self.ui.clear_screen()
-        print(GAMEOVER_CHEAT_WIN_MESSAGE)
-        return GAMEOVER_WIN
-
-    def verb_cheat_lose(self):
-        self.ui.clear_screen()
-        print(GAMEOVER_CHEAT_LOSE_MESSAGE)
-        return GAMEOVER_FORFEIT
-
     def verb_quit(self, message):
         self.ui.clear_screen()
         self.ui.print_quit_confirm(message)
@@ -375,10 +389,51 @@ class GameClient:
             return True
         return False
 
-    def reset_input_and_command(self):
-        # Reset the input and command/object/targets from parser
-        self.user_input = ""
-        self.command, self.object, self.targets = INVALID_INPUT, None, None
+    def verb_take(self, object_name):
+        '''
+        Evaluates a command to take object_name from the Room and if it exists (and is allowed by game rules) then
+        verb_object placed in inventory for the player
+        :param object_name: string input by player in their command
+        :return: True (success), False ( fail, object_name not found in the room)
+        '''
+        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
+        take_success = False
+        if room_object is not None:
+            if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
+                self.gamestate.get_current_room().remove_object_from_room(room_object)
+                self.gamestate.player.add_object_to_inventory(room_object)
+                print(PICKUP_SUCCESS_PREFIX + self.verb_object + PICKUP_SUCCESS_SUFFIX)
+                self.gamestate.update_time_left(TAKE_COST)
+                take_success = True
+            elif room_object.get_cost() > 0:
+                print(PICKUP_NOT_FREE)
+        # Otherwise failed:
+        else:
+            print(PICKUP_FAILURE_PREFIX + self.verb_object + PICKUP_FAILURE_SUFFIX)
+        self.ui.wait_for_enter()
+        return take_success
+
+    def verb_use(self, object_name):
+        used_object = self.gamestate.player.inventory.get_object_by_name(object_name)
+        use_success = False
+
+        if used_object is not None:
+            if used_object.get_name().lower() == "cash":
+                self.gamestate.player.update_cash(200)
+                print("JUST GOT $200 oh hellyea")
+                use_success = True
+            else:
+                print("Used_object not 'cash' ???")
+        else:
+            print("used_object was None!")
+
+        # TODO: Conditionally might need to remove object from inventory
+        # TODO: PRINT MESSAGE
+        # TODO: Spend time resource
+        return use_success
+
+
+
 
 
 
@@ -438,7 +493,7 @@ class GameState:
             room.set_visited(True)
 
         # Retrieve the dictionary of room_name : [object_list] pairs and iterate through, setting each room's objects
-        # to the list in the SaveGame object
+        # to the list in the SaveGame verb_object
         room_objects_dictionary = save_game.get_objects_in_rooms()
         for room_name in room_objects_dictionary:
             room = self.get_room_by_name(room_name)
@@ -446,7 +501,7 @@ class GameState:
                 for room_objects in room_objects_dictionary[room_name]:
                     room.set_objects(room_objects)
             else:
-                logger.debug("Error finding the room stored in a SaveGame object")
+                logger.debug("Error finding the room stored in a SaveGame verb_object")
 
         # Set the current_room
         current_room_name = save_game.get_current_room()
@@ -471,7 +526,8 @@ class GameState:
             'speed' : self.player.speed,
             'coolness' : self.player.coolness,
             'current_room' : self.current_room.get_name(),
-            'time_left' : self.time_left
+            'time_left' : self.time_left,
+            'cash' : self.player.get_cash()
         }
         return header_info
 
@@ -564,8 +620,8 @@ class UserInterface:
 
     def print_status_header(self, info):
         print(STATUS_HEADER_BAR)
-        print("|\tSPEED: " + str(info['speed']) + "\tTIME LEFT: " + str(info['time_left']))
-        print("|\tCOOLNESS: " + str(info['coolness']) )
+        print("|\tSPEED: " + str(info['speed']) + "\t\tTIME LEFT: " + str(info['time_left']))
+        print("|\tCOOLNESS: " + str(info['coolness']) + "\t\tCASH: " + str(info['cash']))
         print("|\tCURRENT LOCATION: " + str(info['current_room']))
         print(STATUS_HEADER_BAR)
 

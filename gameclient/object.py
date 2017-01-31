@@ -2,7 +2,7 @@
 # CS 467 - Winter 2017
 # Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 
-# object.py
+# verb_object.py
 # Description: Object and related classes
 # Principal Author of this file per Project plan: Shawn Hillyer
 
@@ -16,24 +16,31 @@ logger = logging.getLogger(__name__)
 
 import json
 import glob
-
+import pprint
 
 class Object:
     '''
-    An object. Can be in a Room or players inventory.
+    An verb_object. Can be in a Room or players inventory.
      Can be picked up from a room, dropped in a room, used, 'look at'ed, and possibly other actions
     '''
     def __init__(self, properties):
-        if properties['name']:
+        # logger.debug(properties)
+        if 'name' in properties:
             self.name = properties['name']
-        if properties['long_description']:
+        if 'long_description' in properties:
             self.long_description = properties['long_description']
-        if properties['short_description']:
+        if 'short_description' in properties:
             self.short_description = properties['short_description']
-        if properties['default_location']:
+        if 'default_location' in properties:
             self.default_location = properties['default_location']
-        if properties['cost']:
+        if 'cost' in properties:
             self.cost = properties['cost']
+
+        # So a player isn't forced to steal or buy an object more than once
+        if self.default_location == "inventory":
+            self.owned_by_player = True
+        else:
+            self.owned_by_player = False
 
     def get_long_description(self):
         return self.long_description
@@ -57,6 +64,15 @@ class Object:
         # TODO: 1depending on the room they are in it wouldn't make sense once dropped somewhere else(SSH)
         description = "You see a " + self.name + " in the area."
         return description
+
+    def set_is_owned_by_player(self, is_owned_by_player = True):
+        '''
+        :param is_owned_by_player: Boolean. True if player has acquired the object at some point (buy, take, stolen)
+        '''
+        self.owned_by_player = is_owned_by_player
+
+    def is_owned_by_player(self):
+        return self.owned_by_player
 
 class ObjectBuilder:
     '''
@@ -89,16 +105,12 @@ class ObjectBuilder:
         objects_dir = './gamedata/objects/*.json'
         objects_files =  glob.glob(objects_dir)
 
-        # Load room content from directory
-        # TODO: Determine logical order; for now, based on Project Plan (hashems)
+        # Load object content from directory
         for object in objects_files:
             with open(object) as object:
                 object_properties = json.load(object)
                 new_object = Object(object_properties)
                 object_list.append(new_object)
 
-        # DEBUG
-        # for i in rooms:
-        #     print(i.name)
 
         return object_list
