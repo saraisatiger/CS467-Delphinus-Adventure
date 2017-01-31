@@ -1,0 +1,8 @@
+{
+  "name" : "Cash",
+  "long_description" : "Two crisp C-notes worth $200. Could probably buy an entire new PC with this much cash!",
+  "short_description" : "200 bucks",
+  "default_location" : "Street",
+  "details" : "gives money",
+  "cost" : 0
+}

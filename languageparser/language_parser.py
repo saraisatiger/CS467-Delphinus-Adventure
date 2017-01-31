@@ -13,13 +13,13 @@
 # DEV NOTES:
 # 1/22/17:
 # The language parser will have to return more than the verb. It will also need to identify the
-# subject (feature or object) and appropriate prepositions and such. At a minimum I'd expect the LP to
+# subject (feature or verb_object) and appropriate prepositions and such. At a minimum I'd expect the LP to
 # return a python dictionary of a verb that's being called and one or more subjects that are trying to
 # be interacted. For example "use broom on dusty floor" might return:
 #
 # {
 #     'verb' : 'use',
-#     'object' : 'broom',
+#     'verb_object' : 'broom',
 #     'targets' : [
 #         'dusty floor'
 #     ]
@@ -61,28 +61,37 @@ class LanguageParser:
         object = None
         targets = None
 
-        # Hacky way to parse a "look at" command to find the object/feature player wants to examine.
+        # Hacky way to parse a "look at" command to find the verb_object/feature player wants to examine.
         # NOTE: Doesn't parse aliases
         if 'look at' in command:
-            object = command.replace("look at ", "", 1) # replace "look at " with empty string - rest is the object
+            object = command.replace("look at ", "", 1) # replace "look at " with empty string - rest is the verb_object
             command = "look at"
 
         # hacky way to parse a 'take' command.
         # NOTE: Doesn't parse aliases
-        if 'take' in command:
+        elif 'take' in command:
             object = command.replace("take ", "", 1) # replace at most one instance of "take " with empty str
             command = "take"
 
         # hacky way to parse a 'drop' command
         # NOTE: Doesn't parse aliases
-        if 'drop' in command:
+        elif 'drop' in command:
             object = command.replace("drop ", "", 1) # replace at most one instance of "drop " with empty str
             command = "drop"
 
         # Same thing for go
-        if 'go' in command:
+        elif 'go' in command:
             object = command.replace("go ", "", 1)
             command = "go"
+
+        elif 'buy' in command:
+            object = command.replace("buy ", "", 1)
+            command = "buy"
+
+        elif 'use' in command:
+            object = command.replace("use ", "", 1)
+            command = "use"
+
 
         # This simple code just checks if the string entered by user us in one of several Lists defined in the resource
         # file constants/verbs.py. Each list is a set of aliases for each verb and it returns a simple string that
@@ -115,6 +124,10 @@ class LanguageParser:
             command = DROP
         elif command in INVENTORY_ALIASES:
             command = INVENTORY
+        elif command in BUY_ALIASES:
+            command = BUY
+        elif command in USE_ALIASES:
+            command = USE
         # cheat codes
         elif command == "mess with the best":
             command = CHEATCODE_LOSE

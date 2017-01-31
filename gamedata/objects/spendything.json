@@ -1,0 +1,8 @@
+{
+  "name" : "Spendything",
+  "long_description" : "This item is expensive and was never owned by the player",
+  "short_description" : "Spendy!",
+  "default_location" : "Street",
+  "details" : "No worries",
+  "cost" : 150
+}

@@ -22,7 +22,9 @@ class Player:
         self.inventory = Inventory()
 
     def add_object_to_inventory(self, object):
-        self.inventory.add_object(object)
+        if object:
+            object.set_is_owned_by_player()
+            self.inventory.add_object(object)
 
     def remove_object_from_inventory(self, object):
         self.inventory.remove_object(object)
@@ -33,7 +35,11 @@ class Player:
     def get_inventory_objects(self):
         return self.inventory.objects
 
+    def get_cash(self):
+        return self.cash
 
+    def update_cash(self, cash_change):
+        self.cash += cash_change
 
 
 class Inventory:
@@ -45,7 +51,7 @@ class Inventory:
 
     def get_object_by_name(self, object_name):
         '''
-        Finds an object in the inventory by name and returns a reference to it
+        Finds an verb_object in the inventory by name and returns a reference to it
         :param object_name:
         :return:
         '''

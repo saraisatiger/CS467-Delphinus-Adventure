@@ -29,7 +29,7 @@ class Room:
 
     '''
     def __init__(self, properties):
-        # Ensure the properites exist then read them into instance of Room object
+        # Ensure the properites exist then read them into instance of Room verb_object
         if properties:
             self.name = properties['name']
             self.long_description = properties['long_description']
@@ -130,7 +130,7 @@ class Room:
 
     def get_object_by_name(self, object_name):
         '''
-        Return reference to an object looked up by name if it exists in the room
+        Return reference to an verb_object looked up by name if it exists in the room
         :param object_name:
         :return:
         '''
