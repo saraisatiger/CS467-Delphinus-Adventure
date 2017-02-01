@@ -53,10 +53,9 @@ class LanguageParser:
         we will need to send more than just the verb back (the subject etc. also needed). See Dev note near file head
         '''
 
-
         # Parse any command to all lowercase to reduce complexity of our parser.
-        # TODO: Might also want to strip trailing / leading whitespace (but not inner whitespace)
-        # l.strip() strips the left-side whitespace, not sure on right side whitespace
+        # TODO: Might also want to strip trailing whitespace (SSH)
+        # l.strip() strips the left-side whitespace, not sure on right side whitespace (SSH)
         command = command.lower().lstrip()
         object = None
         targets = None
@@ -100,10 +99,7 @@ class LanguageParser:
         # ends up being returned by the parser. -- (SSH)
 
         if command in QUIT_ALIASES:
-            # TODO: Added this to avoid keyboard interrupts midgame (hashems)
             command = QUIT
-            # print(EXIT_MESSAGE)
-            # sys.exit()
         elif command in NEW_GAME_ALIASES:
             command = NEW_GAME
         elif command in LOAD_GAME_ALIASES:

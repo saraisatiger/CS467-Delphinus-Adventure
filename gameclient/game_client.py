@@ -202,11 +202,9 @@ class GameClient:
                 # TODO: Implement STEAL
                 logger.debug("Steal is not yet implemented.")
             elif self.command is BUY:
-                # TODO: Implement BUY
                 self.verb_buy(self.verb_object)
-                logger.debug("Buy is not yet implemented.")
             elif self.command is SPRAYPAINT:
-                # TODO: Implement SPRAYPAINT
+                # TODO: Finish implementing verb_spraypaint and remove the debug print
                 logger.debug("Spraypaint is not fully implemented yet.")
                 self.verb_spraypaint(self.verb_object)
             elif self.command is USE:
@@ -232,8 +230,7 @@ class GameClient:
                 if quit_confirmed == True:
                     status = GAMEOVER_QUIT
             else:
-                # TODO: This should be a different string once every verb is implemented
-                print(COMMAND_NOT_IMPLEMENTED_YET)
+                print(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
 
             # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
@@ -245,7 +242,7 @@ class GameClient:
         Sets appropriate variables in the GameClient's gamestate instance
         :return:
         '''
-        # TODO: Implement this function ((SSH))
+        # TODO: Implement load_game_menu() method ((SSH))
         print(LOAD_GAME_MESSAGE)
 
         # TODO: This should ultimately result in a self.gamestate.initialize_load_game(filename) call (not implemented ((SSH))
@@ -275,8 +272,10 @@ class GameClient:
         else:
             self.gamestate.player.add_object_to_inventory(object)
             self.gamestate.player.update_cash(object.get_cost() * -1 ) # Send in cost as negative to reduce cash
-            buy_succeeded = True
             print(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
+            buy_succeeded = True
+
+        if buy_succeeded:
             self.gamestate.update_time_left(BUY_COST)
 
         self.ui.wait_for_enter()
@@ -293,20 +292,24 @@ class GameClient:
         return GAMEOVER_FORFEIT
 
     def verb_drop(self, object_name):
-        # TODO: Disallow dropping objects when inside of one of the "virtual" rooms. Requires adding a property to rooms
         inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
-        if inventory_object is not None:
+        drop_success = False
+
+        if self.gamestate.get_current_room().is_virtual_space() is True:
+            print(DROP_FAILURE_VIRTUALSPACE)
+        elif inventory_object is not None:
             self.gamestate.player.inventory.remove_object(inventory_object)
             self.gamestate.get_current_room().add_object_to_room(inventory_object)
             print(DROP_SUCCESS_PREFIX + self.verb_object + DROP_SUCCESS_SUFFIX)
-            self.gamestate.update_time_left(DROP_COST)
-            self.ui.wait_for_enter()
-            successful = True
+            drop_success = True
         else:
             print(DROP_FAILURE_PREFIX + self.verb_object + DROP_FAILURE_SUFFIX)
-            successful = False
+
+        if drop_success:
+            self.gamestate.update_time_left(DROP_COST)
+
         self.ui.wait_for_enter()
-        return successful
+        return drop_success
 
     def verb_go(self, destination):
         # See if the destination is the cardinal direction OR the name of one of the room_connections
@@ -365,7 +368,6 @@ class GameClient:
         :return: None
         '''
 
-        # Check of the 'object_name' is a feature of the room
         room_feature = self.gamestate.get_current_room().get_feature(object_name)
         room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(object_name)
@@ -400,18 +402,22 @@ class GameClient:
         '''
         room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
         take_success = False
+
         if room_object is not None:
             if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
                 self.gamestate.get_current_room().remove_object_from_room(room_object)
                 self.gamestate.player.add_object_to_inventory(room_object)
                 print(PICKUP_SUCCESS_PREFIX + self.verb_object + PICKUP_SUCCESS_SUFFIX)
-                self.gamestate.update_time_left(TAKE_COST)
                 take_success = True
             elif room_object.get_cost() > 0:
                 print(PICKUP_NOT_FREE)
         # Otherwise failed:
         else:
             print(PICKUP_FAILURE_PREFIX + self.verb_object + PICKUP_FAILURE_SUFFIX)
+
+        if take_success:
+            self.gamestate.update_time_left(TAKE_COST)
+
         self.ui.wait_for_enter()
         return take_success
 
@@ -438,6 +444,7 @@ class GameClient:
                 g_card = self.gamestate.player.inventory.get_object_by_name("graphics card")
                 ram_chip = self.gamestate.player.inventory.get_object_by_name("ram chip")
                 floppy_disk = self.gamestate.player.inventory.get_object_by_name("floppy disk")
+
                 if g_card is not None and \
                      ram_chip is not None and \
                     floppy_disk is not None:
@@ -463,34 +470,36 @@ class GameClient:
                 self.gamestate.player.remove_object_from_inventory(used_object)
                 self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
                 print(USE_SURGE_SUCCESS)
-
             else:
                 logger.debug("Not implemented: use " + used_object.get_name())
                 print("You used something that the game doesn't know what to do with, please tell your local dev!")
                 use_success = False
-
-
         else:
             print(USE_FAIL)
             use_success = False
 
-        # TODO: Conditionally might need to remove object from inventory, make sure this is done if approp
-
         if use_success:
             self.gamestate.update_time_left(USE_COST)
+
         self.ui.wait_for_enter()
         return use_success
 
     def verb_spraypaint(self, verb_object):
         # TODO: Implement this fully. Check that verb_object is spraypaintable / room is spraypaintable, handle logic if not/fails
         # TODO: also chance of getting caught / going to jail / paying fine / being seen by another tagger for bonus coolness?
+
         spraypaint_success = True
+
         if self.gamestate.player.can_spraypaint():
             print("TODO: You spraypaint stuff and coolness should go up and description should update. ")
             self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
         else:
             print("You would need to practice with the [Spray Paint] before you can try to spraypaint something.")
             spraypaint_success = False
+
+        if spraypaint_success:
+            self.gamestate.update_time_left(SPRAYPAINT_COST)
+
         self.ui.wait_for_enter()
         return spraypaint_success
 
@@ -513,8 +522,6 @@ class GameState:
         :param room: The room the player is in (actual room)
         :return: N/A
         '''
-        # TODO: Decide if we should set this by reference or by doing a room.name lookup and then setting it to that room ((SSH))
-        # TODO: THis lookup would be done out of the GameState.rooms[] list of course ((SSH))
         self.current_room = room
 
     def get_room_by_name(self, room_name):
@@ -524,12 +531,8 @@ class GameState:
         return None
 
     def initialize_new_game(self):
-        # TODO: Need to make sure initialize new game clears ALL gamestate variables. At present, starting new game ((SSH))
-        # TODO: then quitting and starting another new game causes another skateboard to appear in street if left there ((SSH))
-        # TODO: Set player state ((SSH))
-
         self.set_room_vars_to_default()
-        self.set_default_room("Street")
+        self.set_default_room(DEFAULT_ROOM)
         self.time_left = STARTING_TIME
         self.place_objects_in_rooms(self.objects)
 

@@ -19,7 +19,7 @@ class SaveGame:
         :param gamestate:
         '''
 
-        # TODO: Write UNIT TESTS for this code, entirely untested
+        # TODO: Write more UNIT TESTS for this code
         if gamestate:
             # As of 1/29, the useful gamestate data includes:
             # * The current room

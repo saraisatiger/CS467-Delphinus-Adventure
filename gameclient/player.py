@@ -68,7 +68,6 @@ class Inventory:
         :param object_name:
         :return:
         '''
-        # TODO: Test function
         for inventory_object in self.objects:
             if inventory_object.name.lower() == object_name.lower():
                 return inventory_object

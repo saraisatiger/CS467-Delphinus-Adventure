@@ -14,9 +14,10 @@
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
+DEFAULT_ROOM = "Street"
 
 INVALID_MENU_COMMAND_MESSAGE = " is not a valid command at the main menu"
-COMMAND_NOT_IMPLEMENTED_YET = "Either that verb isn't implemented yet, or you typed gibberish!"
+COMMAND_NOT_UNDERSTOOD = "What?! How dare you say that to me!"
 
 # main menu related strings
 MAIN_MENU_1 = "MAIN MENU"
@@ -77,6 +78,7 @@ DROP_SUCCESS_PREFIX = "You drop the "
 DROP_SUCCESS_SUFFIX = " on the ground."
 DROP_FAILURE_PREFIX = "Your attempt to drop a "
 DROP_FAILURE_SUFFIX = " fails because, alas, you do not have one."
+DROP_FAILURE_VIRTUALSPACE = "You can't drop things in the virtual space!"
 
 # 'go' strings
 GO_SUCCESS_PREFIX = "You head off towards the "
@@ -85,8 +87,8 @@ GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
 
 # 'Inventory' related strings
-INVENTORY_LIST_HEADER = "========================================\nBackpack Contents\n----------------------------------------"
-INVENTORY_LIST_FOOTER = "========================================"
+INVENTORY_LIST_HEADER = "========================================================================\nBackpack Contents\n------------------------------------------------------------------------"
+INVENTORY_LIST_FOOTER = "========================================================================"
 INVENTORY_EMPTY = "Empty... not even a floppy disk"
 
 # 'look' strings

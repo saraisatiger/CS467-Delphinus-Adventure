@@ -4,7 +4,8 @@
 
 # verb_object.py
 # Description: Object and related classes
-# Principal Author of this file per Project plan: Shawn Hillyer
+# Principal Author*** of this file per Project plan: Shawn Hillyer
+#  *** The code for ObjectBuilder is essentially the same as what Sara wrote for RoomBuilder method
 
 # CITATIONS
 # CITE:

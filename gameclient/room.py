@@ -35,6 +35,7 @@ class Room:
             self.long_description = properties['long_description']
             self.short_description = properties['short_description']
             self.visited = properties['visited']
+            self.virtual_space = properties['virtual_space']
 
             # Call constructors from features and connections and append them to the Room
             self.room_features = []
@@ -160,6 +161,9 @@ class Room:
 
     def is_visited(self):
         return self.visited
+
+    def is_virtual_space(self):
+        return self.virtual_space
 
 
 class RoomFeature:
