@@ -20,6 +20,7 @@ class Player:
         self.coolness = 0
         self.speed = 0
         self.inventory = Inventory()
+        self.has_spraypaint = False
 
     def add_object_to_inventory(self, object):
         if object:
@@ -40,6 +41,18 @@ class Player:
 
     def update_cash(self, cash_change):
         self.cash += cash_change
+
+    def update_speed(self, speed_change):
+        self.speed += speed_change
+
+    def update_coolness(self, coolness_change):
+        self.coolness += coolness_change
+
+    def set_has_spraypaint(self, has_spraypaint):
+        self.has_spraypaint = True
+
+    def can_spraypaint(self):
+        return self.has_spraypaint
 
 
 class Inventory:
@@ -74,13 +87,15 @@ class Inventory:
         Get a comma-delineated list of the objects in the inventory
         :return:
         '''
+
+        # TODO: Make the strings pad a certain number of characters (spaces or periods) between item name and description
         if self.objects:
             inventory_size = len(self.objects)
             count = 0
             inventory_string = ""
             for object in self.objects:
                 count += 1
-                inventory_string += object.get_name()
+                inventory_string += "[" + object.get_name() + ']:\t' + object.get_short_description()
                 if count is not inventory_size:
                     inventory_string += "\n"
             return inventory_string

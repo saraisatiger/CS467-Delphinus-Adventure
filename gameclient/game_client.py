@@ -207,7 +207,8 @@ class GameClient:
                 logger.debug("Buy is not yet implemented.")
             elif self.command is SPRAYPAINT:
                 # TODO: Implement SPRAYPAINT
-                logger.debug("Spraypaint is not yet implemented.")
+                logger.debug("Spraypaint is not fully implemented yet.")
+                self.verb_spraypaint(self.verb_object)
             elif self.command is USE:
                 self.verb_use(self.verb_object)
             elif self.command is HELP:
@@ -292,6 +293,7 @@ class GameClient:
         return GAMEOVER_FORFEIT
 
     def verb_drop(self, object_name):
+        # TODO: Disallow dropping objects when inside of one of the "virtual" rooms. Requires adding a property to rooms
         inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
         if inventory_object is not None:
             self.gamestate.player.inventory.remove_object(inventory_object)
@@ -415,28 +417,82 @@ class GameClient:
 
     def verb_use(self, object_name):
         used_object = self.gamestate.player.inventory.get_object_by_name(object_name)
-        use_success = False
+        use_success = True
 
         if used_object is not None:
-            if used_object.get_name().lower() == "cash":
+            obj_label = used_object.get_name().lower()
+            # "Cash" item logic
+            if obj_label == "crisp cash":
                 self.gamestate.player.update_cash(200)
-                print("JUST GOT $200 oh hellyea")
-                use_success = True
-            else:
-                print("Used_object not 'cash' ???")
-        else:
-            print("used_object was None!")
+                self.gamestate.player.remove_object_from_inventory(used_object)
+                print(USE_CASH_SUCCESS)
+            elif obj_label == "cash wad":
+                self.gamestate.player.update_cash(57)
+                self.gamestate.player.remove_object_from_inventory(used_object)
+                print(USE_CASH_SUCCESS)
+            elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
+                # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
+                # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
 
-        # TODO: Conditionally might need to remove object from inventory
-        # TODO: PRINT MESSAGE
-        # TODO: Spend time resource
+                # TODO: Refactor this check as a function ("player.has_all_pc_parts()" returns boolean)
+                g_card = self.gamestate.player.inventory.get_object_by_name("graphics card")
+                ram_chip = self.gamestate.player.inventory.get_object_by_name("ram chip")
+                floppy_disk = self.gamestate.player.inventory.get_object_by_name("floppy disk")
+                if g_card is not None and \
+                     ram_chip is not None and \
+                    floppy_disk is not None:
+                    print(USE_COMPUTER_PARTS_SUCCESS)
+                    self.gamestate.player.remove_object_from_inventory(g_card)
+                    self.gamestate.player.remove_object_from_inventory(ram_chip)
+                    self.gamestate.player.remove_object_from_inventory(floppy_disk)
+                else:
+                    print(USE_COMPUTER_PARTS_MISSING)
+            elif obj_label == "hackersnacks":
+                self.gamestate.player.remove_object_from_inventory(used_object)
+                self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
+                print(USE_SNACKS_SUCCESS)
+            elif obj_label == "skateboard":
+                self.gamestate.player.remove_object_from_inventory(used_object)
+                self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
+                print(USE_SKATEBOARD_SUCCESS)
+            elif obj_label == "spray paint":
+                self.gamestate.player.set_has_spraypaint(True)
+                self.gamestate.player.remove_object_from_inventory(used_object)
+                print(USE_SPRAYPAINT_SUCCESS)
+            elif obj_label == "surge":
+                self.gamestate.player.remove_object_from_inventory(used_object)
+                self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
+                print(USE_SURGE_SUCCESS)
+
+            else:
+                logger.debug("Not implemented: use " + used_object.get_name())
+                print("You used something that the game doesn't know what to do with, please tell your local dev!")
+                use_success = False
+
+
+        else:
+            print(USE_FAIL)
+            use_success = False
+
+        # TODO: Conditionally might need to remove object from inventory, make sure this is done if approp
+
+        if use_success:
+            self.gamestate.update_time_left(USE_COST)
+        self.ui.wait_for_enter()
         return use_success
 
-
-
-
-
-
+    def verb_spraypaint(self, verb_object):
+        # TODO: Implement this fully. Check that verb_object is spraypaintable / room is spraypaintable, handle logic if not/fails
+        # TODO: also chance of getting caught / going to jail / paying fine / being seen by another tagger for bonus coolness?
+        spraypaint_success = True
+        if self.gamestate.player.can_spraypaint():
+            print("TODO: You spraypaint stuff and coolness should go up and description should update. ")
+            self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
+        else:
+            print("You would need to practice with the [Spray Paint] before you can try to spraypaint something.")
+            spraypaint_success = False
+        self.ui.wait_for_enter()
+        return spraypaint_success
 
 
 class GameState:

@@ -128,6 +128,8 @@ class LanguageParser:
             command = BUY
         elif command in USE_ALIASES:
             command = USE
+        elif command in SPRAYPAINT_ALIASES:
+            command = SPRAYPAINT
         # cheat codes
         elif command == "mess with the best":
             command = CHEATCODE_LOSE

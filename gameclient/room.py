@@ -200,5 +200,5 @@ class RoomConnection:
         Get the sting as required per specifications for this particular connection
         :return: string
         '''
-        description = "To the [" + self.cardinal_direction + "] you see " + self.description + ". [" + self.label + "]."
+        description = CONNECTION_LIST_PREFIX + self.cardinal_direction + CONNECTION_LIST_SEGWAY + self.description + ". [" + self.label + "]"
         return description
