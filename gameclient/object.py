@@ -60,9 +60,7 @@ class Object:
         return self.cost
 
     def get_environmental_description(self):
-        # TODO: Refine the output of this function somewhat? Could give objects unique environmental descriptions but
-        # TODO: 1depending on the room they are in it wouldn't make sense once dropped somewhere else(SSH)
-        description = "You see a " + self.name + " in the area."
+        description = OBJECTS_LIST_PREFIX + "[" + self.get_name() + "]"
         return description
 
     def set_is_owned_by_player(self, is_owned_by_player = True):

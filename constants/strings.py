@@ -38,9 +38,11 @@ PRESS_KEY_TO_CONTINUE_MSG = "\n>>>> Press [Enter] to continue. <<<<"
 STATUS_HEADER_BAR = "+----------------------------------------------------------------------+"
 DESCRIPTION_HEADER = "DESCRIPTION:"
 DESCRIPTION_FOOTER = "\n"
-EXITS_HEADER = "EXITS:"
-OBJECTS_HEADER = "OBJECTS:"
-
+EXITS_HEADER = "Always know your way out. You see a few ways to go from here:"
+OBJECTS_HEADER = "You see the following interesting items in the area:"
+OBJECTS_LIST_PREFIX = "\t* "
+CONNECTION_LIST_PREFIX = "\t* ["
+CONNECTION_LIST_SEGWAY= "] is "
 
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
@@ -99,6 +101,16 @@ PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."
 PICKUP_FAILURE_PREFIX = "You grasp for the non-existent "
 PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
 PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, just steal it!"
+
+# ' use' strings
+USE_FAIL = "There's just no way to use that because it's not in your bag!"
+USE_CASH_SUCCESS = "You count the bills and put them in your wallet."
+USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"
+USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide to Building Amazing Hacking Machines' to see what you need?"
+USE_SNACKS_SUCCESS = "Crunchy yet satisfying. You feel faster, do you Grok it?"
+USE_SKATEBOARD_SUCCESS = "Stepping onto the Skateboard, you feel as though you can do anything faster. Maybe that's just the Surge you drank for breakfast surging through your veins, though?"
+USE_SPRAYPAINT_SUCCESS = "You spend a few moments shaking the Spray Paint and test it out. You can now spraypaint the town red!"
+USE_SURGE_SUCCESS = "You gulp down the Surge and let out a belch. You feel energized!"
 
 # Gameover cheating messages
 GAMEOVER_CHEAT_WIN_MESSAGE = "Too cool for this game, eh? Well, you win!"
