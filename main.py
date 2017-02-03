@@ -11,7 +11,8 @@
 # CITATIONS
 # CITE:
 
-from gameclient.game_client import *
+# from gameclient.game_client import *
+from gameclient.game_client_new import *
 
 # For debugging
 from debug.debug import *
