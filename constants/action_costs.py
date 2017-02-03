@@ -4,24 +4,26 @@
 
 # action_costs.py
 # Description: Defines how much it costs to complete each of the actions in the game
+# In general we can tweak this file to change the difficulty of the game and action economy
 # Principal Author of this file per Project plan: Shawn Hillyer
 
 # CITATIONS
 # CITE:
 
-STARTING_TIME = 10000
+STARTING_TIME = 5000
 
-LOOK_COST = 0
-LOOK_AT_COST = 0
-GO_COST = -100
-TAKE_COST = -10
+BUY_COST = -25
 DROP_COST = -5
+GO_COST = -100
+HACK_COST = -50
 HELP_COST = 0
 INVENTORY_COST = 0
-HACK_COST = -50
-STEAL_COST = -40
-BUY_COST = -25
+JAIL_COST = 500
+LOOK_AT_COST = 0
+LOOK_COST = 0
 SPRAYPAINT_COST = -30
+STEAL_COST = -40
+TAKE_COST = -10
 USE_COST = -25
 
 

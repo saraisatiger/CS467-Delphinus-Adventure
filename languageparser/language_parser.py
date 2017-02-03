@@ -91,6 +91,9 @@ class LanguageParser:
             object = command.replace("use ", "", 1)
             command = "use"
 
+        elif 'steal' in command:
+            object = command.replace("steal ", "", 1)
+            command = "steal"
 
         # This simple code just checks if the string entered by user us in one of several Lists defined in the resource
         # file constants/verbs.py. Each list is a set of aliases for each verb and it returns a simple string that
@@ -126,6 +129,8 @@ class LanguageParser:
             command = USE
         elif command in SPRAYPAINT_ALIASES:
             command = SPRAYPAINT
+        elif command in STEAL_ALIASES:
+            command = STEAL
         # cheat codes
         elif command == "mess with the best":
             command = CHEATCODE_LOSE
