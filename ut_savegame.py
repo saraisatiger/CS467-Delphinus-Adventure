@@ -1,6 +1,7 @@
 # Unit test to test out the save_game class
 
-from gameclient.game_client import *
+# from gameclient.game_client import *
+from gameclient.game_client_new import *
 from fileio.save_game import *
 import pprint
 
