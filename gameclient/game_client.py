@@ -255,6 +255,13 @@ class GameClient:
         print(SAVE_GAME_MESSAGE)
         self.ui.wait_for_enter()
 
+    def go_to_jail(self):
+        #TODO Refactor this as a general purpose function? Take in the room name, the message, and the cost as parameters
+        county_jail = self.gamestate.get_room_by_name("County Jail")
+        self.gamestate.set_current_room(county_jail)
+        print(GO_TO_JAIL_MESSAGE)
+        self.gamestate.update_time_left(JAIL_COST)
+
     def verb_buy(self, object_name):
         '''
         :param object_name: string, name of the object desired
@@ -525,6 +532,8 @@ class GameClient:
                 else:
                     print(STEAL_FAIL_GENERIC)
                     self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
+                    self.go_to_jail()
+                    return steal_success
 
         self.ui.wait_for_enter()
         return steal_success
@@ -558,6 +567,7 @@ class GameState:
 
     def initialize_new_game(self):
         self.set_room_vars_to_default()
+        self.set_object_vars_to_default()
         self.set_default_room(DEFAULT_ROOM)
         self.time_left = STARTING_TIME
         self.place_objects_in_rooms(self.objects)
@@ -619,6 +629,10 @@ class GameState:
             room.set_visited(False)
             room.objects = []
 
+    def set_object_vars_to_default(self):
+        for obj in self.objects:
+            obj.set_is_owned_by_player(False)
+
     def set_default_room(self, room_name):
         default_room = self.get_room_by_name(room_name)
         self.set_current_room(default_room)
@@ -643,10 +657,19 @@ class GameState:
         :param time_change: Positive --> Increases time_left available. Negative --> Decreases time_left available
         :return: N/A
         '''
+        # TODO: Game design decision. What exactly does speed do? This implementation just adds the speed to any negative
+        # time effects unless it reduces the effect to cause a GAIN in time which makes no sense
+        # We could also make speed some kind of multiplier or some other method
+        if time_change < 0:
+            time_change += self.player.speed
+            if time_change > 0:
+                time_change = 0
         self.time_left += time_change
 
     def get_time_left(self):
         return self.time_left
+
+
 
 
 class UserInterface:

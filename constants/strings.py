@@ -86,10 +86,13 @@ GO_SUCCESS_SUFFIX = " without a problem."
 GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
 
-# 'Inventory' related strings
+# 'Inventory' strings
 INVENTORY_LIST_HEADER = "========================================================================\nBackpack Contents\n------------------------------------------------------------------------"
 INVENTORY_LIST_FOOTER = "========================================================================"
 INVENTORY_EMPTY = "Empty... not even a floppy disk"
+
+# 'jail' strings
+GO_TO_JAIL_MESSAGE = "Your actions have landed you in jail, costing you valuable time!"
 
 # 'look' strings
 NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing else laying about worth taking."
@@ -102,7 +105,7 @@ STEAL_FAIL_ALREADY_OWNED = "You already own that. You can just take it!"
 STEAL_FAIL_FREE_ITEM = "That doesn't cost anything. You should just take it - nobody will care!"
 STEAL_SUCCESS_PREFIX = "Your nimble hands are able to procure the "
 STEAL_SUCCESS_SUFFIX = " without being caught."
-STEAL_FAIL_GENERIC = "You aren't able to steal that without being seen. You can try again."
+STEAL_FAIL_GENERIC = "You aren't able to steal that without being seen. You've been caught!"
 
 # 'take' strings
 PICKUP_SUCCESS_PREFIX = "You pick up the "
