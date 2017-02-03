@@ -9,7 +9,7 @@
 # CITATIONS
 # CITE:
 
-from stringresources.strings import *
+from constants.strings import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)
@@ -17,33 +17,25 @@ logger = logging.getLogger(__name__)
 
 class Room:
     '''
-    A room has at least 2 features, a long and short description, and has either been visited or not
+    Specifications: A room has at least 2 features, a long and short long_description, and has either been visited or not
 
     Each room can have 0 or more room connections, each of which must be able to be accessed by typing
-    the .name for that connection, the cardinal direction, and various combination of either and the verb go,
-    so the connections are encapsulated in their own class
+    the .name for that connection, the cardinal direction, and various combination of either. 'go' in front optional
 
     The room features are encapsulated as they can be examined by typing in their name and this gives a
-    description.
+    long_description.
 
     Rooms can also have objects in them that can be picked up or dropped by the player.
 
-    TODO: Implement methods to get a list of valid objects, features, and "exits" (connections). This would be
-     used in order to check the command (noun and verb, for example) that is returned by the langauge parser
-     and determine if the player's command is valid.
-
-     TODO: Implement method to pick up objects in the room
-
-     TODO: (Possibly) Subclasses for room-specific functionality
     '''
     def __init__(self, properties):
-        logger.debug("Room initialized")
-        # Ensure the properites exist then read them into instance of Room object
+        # Ensure the properites exist then read them into instance of Room verb_object
         if properties:
             self.name = properties['name']
             self.long_description = properties['long_description']
             self.short_description = properties['short_description']
             self.visited = properties['visited']
+            self.virtual_space = properties['virtual_space']
 
             # Call constructors from features and connections and append them to the Room
             self.room_features = []
@@ -56,24 +48,25 @@ class Room:
                 room_connection = RoomConnection(room_connection_properties)
                 self.room_connections.append(room_connection)
 
-        # TODO: Determine if Objects located in rooms are set per the room JSON files or loaded programatically elsewhere
-        self.objects = [] # Room starts with no objects
+        # Room starts with no objects. The ObjectBuilder class makes the objects, the new game or load game initializers
+        # are responsible for populating the rooms/inventory with objects
+        self.objects = []
 
     def get_name(self):
         return self.name
 
     def get_long_description(self):
         '''
-        Get the "long description" version of the room's description
-        :return: string representing full length description
+        Get the "long long_description" version of the room's long_description
+        :return: string representing full length long_description
         '''
-        full_description = self.long_description + self.get_supplemental_description()
+        full_description = self.long_description + "\n" +  self.get_supplemental_description()
         return full_description
 
     def get_short_description(self):
         '''
-        Get the "short description" version of the room's description
-        :return: string representing shortened description used after a room has been visited (visited is True)
+        Get the "short long_description" version of the room's long_description
+        :return: string representing shortened long_description used after a room has been visited (visited is True)
         '''
         full_description = self.short_description + self.get_supplemental_description()
         return full_description
@@ -83,7 +76,7 @@ class Room:
         Get a string of all the connections and objects in the Room
         :return: string
         '''
-        description = "\n\n" + self.get_connection_string() + "\n\n" + self.get_object_list_string()
+        description = "\n" + OBJECTS_HEADER + "\n" + self.get_object_list_string() + "\n" + EXITS_HEADER + "\n" + self.get_connection_string()
         return description
 
     def get_connection_string(self):
@@ -94,7 +87,7 @@ class Room:
         connection_string = ""
         if self.room_connections:
             for connection in self.room_connections:
-                connection_string = connection_string + connection.get_connection_description()
+                connection_string = connection_string + connection.get_connection_description() + "\n"
         return connection_string
 
     def get_object_list_string(self):
@@ -106,7 +99,7 @@ class Room:
         if self.objects:
             objects_string = ""
             for object in self.objects:
-                objects_string = objects_string + object.get_environmental_description()
+                objects_string = objects_string + object.get_environmental_description() + "\n"
         else:
             objects_string = NO_INTERESTING_OBJECTS_MESSAGE
         return objects_string
@@ -138,7 +131,7 @@ class Room:
 
     def get_object_by_name(self, object_name):
         '''
-        Return reference to an object looked up by name if it exists in the room
+        Return reference to an verb_object looked up by name if it exists in the room
         :param object_name:
         :return:
         '''
@@ -148,22 +141,29 @@ class Room:
         return None
 
     def add_object_to_room(self, object):
-        # TODO: Test this function
         self.objects.append(object)
 
 
     def remove_object_from_room(self, object):
-        # TODO: Test this function
         self.objects.remove(object)
 
 
     def remove_object_from_room_by_name(self, object_name):
-        # TODO: Test this function
         object_to_remove = self.get_object_by_name(object_name)
         if object_to_remove is not None:
             self.remove_object_from_room(object_to_remove)
             return True
         return False
+
+    def set_objects(self, object_list):
+        # Used by initialize_new_game() method in GameState class
+        self.objects = object_list
+
+    def is_visited(self):
+        return self.visited
+
+    def is_virtual_space(self):
+        return self.virtual_space
 
 
 class RoomFeature:
@@ -177,22 +177,12 @@ class RoomFeature:
     def __init__(self, properties):
         self.name = properties['name']
         self.description = properties['description']
-        # TODO: I think known_to_player should be tracked either by a game state or player state dictionary
-        # TODO: (SSH) Not sure we even need this variable?
-        # self.known_to_player = properties['known_to_player']
 
     def get_name(self):
         return self.name
 
     def get_description(self):
         return self.description
-
-    # TODO: Delete these two methods related to known_to_player if not used (SSH)
-    # def is_known_to_player(self):
-    #     return self.known_to_player
-
-    # def discover(self):
-    #     self.known_to_player = True
 
 
 class RoomConnection:
@@ -214,5 +204,5 @@ class RoomConnection:
         Get the sting as required per specifications for this particular connection
         :return: string
         '''
-        description = "To the " + self.cardinal_direction + " you see " + self.description + ". "
+        description = CONNECTION_LIST_PREFIX + self.cardinal_direction + CONNECTION_LIST_SEGWAY + self.description + ". [" + self.label + "]"
         return description
