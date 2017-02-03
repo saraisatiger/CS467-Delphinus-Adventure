@@ -97,6 +97,13 @@ NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing else laying about worth taking
 # 'Look at' strings
 LOOK_AT_NOT_SEEN = "You do not see that here."
 
+# 'steal' strings
+STEAL_FAIL_ALREADY_OWNED = "You already own that. You can just take it!"
+STEAL_FAIL_FREE_ITEM = "That doesn't cost anything. You should just take it - nobody will care!"
+STEAL_SUCCESS_PREFIX = "Your nimble hands are able to procure the "
+STEAL_SUCCESS_SUFFIX = " without being caught."
+STEAL_FAIL_GENERIC = "You aren't able to steal that without being seen. You can try again."
+
 # 'take' strings
 PICKUP_SUCCESS_PREFIX = "You pick up the "
 PICKUP_SUCCESS_SUFFIX = " and put it in your backpack."

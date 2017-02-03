@@ -9,14 +9,17 @@
 # CITATIONS
 # CITE: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
 # CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
+# CITE: https://docs.python.org/3.3/library/random.html
 
 import os
 import platform
+import random
 
 from constants.strings import *
-from constants.verbs import *
-from constants.status_codes import *
 from constants.action_costs import *
+from constants.probabilities import *
+from constants.status_codes import *
+from constants.verbs import *
 from fileio.save_game import *
 from fileio.room_builder import RoomBuilder
 from gameclient.player import *
@@ -37,6 +40,7 @@ class GameClient:
         # Instantiate unenforced singleton-style instances of various components
         self.ui = UserInterface()
         self.lp = LanguageParser()
+        self.rand_event = RandomEventGenerator()
 
         # Variables used to store GameClient state
         self.user_input = ""
@@ -102,7 +106,7 @@ class GameClient:
                 elif exit_code is GAMEOVER_QUIT:
                     print("Game over: Player quit")
                     self.reset_input_and_command()
-
+            self.ui.wait_for_enter()
             self.reset_input_and_command()
 
     def main_menu_loop(self):
@@ -199,8 +203,7 @@ class GameClient:
                 # TODO: Implement HACK
                 logger.debug("Hack is not yet implemented.")
             elif self.command is STEAL:
-                # TODO: Implement STEAL
-                logger.debug("Steal is not yet implemented.")
+                self.verb_steal(self.verb_object)
             elif self.command is BUY:
                 self.verb_buy(self.verb_object)
             elif self.command is SPRAYPAINT:
@@ -503,6 +506,29 @@ class GameClient:
         self.ui.wait_for_enter()
         return spraypaint_success
 
+    def verb_steal(self, object_name):
+        steal_success = False
+        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
+
+        if room_object is not None:
+            if room_object.is_owned_by_player() is True:
+                print(STEAL_FAIL_ALREADY_OWNED)
+            elif room_object.get_cost() is 0:
+                print(STEAL_FAIL_FREE_ITEM)
+            elif room_object.get_cost() > 0:
+                if (self.rand_event.attempt_steal() is True):
+                    self.gamestate.get_current_room().remove_object_from_room(room_object)
+                    self.gamestate.player.add_object_to_inventory(room_object)
+                    print(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
+                    steal_success = True
+                    self.gamestate.update_time_left(STEAL_COST)
+                else:
+                    print(STEAL_FAIL_GENERIC)
+                    self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
+
+        self.ui.wait_for_enter()
+        return steal_success
+
 
 class GameState:
     '''
@@ -574,10 +600,8 @@ class GameState:
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\status_codes.py  ((SSH))
         # This function should/will check if player has won or lost(died/whatever)
-        # if self.gamestate.player.speed is 0:
-        #     return GAMEOVER_LOSE
-        #
-        # else:
+        if self.time_left is 0:
+            return GAMEOVER_LOSE
         return GAME_CONTINUE
 
     def get_header_info(self):
@@ -691,9 +715,27 @@ class UserInterface:
     def print_room_description(self, description):
         print(DESCRIPTION_HEADER)
         print(description)
-        # print(DESCRIPTION_FOOTER)
 
     def print_inventory(self, inventory_description):
         print(INVENTORY_LIST_HEADER)
         print(inventory_description)
         print(INVENTORY_LIST_FOOTER)
+
+
+
+class RandomEventGenerator:
+    '''
+    Used to generate / determine random event results within the game.
+    Anything that is randomized in the game should be seeded/randomized and returned from here
+    '''
+    def __init__(self):
+        # Defined in constants/probabilities.py
+        # 100 is 100% chance, 75 = 75 chance, etc.
+        self.steal_success_chance = STEAL_SUCCESS_CHANCE
+        random.seed()
+
+    def attempt_steal(self):
+        num = random.randint(1,100)
+        if num <= self.steal_success_chance:
+            return True
+        return False
