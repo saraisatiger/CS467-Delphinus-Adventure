@@ -58,7 +58,7 @@ YES_ALIASES = {'yes', 'y'}
 # TODO: Make this a lot more extensive
 HELP_MESSAGE_1 = "Here's the information on how to play the game..."
 HELP_MESSAGE_2 = "Type in a command. Valid commands are: "
-VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <verb_object>, go <direction or description>, take <verb_object>, \ndrop <verb_object>, inventory, hack, steal <verb_object>, buy <verb_object>, spraypaint, use <verb_object or feature>\n"
+VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <object>, go <direction or description>, take <object>, \ndrop <object>, inventory, hack, steal <object>, buy <object>, spraypaint, use <object or feature>\n"
 HELP_MESSAGE = [
     HELP_MESSAGE_1,
     HELP_MESSAGE_2,

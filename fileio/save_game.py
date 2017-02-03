@@ -53,18 +53,18 @@ class SaveGame:
     def write_to_file(self, filename):
         '''
         SAVING A SAVEGAME FROM GAMESTATE
-            A SaveGame would be instantiated when a player chooses to 'save' their game. Pass in the gamestate verb_object
-            from the GameClient and then parse through the verb_object looking for the relevant data to save to file.
+            A SaveGame would be instantiated when a player chooses to 'save' their game. Pass in the gamestate object
+            from the GameClient and then parse through the verb_subject looking for the relevant data to save to file.
 
-            Once a SaveGame verb_object is instantiated, you can call write_to_file() method to save the data.
+            Once a SaveGame object is instantiated, you can call write_to_file() method to save the data.
         '''
         pass
 
     def load_from_file(self, filename):
         '''
         LOADING A SAVEGAME FROM FILE
-            Instead, call the load_from_file() method. This will populate the SaveGame verb_object with the necessary
-            data. The GameState class will simply create a SaveGame verb_object, call load_from_file(), then use the SaveGame
+            Instead, call the load_from_file() method. This will populate the SaveGame object with the necessary
+            data. The GameState class will simply create a SaveGame object, call load_from_file(), then use the SaveGame
             to parse it for the data it wants and handle the logic of "repopulating" the GameState so that it matches
             the original savegame in a similar fashion as write_to_file
         '''
