@@ -131,9 +131,9 @@ class Room:
 
     def get_object_by_name(self, object_name):
         '''
-        Return reference to an verb_object looked up by name if it exists in the room
-        :param object_name:
-        :return:
+        Return reference to an object looked up by name if it exists in the room
+        :param object_name: string
+        :return: an object or None if not found
         '''
         for room_object in self.objects:
             if room_object.get_name().lower() == object_name.lower():
