@@ -1,21 +1,21 @@
 {
   "name" : "Actual Pool on the Roof",
-  "long_description" : "So there IS an actual Pool up here! You probably couldn't see it from behind the wall on the other side of the roof. And a Diving Board, too!",
-  "short_description" : "The water looks super inviting...",
+  "long_description" : "Suddenly you are floating... cool water is all around you and you barely remember the adventure that brought you here to this aquatic paradise. The undersides of the transplanted palms glow brilliant magenta from the pool’s excessive underwater LED’s. The water is perfect temperature, and you’re so relaxed that you could whiz, but you mostly don’t. \"Sweet moves,\" says Acid Burn, swimming over next to you and looking extra fine. \"Whoa! Check that out.\" The windows of a nearby office building suddenly light up in a numerical pattern flashing figures and names in golden lights. Acid Burn gestures at to the diving board. \"Why don’t you trick off that diving board and go for a better score? \".",
+  "short_description" : "A real pool! You won!!!",
   "visited" : false,
   "virtual_space" : true,
   "room_features" : [
       {
         "name" : "Acid Burn",
-        "description" : "High five! We did it!"
+        "description" : "Even better underwater"
       },
       {
         "name" : "Diving Board",
         "description" : "CANNON BALLLL!"
       },
       {
-        "name" : "Walls",
-        "description" : "There are some sweet tags on here."
+        "name" : "Windows",
+        "description" : "Someone hacked the lights."
       }
   ],
   "room_connections" : [
