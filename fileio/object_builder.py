@@ -10,7 +10,8 @@
 # CITATIONS
 # CITE:
 
-from gameclient.room import *
+# from constants.strings import *
+from fileio.room_builder import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)
@@ -79,21 +80,6 @@ class ObjectBuilder:
     '''
     def __init__(self):
         pass
-
-    def get_game_objects(self):
-        all_objects = []
-
-        skateboard = Object({
-            'name' : 'Skateboard',
-            'long_description' : 'A trendy skateboard with the text \'Z3R0 C007\' inked on its surface',
-            'short_description' : 'Skateboard is good',
-            'default_location' : 'Street'
-        })
-
-
-        all_objects.append(skateboard)
-
-        return all_objects
 
     def load_object_data_from_file(self):
         '''

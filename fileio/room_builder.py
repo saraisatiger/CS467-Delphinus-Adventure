@@ -24,19 +24,18 @@ import glob
 
 class Room:
     '''
-    Specifications: A room has at least 2 features, a long and short long_description, and has either been visited or not
+    Specifications: A room has at least 2 features, a long and short long_description, and has either been visited or not.
 
-    Each room can have 0 or more room connections, each of which must be able to be accessed by typing
-    the .name for that connection, the cardinal direction, and various combination of either. 'go' in front optional
+    Each room can have 1 or more room connections, each of which must be able to be accessed by typing
+    the name for that connection, the cardinal direction, and various combinations of either ('go' in front is optional).
 
-    The room features are encapsulated as they can be examined by typing in their name and this gives a
-    long_description.
+    The room features are encapsulated as they can be examined by typing in their name. This gives a long_description.
 
     Rooms can also have objects in them that can be picked up or dropped by the player.
-
     '''
+
     def __init__(self, properties):
-        # Ensure the properites exist then read them into instance of Room verb_object
+        # Ensure properties exist then read them into instance of Room verb_object
         if properties:
             self.name = properties['name']
             self.long_description = properties['long_description']
@@ -54,10 +53,9 @@ class Room:
             for room_connection_properties in properties['room_connections']:
                 room_connection = RoomConnection(room_connection_properties)
                 self.room_connections.append(room_connection)
-
-        # Room starts with no objects. The ObjectBuilder class makes the objects, the new game or load game initializers
-        # are responsible for populating the rooms/inventory with objects
-        self.objects = []
+            # Room starts with no objects. The ObjectBuilder class makes the objects, the new game or load game initializers
+            # are responsible for populating the rooms/inventory with objects
+            self.objects = []
 
     def get_name(self):
         return self.name
@@ -67,7 +65,7 @@ class Room:
         Get the "long long_description" version of the room's long_description
         :return: string representing full length long_description
         '''
-        full_description = self.long_description + "\n" +  self.get_supplemental_description()
+        full_description = self.long_description + "\n" + self.get_supplemental_description()
         return full_description
 
     def get_short_description(self):
@@ -111,8 +109,7 @@ class Room:
             objects_string = NO_INTERESTING_OBJECTS_MESSAGE
         return objects_string
 
-
-    def set_visited(self, visited = True):
+    def set_visited(self, visited=True):
         '''
         Sets whether the room has been visited or not
         :return:
@@ -126,7 +123,7 @@ class Room:
         :return: The feature itself or null
         '''
         for room_feature in self.room_features:
-            logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() +"...")
+            logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() + "...")
             if room_feature.get_name().lower() == feature.lower():
                 logger.debug("Match found!")
                 return room_feature
@@ -150,10 +147,8 @@ class Room:
     def add_object_to_room(self, object):
         self.objects.append(object)
 
-
     def remove_object_from_room(self, object):
         self.objects.remove(object)
-
 
     def remove_object_from_room_by_name(self, object_name):
         object_to_remove = self.get_object_by_name(object_name)
@@ -181,6 +176,7 @@ class RoomFeature:
     Each room must have at least two "features" that can be examined (a fish on the ground, lightning bolts in the sky,
     a wooden chair, a smoky smell, etc.).
     '''
+
     def __init__(self, properties):
         self.name = properties['name']
         self.description = properties['description']
@@ -194,12 +190,12 @@ class RoomFeature:
 
 class RoomConnection:
     '''
-
     Per Specifications:
     Exits from a room must be described in both the short-form and long-form descriptions, and should include a
     direction. For example: "There is a dank-smelling staircase, descending into the dark, at the end of the hall on
     the north wall", or "I can see clouds to the east and west that I think I can jump to from here".
     '''
+
     def __init__(self, properties):
         self.label = properties['label']
         self.cardinal_direction = properties['cardinal_direction']
