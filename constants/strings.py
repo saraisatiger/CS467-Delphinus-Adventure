@@ -121,7 +121,8 @@ PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, j
 
 # ' use' strings
 USE_FAIL = "There's just no way to use that because it's not in your bag!"
-USE_CASH_SUCCESS = "You count the bills and put them in your wallet."
+USE_CASH_SUCCESS_PREFIX = "You count the bills and put them in your wallet. You are "
+USE_CASH_SUCCESS_SUFFIX = " dollars richer!"
 USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"
 USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide to Building Amazing Hacking Machines' to see what you need?"
 USE_SNACKS_SUCCESS = "Crunchy yet satisfying. You feel faster, do you Grok it?"

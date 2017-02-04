@@ -491,13 +491,15 @@ class GameClient:
             obj_label = used_object.get_name().lower()
             # "Cash" item logic
             if obj_label == "crisp cash":
-                self.gamestate.player.update_cash(200)
+                cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
+                self.gamestate.player.update_cash(cash_gained)
                 self.gamestate.player.remove_object_from_inventory(used_object)
-                print(USE_CASH_SUCCESS)
+                print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
             elif obj_label == "cash wad":
-                self.gamestate.player.update_cash(57)
+                cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
+                self.gamestate.player.update_cash(cash_gained )
                 self.gamestate.player.remove_object_from_inventory(used_object)
-                print(USE_CASH_SUCCESS)
+                print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
             elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
                 # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
                 # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
@@ -820,3 +822,7 @@ class RandomEventGenerator:
         if num <= self.steal_success_chance:
             return True
         return False
+
+    def get_random_cash_amount(self, min_amount, max_amount):
+        amount = random.randint(min_amount, max_amount)
+        return amount
