@@ -231,7 +231,7 @@ class GameClient:
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
                 if quit_confirmed == True:
-                    status = GAMEOVER_QUIT
+                    status = GAMEOVER_LOAD
             else:
                 print(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
@@ -245,14 +245,66 @@ class GameClient:
         Sets appropriate variables in the GameClient's gamestate instance
         :return:
         '''
-        # TODO: Implement load_game_menu() method ((SSH))
         print(LOAD_GAME_MESSAGE)
+        savegame = SaveGame(None)
+        savegame_list = SaveGame.get_savegame_filenames()
+
+        if savegame_list:
+            input_is_valid = False
+            user_choice = ""
+            option = -1
+
+            while input_is_valid is False:
+                input_is_valid = True # Turn this back to false if we get exception converting to an int
+                counter = 1
+                for savegame in savegame_list:
+                    print(str(counter) + ": " + savegame)
+                    counter += 1
+
+                print("Enter the number of the filename you wish to load and press [Enter]")
+                user_choice = self.ui.user_prompt()
+
+                # Cite: http://stackoverflow.com/questions/5424716/how-to-check-if-input-is-a-number
+                try:
+                    option = int(user_choice)
+                except:
+                    print("That's not a valid integer. Enter the number and press enter.")
+                    input_is_valid = False
+                    continue
+
+                option -= 1
+                if option < 0 or option >= len(savegame_list):
+                    print("That's not a valid menu option. Please choose an integer from the list to load the game")
+                    input_is_valid = False
+                    continue
+
+            # If here we have a valid option
+            self.gamestate.initialize_load_game(savegame_list[option])
+            return True
+
+        else:
+            print(LOAD_GAME_NO_SAVES)
+            return False
 
         # TODO: This should ultimately result in a self.gamestate.initialize_load_game(filename) call (not implemented ((SSH))
 
     def save_game_menu(self):
-        # TODO: Implement the save game menu and logic ((SSH))
-        print(SAVE_GAME_MESSAGE)
+        save_game = SaveGame(self.gamestate)
+        file_name = ""
+        is_valid_filename = False
+
+        while is_valid_filename is False:
+            print(SAVE_GAME_PROMPT)
+            file_name = self.ui.user_prompt()
+            is_valid_filename = save_game.is_valid_filename(file_name)
+            if is_valid_filename is False:
+                print(SAVE_GAME_VALID_FILENAME_MESSAGE)
+
+        if save_game.write_to_file(file_name) is True:
+            print(SAVE_GAME_SUCCESS + file_name)
+        else:
+            print(SAVE_GAME_FAILED + file_name)
+
         self.ui.wait_for_enter()
 
     def go_to_jail(self):

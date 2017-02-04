@@ -10,6 +10,8 @@
 # CITE: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
 # CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
 
+from constants.action_costs import STARTING_TIME
+
 class SaveGame:
     def __init__(self, gamestate):
         '''
@@ -19,19 +21,17 @@ class SaveGame:
         :param gamestate:
         '''
 
+        # These must be defined - the only reason I give them values here is so that I can test the loadgame/savegame
+        # methods without having them actually read/write from/to real files
+        self.current_room = "Street"
+        self.visited_rooms = []
+        self.objects_in_rooms = {}
+        self.player_inventory = []
+        self.time_left = STARTING_TIME
+
         # TODO: Write more UNIT TESTS for this code
         if gamestate:
-            # As of 1/29, the useful gamestate data includes:
-            # * The current room
             self.current_room = gamestate.get_current_room().get_name()
-            # * What rooms have been visited
-            self.visited_rooms = []
-            # * What objects are in each Room's .object's properties
-            self.objects_in_rooms = {}
-            # * What objects are in the player's inventory
-            self.player_inventory = []
-            # * The player's various stats (speed, coolness, etc.)
-            # * The time left
             self.time_left = gamestate.get_time_left()
 
             for room in gamestate.rooms:
@@ -58,7 +58,13 @@ class SaveGame:
 
             Once a SaveGame object is instantiated, you can call write_to_file() method to save the data.
         '''
-        pass
+        write_successful = True
+
+        # if write failed
+        #   write_successful = False
+
+        return write_successful
+
 
     def load_from_file(self, filename):
         '''
@@ -71,16 +77,45 @@ class SaveGame:
         pass
 
     def get_visited_rooms_list(self):
-        return self.visited_rooms
+        if self.visited_rooms is not None:
+            return self.visited_rooms
+        return None
 
     def get_objects_in_rooms(self):
-        return self.objects_in_rooms
+        if self.objects_in_rooms is not None:
+            return self.objects_in_rooms
+        return None
 
     def get_player_inventory(self):
-        return self.player_inventory
+        if self.player_inventory is not None:
+            return self.player_inventory
+        return None
 
     def get_current_room(self):
-        return self.current_room
+        if self.current_room is not None:
+            return self.current_room
+        return None
 
     def get_time_left(self):
-        return self.time_left
+        if self.time_left is not None:
+            return self.time_left
+        return None
+
+    def is_valid_filename(self, file_name):
+        '''
+        Pass in a string and validate if the filename is valid
+        Invalid might be because string is an invalid filename in the op system or some other reason(s)
+        :param file_name:
+        :return: True if filename is valid, False if not valid
+        '''
+        pass
+
+    @staticmethod
+    def get_savegame_filenames():
+        '''
+        Returns a list of the filenames in the savegame folder
+        :return: All files in the savegame folder
+        '''
+        # TODO: Implement this
+        savegames = ["todo1", "todo2", "todo3"]
+        return savegames
