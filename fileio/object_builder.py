@@ -10,7 +10,6 @@
 # CITATIONS
 # CITE:
 
-# from constants.strings import *
 from fileio.room_builder import *
 
 from debug.debug import *
@@ -22,7 +21,7 @@ import pprint
 
 class Object:
     '''
-    An verb_object. Can be in a Room or players inventory.
+    A game object. Can be in a Room or players inventory.
      Can be picked up from a room, dropped in a room, used, 'look at'ed, and possibly other actions
     '''
     def __init__(self, properties):

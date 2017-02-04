@@ -9,14 +9,17 @@
 # CITATIONS
 # CITE: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
 # CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
+# CITE: https://docs.python.org/3.3/library/random.html
 
 import os
 import platform
+import random
 
-# from constants.strings import *
-from constants.verbs import *
-from constants.status_codes import *
+from constants.strings import *
 from constants.action_costs import *
+from constants.probabilities import *
+from constants.status_codes import *
+from constants.verbs import *
 from fileio.save_game import *
 from fileio.room_builder import *
 from fileio.object_builder import *
@@ -37,10 +40,11 @@ class GameClient:
         # Instantiate unenforced singleton-style instances of various components
         self.ui = UserInterface()
         self.lp = LanguageParser()
+        self.rand_event = RandomEventGenerator()
 
         # Variables used to store GameClient state
         self.user_input = ""
-        self.verb_object = ""
+        self.verb_subject = ""
         self.command = INVALID_INPUT
         self.valid_main_menu_commands = { QUIT, LOAD_GAME, NEW_GAME , HELP }
 
@@ -102,7 +106,7 @@ class GameClient:
                 elif exit_code is GAMEOVER_QUIT:
                     print("Game over: Player quit")
                     self.reset_input_and_command()
-
+            self.ui.wait_for_enter()
             self.reset_input_and_command()
 
     def main_menu_loop(self):
@@ -120,7 +124,9 @@ class GameClient:
                 print(self.user_input + INVALID_MENU_COMMAND_MESSAGE + "\n\n")
                 self.ui.wait_for_enter()
             self.main_menu_prompt()
-            self.command, self.verb_object, self.targets = self.lp.parse_command(self.user_input)
+
+            self.send_command_to_parser()
+
 
     def main_menu_prompt(self):
         '''
@@ -143,9 +149,9 @@ class GameClient:
             return False
 
     def reset_input_and_command(self):
-        # Reset the input and command/verb_object/targets from parser
+        # Reset the input and command/verb_subject/targets from parser
         self.user_input = ""
-        self.command, self.verb_object, self.targets = INVALID_INPUT, None, None
+        self.command, self.verb_subject, self.targets = INVALID_INPUT, None, None
 
     def play_game(self):
         '''
@@ -174,9 +180,7 @@ class GameClient:
 
             # Prompt user for input and parse the command
             self.user_input = self.ui.user_prompt()
-
-            # TODO: Update this once languageparser fully implemented
-            self.command, self.verb_object, self.targets = self.lp.parse_command(self.user_input)
+            self.send_command_to_parser()
 
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
@@ -186,29 +190,28 @@ class GameClient:
                 self.ui.clear_screen()
 
             elif self.command is LOOK_AT:
-                self.verb_look_at(self.verb_object)
+                self.verb_look_at(self.verb_subject)
             elif self.command is INVENTORY:
                 self.verb_inventory()
             elif self.command is TAKE:
-                self.verb_take(self.verb_object)
+                self.verb_take(self.verb_subject)
             elif self.command is DROP:
-                self.verb_drop(self.verb_object)
+                self.verb_drop(self.verb_subject)
             elif self.command is GO:
-                self.verb_go(self.verb_object)
+                self.verb_go(self.verb_subject)
             elif self.command is HACK:
                 # TODO: Implement HACK
                 logger.debug("Hack is not yet implemented.")
             elif self.command is STEAL:
-                # TODO: Implement STEAL
-                logger.debug("Steal is not yet implemented.")
+                self.verb_steal(self.verb_subject)
             elif self.command is BUY:
-                self.verb_buy(self.verb_object)
+                self.verb_buy(self.verb_subject)
             elif self.command is SPRAYPAINT:
                 # TODO: Finish implementing verb_spraypaint and remove the debug print
                 logger.debug("Spraypaint is not fully implemented yet.")
-                self.verb_spraypaint(self.verb_object)
+                self.verb_spraypaint(self.verb_subject)
             elif self.command is USE:
-                self.verb_use(self.verb_object)
+                self.verb_use(self.verb_subject)
             elif self.command is HELP:
                 self.verb_help()
             elif self.command is LOAD_GAME:
@@ -228,7 +231,7 @@ class GameClient:
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
                 if quit_confirmed == True:
-                    status = GAMEOVER_QUIT
+                    status = GAMEOVER_LOAD
             else:
                 print(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
@@ -242,15 +245,74 @@ class GameClient:
         Sets appropriate variables in the GameClient's gamestate instance
         :return:
         '''
-        # TODO: Implement load_game_menu() method ((SSH))
         print(LOAD_GAME_MESSAGE)
+        savegame = SaveGame(None)
+        savegame_list = SaveGame.get_savegame_filenames()
+
+        if savegame_list:
+            input_is_valid = False
+            user_choice = ""
+            option = -1
+
+            while input_is_valid is False:
+                input_is_valid = True # Turn this back to false if we get exception converting to an int
+                counter = 1
+                for savegame in savegame_list:
+                    print(str(counter) + ": " + savegame)
+                    counter += 1
+
+                print("Enter the number of the filename you wish to load and press [Enter]")
+                user_choice = self.ui.user_prompt()
+
+                # Cite: http://stackoverflow.com/questions/5424716/how-to-check-if-input-is-a-number
+                try:
+                    option = int(user_choice)
+                except:
+                    print("That's not a valid integer. Enter the number and press enter.")
+                    input_is_valid = False
+                    continue
+
+                option -= 1
+                if option < 0 or option >= len(savegame_list):
+                    print("That's not a valid menu option. Please choose an integer from the list to load the game")
+                    input_is_valid = False
+                    continue
+
+            # If here we have a valid option
+            self.gamestate.initialize_load_game(savegame_list[option])
+            return True
+
+        else:
+            print(LOAD_GAME_NO_SAVES)
+            return False
 
         # TODO: This should ultimately result in a self.gamestate.initialize_load_game(filename) call (not implemented ((SSH))
 
     def save_game_menu(self):
-        # TODO: Implement the save game menu and logic ((SSH))
-        print(SAVE_GAME_MESSAGE)
+        save_game = SaveGame(self.gamestate)
+        file_name = ""
+        is_valid_filename = False
+
+        while is_valid_filename is False:
+            print(SAVE_GAME_PROMPT)
+            file_name = self.ui.user_prompt()
+            is_valid_filename = save_game.is_valid_filename(file_name)
+            if is_valid_filename is False:
+                print(SAVE_GAME_VALID_FILENAME_MESSAGE)
+
+        if save_game.write_to_file(file_name) is True:
+            print(SAVE_GAME_SUCCESS + file_name)
+        else:
+            print(SAVE_GAME_FAILED + file_name)
+
         self.ui.wait_for_enter()
+
+    def go_to_jail(self):
+        #TODO Refactor this as a general purpose function? Take in the room name, the message, and the cost as parameters
+        county_jail = self.gamestate.get_room_by_name("County Jail")
+        self.gamestate.set_current_room(county_jail)
+        print(GO_TO_JAIL_MESSAGE)
+        self.gamestate.update_time_left(JAIL_COST)
 
     def verb_buy(self, object_name):
         '''
@@ -271,6 +333,7 @@ class GameClient:
             print(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
         else:
             self.gamestate.player.add_object_to_inventory(object)
+            self.gamestate.get_current_room().remove_object_from_room(object)
             self.gamestate.player.update_cash(object.get_cost() * -1 ) # Send in cost as negative to reduce cash
             print(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
             buy_succeeded = True
@@ -300,10 +363,10 @@ class GameClient:
         elif inventory_object is not None:
             self.gamestate.player.inventory.remove_object(inventory_object)
             self.gamestate.get_current_room().add_object_to_room(inventory_object)
-            print(DROP_SUCCESS_PREFIX + self.verb_object + DROP_SUCCESS_SUFFIX)
+            print(DROP_SUCCESS_PREFIX + self.verb_subject + DROP_SUCCESS_SUFFIX)
             drop_success = True
         else:
-            print(DROP_FAILURE_PREFIX + self.verb_object + DROP_FAILURE_SUFFIX)
+            print(DROP_FAILURE_PREFIX + self.verb_subject + DROP_FAILURE_SUFFIX)
 
         if drop_success:
             self.gamestate.update_time_left(DROP_COST)
@@ -327,7 +390,7 @@ class GameClient:
                     logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
 
         # If go failed to find the room / direction desired, print a failure message
-        print(GO_FAILURE_PREFIX + self.verb_object + GO_FAILURE_SUFFIX)
+        print(GO_FAILURE_PREFIX + self.verb_subject + GO_FAILURE_SUFFIX)
         return False
 
     def verb_help(self):
@@ -363,8 +426,8 @@ class GameClient:
     def verb_look_at(self, object_name):
         '''
         Attempts to look at the subject
-        :param object_name: Grammatical verb_object at which player wishes to look.
-                            Could be a feature or an verb_object in environment or in their inventory
+        :param object_name: Grammatical object at which player wishes to look.
+                            Could be a feature or an object in environment or in their inventory
         :return: None
         '''
 
@@ -396,7 +459,7 @@ class GameClient:
     def verb_take(self, object_name):
         '''
         Evaluates a command to take object_name from the Room and if it exists (and is allowed by game rules) then
-        verb_object placed in inventory for the player
+        object placed in inventory for the player
         :param object_name: string input by player in their command
         :return: True (success), False ( fail, object_name not found in the room)
         '''
@@ -407,13 +470,13 @@ class GameClient:
             if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
                 self.gamestate.get_current_room().remove_object_from_room(room_object)
                 self.gamestate.player.add_object_to_inventory(room_object)
-                print(PICKUP_SUCCESS_PREFIX + self.verb_object + PICKUP_SUCCESS_SUFFIX)
+                print(PICKUP_SUCCESS_PREFIX + self.verb_subject + PICKUP_SUCCESS_SUFFIX)
                 take_success = True
             elif room_object.get_cost() > 0:
                 print(PICKUP_NOT_FREE)
         # Otherwise failed:
         else:
-            print(PICKUP_FAILURE_PREFIX + self.verb_object + PICKUP_FAILURE_SUFFIX)
+            print(PICKUP_FAILURE_PREFIX + self.verb_subject + PICKUP_FAILURE_SUFFIX)
 
         if take_success:
             self.gamestate.update_time_left(TAKE_COST)
@@ -429,13 +492,15 @@ class GameClient:
             obj_label = used_object.get_name().lower()
             # "Cash" item logic
             if obj_label == "crisp cash":
-                self.gamestate.player.update_cash(200)
+                cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
+                self.gamestate.player.update_cash(cash_gained)
                 self.gamestate.player.remove_object_from_inventory(used_object)
-                print(USE_CASH_SUCCESS)
+                print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
             elif obj_label == "cash wad":
-                self.gamestate.player.update_cash(57)
+                cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
+                self.gamestate.player.update_cash(cash_gained )
                 self.gamestate.player.remove_object_from_inventory(used_object)
-                print(USE_CASH_SUCCESS)
+                print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
             elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
                 # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
                 # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
@@ -449,9 +514,11 @@ class GameClient:
                      ram_chip is not None and \
                     floppy_disk is not None:
                     print(USE_COMPUTER_PARTS_SUCCESS)
+                    self.ui.wait_for_enter()
                     self.gamestate.player.remove_object_from_inventory(g_card)
                     self.gamestate.player.remove_object_from_inventory(ram_chip)
                     self.gamestate.player.remove_object_from_inventory(floppy_disk)
+                    self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
                 else:
                     print(USE_COMPUTER_PARTS_MISSING)
             elif obj_label == "hackersnacks":
@@ -485,8 +552,8 @@ class GameClient:
         return use_success
 
     def verb_spraypaint(self, verb_object):
-        # TODO: Implement this fully. Check that verb_object is spraypaintable / room is spraypaintable, handle logic if not/fails
-        # TODO: also chance of getting caught / going to jail / paying fine / being seen by another tagger for bonus coolness?
+        # TODO: Implement this fully. Check that object/feature is spraypaintable and handle logic if not/fails
+        # TODO: also chance of getting caught / going to jail or some other bad effect
 
         spraypaint_success = True
 
@@ -502,6 +569,37 @@ class GameClient:
 
         self.ui.wait_for_enter()
         return spraypaint_success
+
+    def verb_steal(self, object_name):
+        steal_success = False
+        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
+
+        if room_object is not None:
+            if room_object.is_owned_by_player() is True:
+                print(STEAL_FAIL_ALREADY_OWNED)
+            elif room_object.get_cost() is 0:
+                print(STEAL_FAIL_FREE_ITEM)
+            elif room_object.get_cost() > 0:
+                if (self.rand_event.attempt_steal() is True):
+                    self.gamestate.get_current_room().remove_object_from_room(room_object)
+                    self.gamestate.player.add_object_to_inventory(room_object)
+                    print(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
+                    steal_success = True
+                    self.gamestate.update_time_left(STEAL_COST)
+                else:
+                    print(STEAL_FAIL_GENERIC)
+                    self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
+                    self.go_to_jail()
+                    return steal_success
+
+        self.ui.wait_for_enter()
+        return steal_success
+
+    def send_command_to_parser(self):
+        results = self.lp.parse_command(self.user_input)
+        self.command = results.get_verb()
+        self.verb_subject = results.get_subject()['name']
+        self.targets = results.get_targets()
 
 
 class GameState:
@@ -532,6 +630,7 @@ class GameState:
 
     def initialize_new_game(self):
         self.set_room_vars_to_default()
+        self.set_object_vars_to_default()
         self.set_default_room(DEFAULT_ROOM)
         self.time_left = STARTING_TIME
         self.place_objects_in_rooms(self.objects)
@@ -552,7 +651,7 @@ class GameState:
             room.set_visited(True)
 
         # Retrieve the dictionary of room_name : [object_list] pairs and iterate through, setting each room's objects
-        # to the list in the SaveGame verb_object
+        # to the list in the SaveGame object
         room_objects_dictionary = save_game.get_objects_in_rooms()
         for room_name in room_objects_dictionary:
             room = self.get_room_by_name(room_name)
@@ -560,7 +659,7 @@ class GameState:
                 for room_objects in room_objects_dictionary[room_name]:
                     room.set_objects(room_objects)
             else:
-                logger.debug("Error finding the room stored in a SaveGame verb_object")
+                logger.debug("Error finding the room stored in a SaveGame object")
 
         # Set the current_room
         current_room_name = save_game.get_current_room()
@@ -574,10 +673,8 @@ class GameState:
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\status_codes.py  ((SSH))
         # This function should/will check if player has won or lost(died/whatever)
-        # if self.gamestate.player.speed is 0:
-        #     return GAMEOVER_LOSE
-        #
-        # else:
+        if self.time_left is 0:
+            return GAMEOVER_LOSE
         return GAME_CONTINUE
 
     def get_header_info(self):
@@ -594,6 +691,10 @@ class GameState:
         for room in self.rooms:
             room.set_visited(False)
             room.objects = []
+
+    def set_object_vars_to_default(self):
+        for obj in self.objects:
+            obj.set_is_owned_by_player(False)
 
     def set_default_room(self, room_name):
         default_room = self.get_room_by_name(room_name)
@@ -619,10 +720,19 @@ class GameState:
         :param time_change: Positive --> Increases time_left available. Negative --> Decreases time_left available
         :return: N/A
         '''
+        # TODO: Game design decision. What exactly does speed do? This implementation just adds the speed to any negative
+        # time effects unless it reduces the effect to cause a GAIN in time which makes no sense
+        # We could also make speed some kind of multiplier or some other method
+        if time_change < 0:
+            time_change += self.player.speed
+            if time_change > 0:
+                time_change = 0
         self.time_left += time_change
 
     def get_time_left(self):
         return self.time_left
+
+
 
 
 class UserInterface:
@@ -691,9 +801,31 @@ class UserInterface:
     def print_room_description(self, description):
         print(DESCRIPTION_HEADER)
         print(description)
-        # print(DESCRIPTION_FOOTER)
 
     def print_inventory(self, inventory_description):
         print(INVENTORY_LIST_HEADER)
         print(inventory_description)
         print(INVENTORY_LIST_FOOTER)
+
+
+
+class RandomEventGenerator:
+    '''
+    Used to generate / determine random event results within the game.
+    Anything that is randomized in the game should be seeded/randomized and returned from here
+    '''
+    def __init__(self):
+        # Defined in constants/probabilities.py
+        # 100 is 100% chance, 75 = 75 chance, etc.
+        self.steal_success_chance = STEAL_SUCCESS_CHANCE
+        random.seed()
+
+    def attempt_steal(self):
+        num = random.randint(1,100)
+        if num <= self.steal_success_chance:
+            return True
+        return False
+
+    def get_random_cash_amount(self, min_amount, max_amount):
+        amount = random.randint(min_amount, max_amount)
+        return amount

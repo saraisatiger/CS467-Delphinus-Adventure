@@ -4,5 +4,5 @@
   "short_description" : "A black chip",
   "default_location" : "\"Pool\" on the Roof",
   "details" : "build computer",
-  "cost" : 0
+  "cost" : 10
 }

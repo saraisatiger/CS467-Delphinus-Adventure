@@ -64,7 +64,7 @@ class Inventory:
 
     def get_object_by_name(self, object_name):
         '''
-        Finds an verb_object in the inventory by name and returns a reference to it
+        Finds an object in the inventory by name and returns a reference to it
         :param object_name:
         :return:
         '''

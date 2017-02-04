@@ -48,9 +48,14 @@ CONNECTION_LIST_SEGWAY= "] is "
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load saved game..."
-SAVE_GAME_MESSAGE = "This would be a menu to save the game..."
+
+SAVE_GAME_PROMPT = "Name for your file: "
+SAVE_GAME_SUCCESS = "Saving game to filename: "
+SAVE_GAME_FAILED = "There was an error saving the game to filename: "
+SAVE_GAME_VALID_FILENAME_MESSAGE = "Something about the filename you provided was invalid."
 LOAD_CONFIRM_PROMPT = "Loading a game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
 QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
+LOAD_GAME_NO_SAVES = "There are no savegames available to load."
 YES_ALIASES = {'yes', 'y'}
 
 
@@ -58,7 +63,7 @@ YES_ALIASES = {'yes', 'y'}
 # TODO: Make this a lot more extensive
 HELP_MESSAGE_1 = "Here's the information on how to play the game..."
 HELP_MESSAGE_2 = "Type in a command. Valid commands are: "
-VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <verb_object>, go <direction or description>, take <verb_object>, \ndrop <verb_object>, inventory, hack, steal <verb_object>, buy <verb_object>, spraypaint, use <verb_object or feature>\n"
+VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <object>, go <direction or description>, take <object>, \ndrop <object>, inventory, hack, steal <object>, buy <object>, spraypaint, use <object or feature>\n"
 HELP_MESSAGE = [
     HELP_MESSAGE_1,
     HELP_MESSAGE_2,
@@ -86,16 +91,26 @@ GO_SUCCESS_SUFFIX = " without a problem."
 GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
 
-# 'Inventory' related strings
+# 'Inventory' strings
 INVENTORY_LIST_HEADER = "========================================================================\nBackpack Contents\n------------------------------------------------------------------------"
 INVENTORY_LIST_FOOTER = "========================================================================"
 INVENTORY_EMPTY = "Empty... not even a floppy disk"
+
+# 'jail' strings
+GO_TO_JAIL_MESSAGE = "Your actions have landed you in jail, costing you valuable time!"
 
 # 'look' strings
 NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing else laying about worth taking."
 
 # 'Look at' strings
 LOOK_AT_NOT_SEEN = "You do not see that here."
+
+# 'steal' strings
+STEAL_FAIL_ALREADY_OWNED = "You already own that. You can just take it!"
+STEAL_FAIL_FREE_ITEM = "That doesn't cost anything. You should just take it - nobody will care!"
+STEAL_SUCCESS_PREFIX = "Your nimble hands are able to procure the "
+STEAL_SUCCESS_SUFFIX = " without being caught."
+STEAL_FAIL_GENERIC = "You aren't able to steal that without being seen. You've been caught!"
 
 # 'take' strings
 PICKUP_SUCCESS_PREFIX = "You pick up the "
@@ -106,7 +121,8 @@ PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, j
 
 # ' use' strings
 USE_FAIL = "There's just no way to use that because it's not in your bag!"
-USE_CASH_SUCCESS = "You count the bills and put them in your wallet."
+USE_CASH_SUCCESS_PREFIX = "You count the bills and put them in your wallet. You are "
+USE_CASH_SUCCESS_SUFFIX = " dollars richer!"
 USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"
 USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide to Building Amazing Hacking Machines' to see what you need?"
 USE_SNACKS_SUCCESS = "Crunchy yet satisfying. You feel faster, do you Grok it?"
