@@ -78,10 +78,10 @@ class Room:
 
     def get_supplemental_description(self):
         '''
-        Get a string of all the connections and objects in the Room
+        Get a string of all the connections, features, and objects in the Room
         :return: string
         '''
-        description = "\n" + OBJECTS_HEADER + "\n" + self.get_object_list_string() + "\n" + EXITS_HEADER + "\n" + self.get_connection_string()
+        description = "\n" + FEATURES_HEADER + "\n" + self.get_feature_list_string() + "\n" + OBJECTS_HEADER + "\n" + self.get_object_list_string() + "\n" + EXITS_HEADER + "\n" + self.get_connection_string()
         return description
 
     def get_connection_string(self):
@@ -108,6 +108,17 @@ class Room:
         else:
             objects_string = NO_INTERESTING_OBJECTS_MESSAGE
         return objects_string
+
+    def get_feature_list_string(self):
+        '''
+        Returns a string that describes the interesting features in the environment.
+        Called by get_long_description
+        :return:
+        '''
+        feature_string = ""
+        for feature in self.room_features:
+            feature_string = feature_string + feature.get_feature_description() + "\n"
+        return feature_string
 
     def set_visited(self, visited=True):
         '''
@@ -186,6 +197,14 @@ class RoomFeature:
 
     def get_description(self):
         return self.description
+
+    def get_feature_description(self):
+        '''
+        Get the string for room features
+        :return: string
+        '''
+        description = FEATURES_LIST_PREFIX + "[" + self.name + "]"
+        return description
 
 
 class RoomConnection:
