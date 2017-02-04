@@ -333,6 +333,7 @@ class GameClient:
             print(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
         else:
             self.gamestate.player.add_object_to_inventory(object)
+            self.gamestate.get_current_room().remove_object_from_room(object)
             self.gamestate.player.update_cash(object.get_cost() * -1 ) # Send in cost as negative to reduce cash
             print(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
             buy_succeeded = True
@@ -513,9 +514,11 @@ class GameClient:
                      ram_chip is not None and \
                     floppy_disk is not None:
                     print(USE_COMPUTER_PARTS_SUCCESS)
+                    self.ui.wait_for_enter()
                     self.gamestate.player.remove_object_from_inventory(g_card)
                     self.gamestate.player.remove_object_from_inventory(ram_chip)
                     self.gamestate.player.remove_object_from_inventory(floppy_disk)
+                    self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
                 else:
                     print(USE_COMPUTER_PARTS_MISSING)
             elif obj_label == "hackersnacks":
