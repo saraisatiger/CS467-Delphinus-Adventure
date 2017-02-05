@@ -40,6 +40,8 @@ STATUS_HEADER_BAR = "+----------------------------------------------------------
 DESCRIPTION_HEADER = "DESCRIPTION:"
 DESCRIPTION_FOOTER = "\n"
 EXITS_HEADER = "Always know your way out. You see a few ways to go from here:"
+FEATURES_HEADER = "This area has the following interesting features:"
+FEATURES_LIST_PREFIX = "\t* "
 OBJECTS_HEADER = "You see the following interesting items in the area:"
 OBJECTS_LIST_PREFIX = "\t* "
 CONNECTION_LIST_PREFIX = "\t* ["
@@ -101,6 +103,8 @@ GO_TO_JAIL_MESSAGE = "Your actions have landed you in jail, costing you valuable
 
 # 'look' strings
 NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing else laying about worth taking."
+NO_INTERESTING_FEATURES_MESSAGE = "You see nothing else worth checking out."
+
 
 # 'Look at' strings
 LOOK_AT_NOT_SEEN = "You do not see that here."

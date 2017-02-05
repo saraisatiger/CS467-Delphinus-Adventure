@@ -21,9 +21,9 @@ from constants.probabilities import *
 from constants.status_codes import *
 from constants.verbs import *
 from fileio.save_game import *
-from fileio.room_builder import RoomBuilder
+from fileio.room_builder import *
+from fileio.object_builder import *
 from gameclient.player import *
-from gameclient.object import *
 from languageparser.language_parser import LanguageParser
 
 from debug.debug import *
@@ -414,7 +414,7 @@ class GameClient:
         self.ui.clear_screen()
 
         if self.gamestate.get_current_room().visited is False or print_long_description is True:
-            description= self.gamestate.get_current_room().get_long_description()
+            description = self.gamestate.get_current_room().get_long_description()
         else:
             description = self.gamestate.get_current_room().get_short_description()
 
