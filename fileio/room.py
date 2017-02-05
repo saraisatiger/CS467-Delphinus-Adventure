@@ -2,7 +2,7 @@
 # CS 467 - Winter 2017
 # Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 
-# room_builder.py
+# room.py
 # Description:
 # Principal Author of this file per Project plan: Sara Hashem and Shawn Hillyer
 
@@ -12,7 +12,7 @@
 # CITE: https://jsonformatter.curiousconcept.com/
 
 from constants.strings import *
-from fileio.object_builder import *
+from fileio.object import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)

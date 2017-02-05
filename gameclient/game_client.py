@@ -21,8 +21,8 @@ from constants.probabilities import *
 from constants.status_codes import *
 from constants.verbs import *
 from fileio.save_game import *
-from fileio.room_builder import *
-from fileio.object_builder import *
+from fileio.room import *
+from fileio.object import *
 from gameclient.player import *
 from languageparser.language_parser import LanguageParser
 
