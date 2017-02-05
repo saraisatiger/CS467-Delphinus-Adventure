@@ -3,33 +3,39 @@
 # Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 
 # room.py
-# Description: Room class and related / composite classes
-# Principal Author of this file per Project plan: Shawn Hillyer
+# Description:
+# Principal Author of this file per Project plan: Sara Hashem and Shawn Hillyer
 
 # CITATIONS
-# CITE:
+# CITE: http://askubuntu.com/questions/352198/reading-all-files-from-a-directory
+# CITE: http://pythonfiddle.com/
+# CITE: https://jsonformatter.curiousconcept.com/
 
 from constants.strings import *
+from fileio.object import *
 
 from debug.debug import *
 logger = logging.getLogger(__name__)
 
+import json
+import glob
+
+
 
 class Room:
     '''
-    Specifications: A room has at least 2 features, a long and short long_description, and has either been visited or not
+    Specifications: A room has at least 2 features, a long and short long_description, and has either been visited or not.
 
-    Each room can have 0 or more room connections, each of which must be able to be accessed by typing
-    the .name for that connection, the cardinal direction, and various combination of either. 'go' in front optional
+    Each room can have 1 or more room connections, each of which must be able to be accessed by typing
+    the name for that connection, the cardinal direction, and various combinations of either ('go' in front is optional).
 
-    The room features are encapsulated as they can be examined by typing in their name and this gives a
-    long_description.
+    The room features are encapsulated as they can be examined by typing in their name. This gives a long_description.
 
     Rooms can also have objects in them that can be picked up or dropped by the player.
-
     '''
+
     def __init__(self, properties):
-        # Ensure the properites exist then read them into instance of Room verb_object
+        # Ensure properties exist then read them into instance of Room verb_object
         if properties:
             self.name = properties['name']
             self.long_description = properties['long_description']
@@ -47,10 +53,9 @@ class Room:
             for room_connection_properties in properties['room_connections']:
                 room_connection = RoomConnection(room_connection_properties)
                 self.room_connections.append(room_connection)
-
-        # Room starts with no objects. The ObjectBuilder class makes the objects, the new game or load game initializers
-        # are responsible for populating the rooms/inventory with objects
-        self.objects = []
+            # Room starts with no objects. The ObjectBuilder class makes the objects, the new game or load game initializers
+            # are responsible for populating the rooms/inventory with objects
+            self.objects = []
 
     def get_name(self):
         return self.name
@@ -60,7 +65,7 @@ class Room:
         Get the "long long_description" version of the room's long_description
         :return: string representing full length long_description
         '''
-        full_description = self.long_description + "\n" +  self.get_supplemental_description()
+        full_description = self.long_description + "\n" + self.get_supplemental_description()
         return full_description
 
     def get_short_description(self):
@@ -73,10 +78,10 @@ class Room:
 
     def get_supplemental_description(self):
         '''
-        Get a string of all the connections and objects in the Room
+        Get a string of all the connections, features, and objects in the Room
         :return: string
         '''
-        description = "\n" + OBJECTS_HEADER + "\n" + self.get_object_list_string() + "\n" + EXITS_HEADER + "\n" + self.get_connection_string()
+        description = "\n" + FEATURES_HEADER + "\n" + self.get_feature_list_string() + "\n" + OBJECTS_HEADER + "\n" + self.get_object_list_string() + "\n" + EXITS_HEADER + "\n" + self.get_connection_string()
         return description
 
     def get_connection_string(self):
@@ -104,8 +109,18 @@ class Room:
             objects_string = NO_INTERESTING_OBJECTS_MESSAGE
         return objects_string
 
+    def get_feature_list_string(self):
+        '''
+        Returns a string that describes the interesting features in the environment.
+        Called by get_long_description
+        :return:
+        '''
+        feature_string = ""
+        for feature in self.room_features:
+            feature_string = feature_string + feature.get_feature_description() + "\n"
+        return feature_string
 
-    def set_visited(self, visited = True):
+    def set_visited(self, visited=True):
         '''
         Sets whether the room has been visited or not
         :return:
@@ -119,7 +134,7 @@ class Room:
         :return: The feature itself or null
         '''
         for room_feature in self.room_features:
-            logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() +"...")
+            logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() + "...")
             if room_feature.get_name().lower() == feature.lower():
                 logger.debug("Match found!")
                 return room_feature
@@ -131,9 +146,9 @@ class Room:
 
     def get_object_by_name(self, object_name):
         '''
-        Return reference to an object looked up by name if it exists in the room
-        :param object_name: string
-        :return: an object or None if not found
+        Return reference to an verb_object looked up by name if it exists in the room
+        :param object_name:
+        :return:
         '''
         for room_object in self.objects:
             if room_object.get_name().lower() == object_name.lower():
@@ -143,10 +158,8 @@ class Room:
     def add_object_to_room(self, object):
         self.objects.append(object)
 
-
     def remove_object_from_room(self, object):
         self.objects.remove(object)
-
 
     def remove_object_from_room_by_name(self, object_name):
         object_to_remove = self.get_object_by_name(object_name)
@@ -174,6 +187,7 @@ class RoomFeature:
     Each room must have at least two "features" that can be examined (a fish on the ground, lightning bolts in the sky,
     a wooden chair, a smoky smell, etc.).
     '''
+
     def __init__(self, properties):
         self.name = properties['name']
         self.description = properties['description']
@@ -184,15 +198,23 @@ class RoomFeature:
     def get_description(self):
         return self.description
 
+    def get_feature_description(self):
+        '''
+        Get the string for room features
+        :return: string
+        '''
+        description = FEATURES_LIST_PREFIX + "[" + self.name + "]"
+        return description
+
 
 class RoomConnection:
     '''
-
     Per Specifications:
     Exits from a room must be described in both the short-form and long-form descriptions, and should include a
     direction. For example: "There is a dank-smelling staircase, descending into the dark, at the end of the hall on
     the north wall", or "I can see clouds to the east and west that I think I can jump to from here".
     '''
+
     def __init__(self, properties):
         self.label = properties['label']
         self.cardinal_direction = properties['cardinal_direction']
@@ -206,3 +228,30 @@ class RoomConnection:
         '''
         description = CONNECTION_LIST_PREFIX + self.cardinal_direction + CONNECTION_LIST_SEGWAY + self.description + ". [" + self.label + "]"
         return description
+
+
+class RoomBuilder:
+    '''
+    This class is designed to build a room or multiple rooms from files
+    '''
+    def __init__(self):
+        # logger.debug("RoomBuilder instantiated")
+        pass
+
+    def load_room_data_from_file(self):
+        '''
+        Called by GameClient to instantiate all of the rooms. This is called whether the game is new
+        or loaded. Returns ALL rooms as a list.
+        '''
+        rooms = []
+        rooms_dir = './gamedata/rooms/*.json'
+        rooms_files =  glob.glob(rooms_dir)
+
+        # Load room content from directory
+        for room in rooms_files:
+            with open(room) as room:
+                room_properties = json.load(room)
+                new_room = Room(room_properties)
+                rooms.append(new_room)
+
+        return rooms
