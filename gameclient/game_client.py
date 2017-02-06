@@ -231,7 +231,7 @@ class GameClient:
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
                 if quit_confirmed == True:
-                    status = GAMEOVER_LOAD
+                    status = GAMEOVER_QUIT
             else:
                 print(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
@@ -319,24 +319,30 @@ class GameClient:
         :param object_name: string, name of the object desired
         :return: True if player bought object_name, false otherwise
         '''
-        object = self.gamestate.get_current_room().get_object_by_name(object_name)
-        player_cash = self.gamestate.player.get_cash()
         buy_succeeded = False
 
-        if object is None:
-            print(BUY_NOT_IN_ROOM)
-        elif object.get_cost() is 0:
-            print(BUY_FREE_ITEM)
-        elif object.is_owned_by_player() is True:
-            print(BUY_FREE_ITEM)
-        elif object.get_cost() > player_cash:
-            print(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
+        room_feature = self.gamestate.get_current_room().get_feature(object_name)
+        if room_feature is not None:
+            print("You can't buy the " + room_feature.get_name())
+            buy_succeeded = False
         else:
-            self.gamestate.player.add_object_to_inventory(object)
-            self.gamestate.get_current_room().remove_object_from_room(object)
-            self.gamestate.player.update_cash(object.get_cost() * -1 ) # Send in cost as negative to reduce cash
-            print(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
-            buy_succeeded = True
+            object = self.gamestate.get_current_room().get_object_by_name(object_name)
+            player_cash = self.gamestate.player.get_cash()
+
+            if object is None:
+                print(BUY_NOT_IN_ROOM)
+            elif object.get_cost() is 0:
+                print(BUY_FREE_ITEM)
+            elif object.is_owned_by_player() is True:
+                print(BUY_FREE_ITEM)
+            elif object.get_cost() > player_cash:
+                print(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
+            else:
+                self.gamestate.player.add_object_to_inventory(object)
+                self.gamestate.get_current_room().remove_object_from_room(object)
+                self.gamestate.player.update_cash(object.get_cost() * -1 ) # Send in cost as negative to reduce cash
+                print(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
+                buy_succeeded = True
 
         if buy_succeeded:
             self.gamestate.update_time_left(BUY_COST)
@@ -355,18 +361,25 @@ class GameClient:
         return GAMEOVER_FORFEIT
 
     def verb_drop(self, object_name):
-        inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
         drop_success = False
 
-        if self.gamestate.get_current_room().is_virtual_space() is True:
-            print(DROP_FAILURE_VIRTUALSPACE)
-        elif inventory_object is not None:
-            self.gamestate.player.inventory.remove_object(inventory_object)
-            self.gamestate.get_current_room().add_object_to_room(inventory_object)
-            print(DROP_SUCCESS_PREFIX + self.verb_subject + DROP_SUCCESS_SUFFIX)
-            drop_success = True
+        room_feature = self.gamestate.get_current_room().get_feature(object_name)
+        if room_feature is not None:
+            print("You can't drop the " + room_feature.get_name() + " because you're not carrying it. Don't be silly!")
+            drop_success = False
+
         else:
-            print(DROP_FAILURE_PREFIX + self.verb_subject + DROP_FAILURE_SUFFIX)
+            inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
+
+            if self.gamestate.get_current_room().is_virtual_space() is True:
+                print(DROP_FAILURE_VIRTUALSPACE)
+            elif inventory_object is not None:
+                self.gamestate.player.inventory.remove_object(inventory_object)
+                self.gamestate.get_current_room().add_object_to_room(inventory_object)
+                print(DROP_SUCCESS_PREFIX + self.verb_subject + DROP_SUCCESS_SUFFIX)
+                drop_success = True
+            else:
+                print(DROP_FAILURE_PREFIX + self.verb_subject + DROP_FAILURE_SUFFIX)
 
         if drop_success:
             self.gamestate.update_time_left(DROP_COST)

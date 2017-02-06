@@ -140,10 +140,11 @@ class LanguageParser:
         else:
             command = INVALID_INPUT
 
-        logger.debug("Returning: " + str(command) + ", " + str(subject) + ", " + str(targets))
         # return (command, subject, targets)
 
         results = LanguageParserWrapper()
         results.set_verb(str(command))
         results.set_subject(str(subject), str("object"))
+
+        logger.debug("Returning: \n" + str(results))
         return results
