@@ -47,7 +47,7 @@ def get_terminal_dimensions():
 
 def is_minimum_terminal_size(rows, cols):
     # Minimums are defined in constants.constants module
-    if rows >= MIN_ROWS and cols >= MIN_COLS:
+    if int(rows) >= int(MIN_ROWS) and int(cols) >= int(MIN_COLS):
         return True
     return False
 
