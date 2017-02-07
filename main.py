@@ -47,11 +47,11 @@ def get_terminal_dimensions():
 
 def is_minimum_terminal_size(rows, cols):
     # Minimums are defined in constants.constants module
-    if rows >= MIN_ROWS and cols >= MIN_COLS:
+    if int(rows) >= int(MIN_ROWS) and int(cols) >= int(MIN_COLS):
         return True
     return False
 
 def print_minimum_terminal_size_error(rows, cols):
-    print("The minimum terminal size is " + rows + " rows and " + + " columns. \nResize your terminal and try launching again.")
+    print("The minimum terminal size is " + str(rows) + " rows and " + str(cols) + " columns. \nResize your terminal and try launching again.")
 
 if __name__ == "__main__": main()
