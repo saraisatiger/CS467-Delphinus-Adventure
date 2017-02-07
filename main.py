@@ -52,6 +52,6 @@ def is_minimum_terminal_size(rows, cols):
     return False
 
 def print_minimum_terminal_size_error(rows, cols):
-    print("The minimum terminal size is " + str(rows) + " rows and " + int(cols) + " columns. \nResize your terminal and try launching again.")
+    print("The minimum terminal size is " + str(rows) + " rows and " + str(cols) + " columns. \nResize your terminal and try launching again.")
 
 if __name__ == "__main__": main()
