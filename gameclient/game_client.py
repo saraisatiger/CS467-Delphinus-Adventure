@@ -24,6 +24,7 @@ from fileio.save_game import *
 from fileio.room import *
 from fileio.object import *
 from gameclient.player import *
+from gameclient.wprint import *
 from languageparser.language_parser import LanguageParser
 
 from debug.debug import *
@@ -75,7 +76,7 @@ class GameClient:
                 self.load_game_menu()
             # Or exit the game...
             elif self.command is QUIT:
-                print(EXIT_MESSAGE)
+                wprint(EXIT_MESSAGE)
                 sys.exit()
             # Or print the help menu
             elif self.command is HELP:
@@ -91,20 +92,20 @@ class GameClient:
                 # The constants are defined in constants\status_codes.py
                 exit_code = self.play_game()
                 if exit_code is GAMEOVER_FORFEIT:
-                    print("Game over: Forfeit")
+                    wprint("Game over: Forfeit")
                 elif exit_code is GAMEOVER_WIN:
-                    print("Game over: Player won")
+                    wprint("Game over: Player won")
                 elif exit_code is GAMEOVER_LOSE:
-                    print("Game over: Player lost")
+                    wprint("Game over: Player lost")
                 elif exit_code is GAMEOVER_SAVE:
-                    print("Game over: Player saved game")
+                    wprint("Game over: Player saved game")
                 elif exit_code is GAMEOVER_LOAD:
-                    print("Game over: Player loading game")
+                    wprint("Game over: Player loading game")
                     self.load_game_menu()
                     self.reset_input_and_command()
                     self.play_game()
                 elif exit_code is GAMEOVER_QUIT:
-                    print("Game over: Player quit")
+                    wprint("Game over: Player quit")
                     self.reset_input_and_command()
             self.ui.wait_for_enter()
             self.reset_input_and_command()
@@ -121,7 +122,7 @@ class GameClient:
                 first_pass = False
             else:
                 self.ui.clear_screen()
-                print(self.user_input + INVALID_MENU_COMMAND_MESSAGE + "\n\n")
+                wprint(self.user_input + INVALID_MENU_COMMAND_MESSAGE + "\n\n")
                 self.ui.wait_for_enter()
             self.main_menu_prompt()
 
@@ -238,7 +239,7 @@ class GameClient:
                 if quit_confirmed == True:
                     status = GAMEOVER_QUIT
             else:
-                print(COMMAND_NOT_UNDERSTOOD)
+                wprint(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
 
             # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
@@ -250,8 +251,7 @@ class GameClient:
         Sets appropriate variables in the GameClient's gamestate instance
         :return:
         '''
-        print(LOAD_GAME_MESSAGE)
-        savegame = SaveGame(None)
+        wprint(LOAD_GAME_MESSAGE)
         savegame_list = SaveGame.get_savegame_filenames()
 
         if savegame_list:
@@ -263,23 +263,23 @@ class GameClient:
                 input_is_valid = True # Turn this back to false if we get exception converting to an int
                 counter = 1
                 for savegame in savegame_list:
-                    print(str(counter) + ": " + savegame)
+                    wprint(str(counter) + ": " + savegame)
                     counter += 1
 
-                print("Enter the number of the filename you wish to load and press [Enter]")
+                wprint("Enter the number of the filename you wish to load and press [Enter]")
                 user_choice = self.ui.user_prompt()
 
                 # Cite: http://stackoverflow.com/questions/5424716/how-to-check-if-input-is-a-number
                 try:
                     option = int(user_choice)
                 except:
-                    print("That's not a valid integer. Enter the number and press enter.")
+                    wprint("That's not a valid integer. Enter the number and press enter.")
                     input_is_valid = False
                     continue
 
                 option -= 1
                 if option < 0 or option >= len(savegame_list):
-                    print("That's not a valid menu option. Please choose an integer from the list to load the game")
+                    wprint("That's not a valid menu option. Please choose an integer from the list to load the game")
                     input_is_valid = False
                     continue
 
@@ -288,7 +288,7 @@ class GameClient:
             return True
 
         else:
-            print(LOAD_GAME_NO_SAVES)
+            wprint(LOAD_GAME_NO_SAVES)
             return False
 
     def save_game_menu(self):
@@ -297,16 +297,16 @@ class GameClient:
         is_valid_filename = False
 
         while is_valid_filename is False:
-            print(SAVE_GAME_PROMPT)
+            wprint(SAVE_GAME_PROMPT)
             file_name = self.ui.user_prompt()
             is_valid_filename = save_game.is_valid_filename(file_name)
             if is_valid_filename is False:
-                print(SAVE_GAME_VALID_FILENAME_MESSAGE)
+                wprint(SAVE_GAME_VALID_FILENAME_MESSAGE)
 
         if save_game.write_to_file(file_name) is True:
-            print(SAVE_GAME_SUCCESS + file_name)
+            wprint(SAVE_GAME_SUCCESS + file_name)
         else:
-            print(SAVE_GAME_FAILED + file_name)
+            wprint(SAVE_GAME_FAILED + file_name)
 
         self.ui.wait_for_enter()
 
@@ -314,7 +314,7 @@ class GameClient:
         #TODO Refactor this as a general purpose function? Take in the room name, the message, and the cost as parameters
         county_jail = self.gamestate.get_room_by_name("County Jail")
         self.gamestate.set_current_room(county_jail)
-        print(GO_TO_JAIL_MESSAGE)
+        wprint(GO_TO_JAIL_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
 
     def verb_buy(self, subject_name):
@@ -326,25 +326,25 @@ class GameClient:
 
         room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
         if room_feature is not None:
-            print("You can't buy the " + room_feature.get_name())
+            wprint("You can't buy the " + room_feature.get_name())
             buy_succeeded = False
         else:
             object = self.gamestate.get_current_room().get_object_by_name(subject_name)
             player_cash = self.gamestate.player.get_cash()
 
             if object is None:
-                print(BUY_NOT_IN_ROOM)
+                wprint(BUY_NOT_IN_ROOM)
             elif object.get_cost() is 0:
-                print(BUY_FREE_ITEM)
+                wprint(BUY_FREE_ITEM)
             elif object.is_owned_by_player() is True:
-                print(BUY_FREE_ITEM)
+                wprint(BUY_FREE_ITEM)
             elif object.get_cost() > player_cash:
-                print(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
+                wprint(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
             else:
                 self.gamestate.player.add_object_to_inventory(object)
                 self.gamestate.get_current_room().remove_object_from_room(object)
                 self.gamestate.player.update_cash(object.get_cost() * -1 ) # Send in cost as negative to reduce cash
-                print(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
+                wprint(BUY_SUCCESS_PREFIX + object.get_name() + BUY_SUCCESS_SUFFIX)
                 buy_succeeded = True
 
         if buy_succeeded:
@@ -355,12 +355,12 @@ class GameClient:
 
     def verb_cheat_win(self):
         self.ui.clear_screen()
-        print(GAMEOVER_CHEAT_WIN_MESSAGE)
+        wprint(GAMEOVER_CHEAT_WIN_MESSAGE)
         return GAMEOVER_WIN
 
     def verb_cheat_lose(self):
         self.ui.clear_screen()
-        print(GAMEOVER_CHEAT_LOSE_MESSAGE)
+        wprint(GAMEOVER_CHEAT_LOSE_MESSAGE)
         return GAMEOVER_FORFEIT
 
     def verb_drop(self, object_name):
@@ -368,21 +368,21 @@ class GameClient:
 
         room_feature = self.gamestate.get_current_room().get_feature_by_name(object_name)
         if room_feature is not None:
-            print("You can't drop the " + room_feature.get_name() + " because you're not carrying it. Don't be silly!")
+            wprint("You can't drop the " + room_feature.get_name() + " because you're not carrying it. Don't be silly!")
             drop_success = False
 
         else:
             inventory_object = self.gamestate.player.inventory.get_object_by_name(object_name)
 
             if self.gamestate.get_current_room().is_virtual_space() is True:
-                print(DROP_FAILURE_VIRTUALSPACE)
+                wprint(DROP_FAILURE_VIRTUALSPACE)
             elif inventory_object is not None:
                 self.gamestate.player.inventory.remove_object(inventory_object)
                 self.gamestate.get_current_room().add_object_to_room(inventory_object)
-                print(DROP_SUCCESS_PREFIX + self.verb_subject_name + DROP_SUCCESS_SUFFIX)
+                wprint(DROP_SUCCESS_PREFIX + self.verb_subject_name + DROP_SUCCESS_SUFFIX)
                 drop_success = True
             else:
-                print(DROP_FAILURE_PREFIX + self.verb_subject_name + DROP_FAILURE_SUFFIX)
+                wprint(DROP_FAILURE_PREFIX + self.verb_subject_name + DROP_FAILURE_SUFFIX)
 
         if drop_success:
             self.gamestate.update_time_left(DROP_COST)
@@ -396,7 +396,7 @@ class GameClient:
 
         room_feature = self.gamestate.get_current_room().get_feature_by_name(destination)
         if room_feature is not None:
-            print("You can't go to the " + room_feature.get_name() + " because you're basically there already!")
+            wprint("You can't go to the " + room_feature.get_name() + " because you're basically there already!")
             go_success = False
 
         else:
@@ -407,13 +407,13 @@ class GameClient:
                     new_room = self.gamestate.get_room_by_name(connection.destination.lower())
                     if new_room:
                         self.gamestate.set_current_room(new_room)
-                        print(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
+                        wprint(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
                         self.gamestate.update_time_left(GO_COST)
                         go_success = True
                     else:
                         logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
                         # If go failed to find the room / direction desired, print a failure message
-                        print(GO_FAILURE_PREFIX + self.verb_subject_name + GO_FAILURE_SUFFIX)
+                        wprint(GO_FAILURE_PREFIX + self.verb_subject_name + GO_FAILURE_SUFFIX)
 
         self.ui.wait_for_enter()
         return go_success
@@ -431,7 +431,7 @@ class GameClient:
             # call the 'look at' verb on features in other rooms that they are not presently in
             room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
             if room_feature is not None:
-                print(room_feature.get_name() + " is a feature of the room. 'Look at' it to learn more.")
+                wprint(room_feature.get_name() + " is a feature of the room. 'Look at' it to learn more.")
                 self.ui.wait_for_enter()
                 return
 
@@ -442,7 +442,7 @@ class GameClient:
             if obj is None:
                 obj = self.gamestate.player.inventory.get_object_by_name(subject_name)
             if obj is not None:
-                print(obj.get_name() + " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'.")
+                wprint(obj.get_name() + " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'.")
                 self.ui.wait_for_enter()
                 return
             else:
@@ -497,7 +497,8 @@ class GameClient:
             description = LOOK_AT_NOT_SEEN
 
         self.gamestate.update_time_left(LOOK_AT_COST)
-        print(description)
+        description = textwrap.fill(description, TEXT_WIDTH)
+        print(description) # Don't use wprint() or it will remove linebreaks
         self.ui.wait_for_enter()
 
     def verb_quit(self, message):
@@ -523,9 +524,9 @@ class GameClient:
             logger.debug("verb_take() subject_type == 'feature'")
             room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
             if room_feature is None:
-                print("You don't see a " + subject_name + " to try and take.")
+                wprint("You don't see a " + subject_name + " to try and take.")
             else:
-                print("You cannot take the " + room_feature.get_name() + " - that's impractical.")
+                wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
         elif subject_type == "object":
             logger.debug("verb_take() subject_type == 'object'")
@@ -535,13 +536,13 @@ class GameClient:
                 if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
                     self.gamestate.get_current_room().remove_object_from_room(room_object)
                     self.gamestate.player.add_object_to_inventory(room_object)
-                    print(PICKUP_SUCCESS_PREFIX + self.verb_subject_name + PICKUP_SUCCESS_SUFFIX)
+                    wprint(PICKUP_SUCCESS_PREFIX + self.verb_subject_name + PICKUP_SUCCESS_SUFFIX)
                     take_success = True
                 elif room_object.get_cost() > 0:
-                    print(PICKUP_NOT_FREE)
+                    wprint(PICKUP_NOT_FREE)
             # Otherwise failed:
             else:
-                print(PICKUP_FAILURE_PREFIX + self.verb_subject_name + PICKUP_FAILURE_SUFFIX)
+                wprint(PICKUP_FAILURE_PREFIX + self.verb_subject_name + PICKUP_FAILURE_SUFFIX)
 
         if take_success:
             self.gamestate.update_time_left(TAKE_COST)
@@ -553,7 +554,7 @@ class GameClient:
         use_success = True
 
         if subject_type == "feature":
-            print("You cannot use that.")
+            wprint("You cannot use that.")
             use_success = False
         elif subject_type == "object":
             used_object = self.gamestate.player.inventory.get_object_by_name(subject_name)
@@ -565,12 +566,12 @@ class GameClient:
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
                     self.gamestate.player.update_cash(cash_gained)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                    wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label == "cash wad":
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
                     self.gamestate.player.update_cash(cash_gained )
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                    wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
                     # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
                     # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
@@ -583,36 +584,36 @@ class GameClient:
                     if g_card is not None and \
                          ram_chip is not None and \
                         floppy_disk is not None:
-                        print(USE_COMPUTER_PARTS_SUCCESS)
+                        wprint(USE_COMPUTER_PARTS_SUCCESS)
                         self.ui.wait_for_enter()
                         self.gamestate.player.remove_object_from_inventory(g_card)
                         self.gamestate.player.remove_object_from_inventory(ram_chip)
                         self.gamestate.player.remove_object_from_inventory(floppy_disk)
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
                     else:
-                        print(USE_COMPUTER_PARTS_MISSING)
+                        wprint(USE_COMPUTER_PARTS_MISSING)
                 elif obj_label == "hackersnacks":
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                    print(USE_SNACKS_SUCCESS)
+                    wprint(USE_SNACKS_SUCCESS)
                 elif obj_label == "skateboard":
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
-                    print(USE_SKATEBOARD_SUCCESS)
+                    wprint(USE_SKATEBOARD_SUCCESS)
                 elif obj_label == "spray paint":
                     self.gamestate.player.set_has_spraypaint(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    print(USE_SPRAYPAINT_SUCCESS)
+                    wprint(USE_SPRAYPAINT_SUCCESS)
                 elif obj_label == "surge":
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                    print(USE_SURGE_SUCCESS)
+                    wprint(USE_SURGE_SUCCESS)
                 else:
                     logger.debug("Not implemented: use " + used_object.get_name())
-                    print("You used something that the game doesn't know what to do with, please tell your local dev!")
+                    wprint("You used something that the game doesn't know what to do with, please tell your local dev!")
                     use_success = False
             else:
-                print(USE_FAIL)
+                wprint(USE_FAIL)
                 use_success = False
 
         if use_success:
@@ -628,10 +629,10 @@ class GameClient:
         spraypaint_success = True
 
         if self.gamestate.player.can_spraypaint():
-            print("TODO: You spraypaint stuff and coolness should go up and description should update. ")
+            wprint("TODO: You spraypaint stuff and coolness should go up and description should update. ")
             self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
         else:
-            print("You need to [use Spray Paint] before you can try to spraypaint the world.")
+            wprint("You need to [use Spray Paint] before you can try to spraypaint the world.")
             spraypaint_success = False
 
         if spraypaint_success:
@@ -644,7 +645,7 @@ class GameClient:
         steal_success = False
 
         if subject_type == "feature":
-            print("You cannot steal that.")
+            wprint("You cannot steal that.")
             steal_success = False
 
         elif subject_type == "object":
@@ -653,23 +654,23 @@ class GameClient:
 
             if room_object is not None:
                 if room_object.is_owned_by_player() is True:
-                    print(STEAL_FAIL_ALREADY_OWNED)
+                    wprint(STEAL_FAIL_ALREADY_OWNED)
                 elif room_object.get_cost() is 0:
-                    print(STEAL_FAIL_FREE_ITEM)
+                    wprint(STEAL_FAIL_FREE_ITEM)
                 elif room_object.get_cost() > 0:
                     if (self.rand_event.attempt_steal() is True):
                         self.gamestate.get_current_room().remove_object_from_room(room_object)
                         self.gamestate.player.add_object_to_inventory(room_object)
-                        print(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
+                        wprint(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
                         steal_success = True
                         self.gamestate.update_time_left(STEAL_COST)
                     else:
-                        print(STEAL_FAIL_PRISON)
+                        wprint(STEAL_FAIL_PRISON)
                         self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
                         self.go_to_jail()
                         return steal_success
             else:
-                print(STEAL_FAIL_NOT_HERE)
+                wprint(STEAL_FAIL_NOT_HERE)
 
         self.ui.wait_for_enter()
         return steal_success
@@ -837,11 +838,11 @@ class UserInterface:
 
 
     def print_introduction(self):
-        print(INTRO_STRING)
+        wprint(INTRO_STRING)
 
     def print_main_menu(self):
         for line in MAIN_MENU_LINES:
-            print(line)
+            wprint(line)
 
     def user_prompt(self):
         user_input = input(self.prompt_text)
@@ -849,11 +850,11 @@ class UserInterface:
 
     def print_help_message(self):
         for line in HELP_MESSAGE:
-            print(line)
+            wprint(line)
         self.wait_for_enter()
 
     def print_quit_confirm(self, message):
-        print(message)
+        wprint(message)
 
     def clear_screen(self):
         # Cite: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
@@ -866,28 +867,28 @@ class UserInterface:
 
     def new_game_splash_screen(self):
         self.clear_screen()
-        print(NEW_GAME_MESSAGE)  # Defined in constants\strings.py
+        wprint(NEW_GAME_MESSAGE)  # Defined in constants\strings.py
         self.wait_for_enter()
 
     def print_status_header(self, info):
-        print(STATUS_HEADER_BAR)
-        print("|\tSPEED: " + str(info['speed']) + "\t\tTIME LEFT: " + str(info['time_left']))
-        print("|\tCOOLNESS: " + str(info['coolness']) + "\t\tCASH: " + str(info['cash']))
-        print("|\tCURRENT LOCATION: " + str(info['current_room']))
-        print(STATUS_HEADER_BAR)
+        wprint(STATUS_HEADER_BAR)
+        wprint("|\tSPEED: " + str(info['speed']) + "\t\tTIME LEFT: " + str(info['time_left']))
+        wprint("|\tCOOLNESS: " + str(info['coolness']) + "\t\tCASH: " + str(info['cash']))
+        wprint("|\tCURRENT LOCATION: " + str(info['current_room']))
+        wprint(STATUS_HEADER_BAR)
 
     def wait_for_enter(self):
         input(PRESS_KEY_TO_CONTINUE_MSG)
         self.clear_screen()
 
     def print_room_description(self, description):
-        print(DESCRIPTION_HEADER)
-        print(description)
+        wprint(DESCRIPTION_HEADER)
+        print(description) # Don't use wprint here or it will remove linebreaks
 
     def print_inventory(self, inventory_description):
-        print(INVENTORY_LIST_HEADER)
+        wprint(INVENTORY_LIST_HEADER)
         print(inventory_description)
-        print(INVENTORY_LIST_FOOTER)
+        wprint(INVENTORY_LIST_FOOTER)
 
 
 

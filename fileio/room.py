@@ -12,9 +12,12 @@
 # CITE: https://jsonformatter.curiousconcept.com/
 
 from constants.strings import *
+from constants.constants import *
 from fileio.object import *
+import textwrap
 
 from debug.debug import *
+
 logger = logging.getLogger(__name__)
 
 import json
@@ -65,7 +68,7 @@ class Room:
         Get the "long long_description" version of the room's long_description
         :return: string representing full length long_description
         '''
-        full_description = self.long_description + "\n" + self.get_supplemental_description()
+        full_description = textwrap.fill(self.long_description, TEXT_WIDTH) + "\n" + self.get_supplemental_description()
         return full_description
 
     def get_short_description(self):
@@ -73,7 +76,7 @@ class Room:
         Get the "short long_description" version of the room's long_description
         :return: string representing shortened long_description used after a room has been visited (visited is True)
         '''
-        full_description = self.short_description +"\n" + self.get_supplemental_description()
+        full_description = textwrap.fill(self.short_description, TEXT_WIDTH) +"\n" + self.get_supplemental_description()
         return full_description
 
     def get_supplemental_description(self):
@@ -92,7 +95,7 @@ class Room:
         connection_string = ""
         if self.room_connections:
             for connection in self.room_connections:
-                connection_string = connection_string + connection.get_connection_description() + "\n"
+                connection_string = connection_string + textwrap.fill(connection.get_connection_description(), TEXT_WIDTH) + "\n"
         return connection_string
 
     def get_object_list_string(self):
@@ -104,7 +107,7 @@ class Room:
         if self.objects:
             objects_string = ""
             for object in self.objects:
-                objects_string = objects_string + object.get_environmental_description() + "\n"
+                objects_string = objects_string + textwrap.fill(object.get_environmental_description(), TEXT_WIDTH) + "\n"
         else:
             objects_string = NO_INTERESTING_OBJECTS_MESSAGE
         return objects_string
@@ -117,7 +120,7 @@ class Room:
         '''
         feature_string = ""
         for feature in self.room_features:
-            feature_string = feature_string + feature.get_feature_description() + "\n"
+            feature_string = feature_string + textwrap.fill(feature.get_feature_description(), TEXT_WIDTH) + "\n"
         return feature_string
 
     def set_visited(self, visited=True):
@@ -139,7 +142,7 @@ class Room:
                 # logger.debug("Match found!")
                 return room_feature
             # else:
-                logger.debug("Not a match!")
+            #     logger.debug("Not a match!")
 
         # If the room does not have a feature with that name, return None
         return None
