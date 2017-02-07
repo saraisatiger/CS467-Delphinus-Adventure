@@ -114,7 +114,8 @@ STEAL_FAIL_ALREADY_OWNED = "You already own that. You can just take it!"
 STEAL_FAIL_FREE_ITEM = "That doesn't cost anything. You should just take it - nobody will care!"
 STEAL_SUCCESS_PREFIX = "Your nimble hands are able to procure the "
 STEAL_SUCCESS_SUFFIX = " without being caught."
-STEAL_FAIL_GENERIC = "You aren't able to steal that without being seen. You've been caught!"
+STEAL_FAIL_PRISON = "You aren't able to steal that without being seen. You've been caught!"
+STEAL_FAIL_NOT_HERE = "Thou shalt not steal that which is not present!"
 
 # 'take' strings
 PICKUP_SUCCESS_PREFIX = "You pick up the "
@@ -124,7 +125,7 @@ PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
 PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, just steal it!"
 
 # ' use' strings
-USE_FAIL = "There's just no way to use that because it's not in your bag!"
+USE_FAIL = "You cannot use that unless it is in your bag!"
 USE_CASH_SUCCESS_PREFIX = "You count the bills and put them in your wallet. You are "
 USE_CASH_SUCCESS_SUFFIX = " dollars richer!"
 USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"

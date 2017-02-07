@@ -79,3 +79,6 @@ class LanguageParserWrapper:
 
     def get_targets(self):
         return self.targets
+
+    def get_preposition(self):
+        return self.preposition

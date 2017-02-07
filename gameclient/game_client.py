@@ -199,7 +199,7 @@ class GameClient:
             elif self.command is INVENTORY:
                 self.verb_inventory()
             elif self.command is TAKE:
-                self.verb_take(self.verb_subject_name)
+                self.verb_take(self.verb_subject_name, self.verb_subject_type)
             elif self.command is DROP:
                 self.verb_drop(self.verb_subject_name)
             elif self.command is GO:
@@ -208,7 +208,7 @@ class GameClient:
                 # TODO: Implement HACK
                 logger.debug("Hack is not yet implemented.")
             elif self.command is STEAL:
-                self.verb_steal(self.verb_subject_name)
+                self.verb_steal(self.verb_subject_name, self.verb_subject_type)
             elif self.command is BUY:
                 self.verb_buy(self.verb_subject_name)
             elif self.command is SPRAYPAINT:
@@ -216,7 +216,7 @@ class GameClient:
                 logger.debug("Spraypaint is not fully implemented yet.")
                 self.verb_spraypaint(self.verb_subject_name)
             elif self.command is USE:
-                self.verb_use(self.verb_subject_name)
+                self.verb_use(self.verb_subject_name, self.verb_subject_type)
             elif self.command is HELP:
                 self.verb_help(self.verb_subject_name, self.verb_subject_type)
             elif self.command is LOAD_GAME:
@@ -319,19 +319,19 @@ class GameClient:
         print(GO_TO_JAIL_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
 
-    def verb_buy(self, object_name):
+    def verb_buy(self, subject_name):
         '''
-        :param object_name: string, name of the object desired
+        :param subject_name: string, name of the object desired
         :return: True if player bought object_name, false otherwise
         '''
         buy_succeeded = False
 
-        room_feature = self.gamestate.get_current_room().get_feature(object_name)
+        room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
         if room_feature is not None:
             print("You can't buy the " + room_feature.get_name())
             buy_succeeded = False
         else:
-            object = self.gamestate.get_current_room().get_object_by_name(object_name)
+            object = self.gamestate.get_current_room().get_object_by_name(subject_name)
             player_cash = self.gamestate.player.get_cash()
 
             if object is None:
@@ -368,7 +368,7 @@ class GameClient:
     def verb_drop(self, object_name):
         drop_success = False
 
-        room_feature = self.gamestate.get_current_room().get_feature(object_name)
+        room_feature = self.gamestate.get_current_room().get_feature_by_name(object_name)
         if room_feature is not None:
             print("You can't drop the " + room_feature.get_name() + " because you're not carrying it. Don't be silly!")
             drop_success = False
@@ -396,7 +396,7 @@ class GameClient:
 
         go_success = False
 
-        room_feature = self.gamestate.get_current_room().get_feature(destination)
+        room_feature = self.gamestate.get_current_room().get_feature_by_name(destination)
         if room_feature is not None:
             print("You can't go to the " + room_feature.get_name() + " because you're basically there already!")
             go_success = False
@@ -431,7 +431,7 @@ class GameClient:
         if subject_type == "feature":
             # Only print a hep message if the feature is part of current room to avoid confusion and player trying to
             # call the 'look at' verb on features in other rooms that they are not presently in
-            room_feature = self.gamestate.get_current_room().get_feature(subject_name)
+            room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
             if room_feature is not None:
                 print(room_feature.get_name() + " is a feature of the room. 'Look at' it to learn more.")
                 self.ui.wait_for_enter()
@@ -467,7 +467,7 @@ class GameClient:
         '''
         self.ui.clear_screen()
 
-        if self.gamestate.get_current_room().visited is False or print_long_description is True:
+        if self.gamestate.get_current_room().is_visited() is False or print_long_description is True:
             description = self.gamestate.get_current_room().get_long_description()
         else:
             description = self.gamestate.get_current_room().get_short_description()
@@ -485,7 +485,7 @@ class GameClient:
         :return: None
         '''
 
-        room_feature = self.gamestate.get_current_room().get_feature(object_name)
+        room_feature = self.gamestate.get_current_room().get_feature_by_name(object_name)
         room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(object_name)
 
@@ -510,27 +510,40 @@ class GameClient:
             return True
         return False
 
-    def verb_take(self, object_name):
+    def verb_take(self, subject_name, subject_type):
         '''
         Evaluates a command to take object_name from the Room and if it exists (and is allowed by game rules) then
         object placed in inventory for the player
-        :param object_name: string input by player in their command
+        :param subject_name: string input by player in their command
         :return: True (success), False ( fail, object_name not found in the room)
         '''
-        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
         take_success = False
 
-        if room_object is not None:
-            if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
-                self.gamestate.get_current_room().remove_object_from_room(room_object)
-                self.gamestate.player.add_object_to_inventory(room_object)
-                print(PICKUP_SUCCESS_PREFIX + self.verb_subject_name + PICKUP_SUCCESS_SUFFIX)
-                take_success = True
-            elif room_object.get_cost() > 0:
-                print(PICKUP_NOT_FREE)
-        # Otherwise failed:
-        else:
-            print(PICKUP_FAILURE_PREFIX + self.verb_subject_name + PICKUP_FAILURE_SUFFIX)
+        logger.debug("Inside verb_take()")
+
+        if subject_type == "feature":
+            logger.debug("verb_take() subject_type == 'feature'")
+            room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
+            if room_feature is None:
+                print("You don't see a " + subject_name + " to try and take.")
+            else:
+                print("You cannot take the " + room_feature.get_name() + " - that's impractical.")
+
+        elif subject_type == "object":
+            logger.debug("verb_take() subject_type == 'object'")
+            room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
+
+            if room_object is not None:
+                if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
+                    self.gamestate.get_current_room().remove_object_from_room(room_object)
+                    self.gamestate.player.add_object_to_inventory(room_object)
+                    print(PICKUP_SUCCESS_PREFIX + self.verb_subject_name + PICKUP_SUCCESS_SUFFIX)
+                    take_success = True
+                elif room_object.get_cost() > 0:
+                    print(PICKUP_NOT_FREE)
+            # Otherwise failed:
+            else:
+                print(PICKUP_FAILURE_PREFIX + self.verb_subject_name + PICKUP_FAILURE_SUFFIX)
 
         if take_success:
             self.gamestate.update_time_left(TAKE_COST)
@@ -538,66 +551,71 @@ class GameClient:
         self.ui.wait_for_enter()
         return take_success
 
-    def verb_use(self, object_name):
-        used_object = self.gamestate.player.inventory.get_object_by_name(object_name)
+    def verb_use(self, subject_name, subject_type):
         use_success = True
 
-        if used_object is not None:
-            obj_label = used_object.get_name().lower()
-            # "Cash" item logic
-            if obj_label == "crisp cash":
-                cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
-                self.gamestate.player.update_cash(cash_gained)
-                self.gamestate.player.remove_object_from_inventory(used_object)
-                print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
-            elif obj_label == "cash wad":
-                cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
-                self.gamestate.player.update_cash(cash_gained )
-                self.gamestate.player.remove_object_from_inventory(used_object)
-                print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
-            elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
-                # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
-                # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
-
-                # TODO: Refactor this check as a function ("player.has_all_pc_parts()" returns boolean)
-                g_card = self.gamestate.player.inventory.get_object_by_name("graphics card")
-                ram_chip = self.gamestate.player.inventory.get_object_by_name("ram chip")
-                floppy_disk = self.gamestate.player.inventory.get_object_by_name("floppy disk")
-
-                if g_card is not None and \
-                     ram_chip is not None and \
-                    floppy_disk is not None:
-                    print(USE_COMPUTER_PARTS_SUCCESS)
-                    self.ui.wait_for_enter()
-                    self.gamestate.player.remove_object_from_inventory(g_card)
-                    self.gamestate.player.remove_object_from_inventory(ram_chip)
-                    self.gamestate.player.remove_object_from_inventory(floppy_disk)
-                    self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
-                else:
-                    print(USE_COMPUTER_PARTS_MISSING)
-            elif obj_label == "hackersnacks":
-                self.gamestate.player.remove_object_from_inventory(used_object)
-                self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                print(USE_SNACKS_SUCCESS)
-            elif obj_label == "skateboard":
-                self.gamestate.player.remove_object_from_inventory(used_object)
-                self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
-                print(USE_SKATEBOARD_SUCCESS)
-            elif obj_label == "spray paint":
-                self.gamestate.player.set_has_spraypaint(True)
-                self.gamestate.player.remove_object_from_inventory(used_object)
-                print(USE_SPRAYPAINT_SUCCESS)
-            elif obj_label == "surge":
-                self.gamestate.player.remove_object_from_inventory(used_object)
-                self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                print(USE_SURGE_SUCCESS)
-            else:
-                logger.debug("Not implemented: use " + used_object.get_name())
-                print("You used something that the game doesn't know what to do with, please tell your local dev!")
-                use_success = False
-        else:
-            print(USE_FAIL)
+        if subject_type == "feature":
+            print("You cannot use that.")
             use_success = False
+        elif subject_type == "object":
+            used_object = self.gamestate.player.inventory.get_object_by_name(subject_name)
+
+            if used_object is not None:
+                obj_label = used_object.get_name().lower()
+                # "Cash" item logic
+                if obj_label == "crisp cash":
+                    cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
+                    self.gamestate.player.update_cash(cash_gained)
+                    self.gamestate.player.remove_object_from_inventory(used_object)
+                    print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                elif obj_label == "cash wad":
+                    cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
+                    self.gamestate.player.update_cash(cash_gained )
+                    self.gamestate.player.remove_object_from_inventory(used_object)
+                    print(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
+                    # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
+                    # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
+
+                    # TODO: Refactor this check as a function ("player.has_all_pc_parts()" returns boolean)
+                    g_card = self.gamestate.player.inventory.get_object_by_name("graphics card")
+                    ram_chip = self.gamestate.player.inventory.get_object_by_name("ram chip")
+                    floppy_disk = self.gamestate.player.inventory.get_object_by_name("floppy disk")
+
+                    if g_card is not None and \
+                         ram_chip is not None and \
+                        floppy_disk is not None:
+                        print(USE_COMPUTER_PARTS_SUCCESS)
+                        self.ui.wait_for_enter()
+                        self.gamestate.player.remove_object_from_inventory(g_card)
+                        self.gamestate.player.remove_object_from_inventory(ram_chip)
+                        self.gamestate.player.remove_object_from_inventory(floppy_disk)
+                        self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
+                    else:
+                        print(USE_COMPUTER_PARTS_MISSING)
+                elif obj_label == "hackersnacks":
+                    self.gamestate.player.remove_object_from_inventory(used_object)
+                    self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
+                    print(USE_SNACKS_SUCCESS)
+                elif obj_label == "skateboard":
+                    self.gamestate.player.remove_object_from_inventory(used_object)
+                    self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
+                    print(USE_SKATEBOARD_SUCCESS)
+                elif obj_label == "spray paint":
+                    self.gamestate.player.set_has_spraypaint(True)
+                    self.gamestate.player.remove_object_from_inventory(used_object)
+                    print(USE_SPRAYPAINT_SUCCESS)
+                elif obj_label == "surge":
+                    self.gamestate.player.remove_object_from_inventory(used_object)
+                    self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
+                    print(USE_SURGE_SUCCESS)
+                else:
+                    logger.debug("Not implemented: use " + used_object.get_name())
+                    print("You used something that the game doesn't know what to do with, please tell your local dev!")
+                    use_success = False
+            else:
+                print(USE_FAIL)
+                use_success = False
 
         if use_success:
             self.gamestate.update_time_left(USE_COST)
@@ -615,7 +633,7 @@ class GameClient:
             print("TODO: You spraypaint stuff and coolness should go up and description should update. ")
             self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
         else:
-            print("You would need to practice with the [Spray Paint] before you can try to spraypaint something.")
+            print("You need to [use Spray Paint] before you can try to spraypaint the world.")
             spraypaint_success = False
 
         if spraypaint_success:
@@ -624,27 +642,36 @@ class GameClient:
         self.ui.wait_for_enter()
         return spraypaint_success
 
-    def verb_steal(self, object_name):
+    def verb_steal(self, subject_name, subject_type):
         steal_success = False
-        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
 
-        if room_object is not None:
-            if room_object.is_owned_by_player() is True:
-                print(STEAL_FAIL_ALREADY_OWNED)
-            elif room_object.get_cost() is 0:
-                print(STEAL_FAIL_FREE_ITEM)
-            elif room_object.get_cost() > 0:
-                if (self.rand_event.attempt_steal() is True):
-                    self.gamestate.get_current_room().remove_object_from_room(room_object)
-                    self.gamestate.player.add_object_to_inventory(room_object)
-                    print(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
-                    steal_success = True
-                    self.gamestate.update_time_left(STEAL_COST)
-                else:
-                    print(STEAL_FAIL_GENERIC)
-                    self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
-                    self.go_to_jail()
-                    return steal_success
+        if subject_type == "feature":
+            print("You cannot steal that.")
+            steal_success = False
+
+        elif subject_type == "object":
+
+            room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
+
+            if room_object is not None:
+                if room_object.is_owned_by_player() is True:
+                    print(STEAL_FAIL_ALREADY_OWNED)
+                elif room_object.get_cost() is 0:
+                    print(STEAL_FAIL_FREE_ITEM)
+                elif room_object.get_cost() > 0:
+                    if (self.rand_event.attempt_steal() is True):
+                        self.gamestate.get_current_room().remove_object_from_room(room_object)
+                        self.gamestate.player.add_object_to_inventory(room_object)
+                        print(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
+                        steal_success = True
+                        self.gamestate.update_time_left(STEAL_COST)
+                    else:
+                        print(STEAL_FAIL_PRISON)
+                        self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
+                        self.go_to_jail()
+                        return steal_success
+            else:
+                print(STEAL_FAIL_NOT_HERE)
 
         self.ui.wait_for_enter()
         return steal_success
@@ -653,7 +680,10 @@ class GameClient:
         results = self.lp.parse_command(self.user_input)
         self.command = results.get_verb()
         self.verb_subject_name = results.get_subject()['name']
+        self.verb_subject_type = results.get_subject()['type']
         self.targets = results.get_targets()
+        self.verb_preposition = results.get_preposition()
+
 
 
 class GameState:
