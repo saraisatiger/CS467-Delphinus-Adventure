@@ -11,6 +11,7 @@
 # of the strings here to one file so we can easily modify things without having to dig through code to find strings (SSH)
 # CITE: Also this is similar to how our assembly programs stored strings in one spot and just referenced by name later
 
+from constants.constants import *
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
@@ -36,7 +37,7 @@ MAIN_MENU_LINES = [
 # General UI strings
 PROMPT_TEXT = ">> "
 PRESS_KEY_TO_CONTINUE_MSG = "\n>>>> Press [Enter] to continue. <<<<"
-STATUS_HEADER_BAR = "+----------------------------------------------------------------------+"
+STATUS_HEADER_BAR = "=" * TEXT_WIDTH
 DESCRIPTION_HEADER = "DESCRIPTION:"
 DESCRIPTION_FOOTER = "\n"
 EXITS_HEADER = "Always know your way out. You see a few ways to go from here:"
@@ -94,8 +95,8 @@ GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
 
 # 'Inventory' strings
-INVENTORY_LIST_HEADER = "========================================================================\nBackpack Contents\n------------------------------------------------------------------------"
-INVENTORY_LIST_FOOTER = "========================================================================"
+INVENTORY_LIST_HEADER = STATUS_HEADER_BAR + "\nBackpack Contents\n" + STATUS_HEADER_BAR
+INVENTORY_LIST_FOOTER = STATUS_HEADER_BAR
 INVENTORY_EMPTY = "Empty... not even a floppy disk"
 
 # 'jail' strings
