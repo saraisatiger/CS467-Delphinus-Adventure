@@ -418,6 +418,13 @@ class GameClient:
         self.ui.wait_for_enter()
         return go_success
 
+    def verb_hack(self, subject_name, subject_type):
+        if subject_type == SUBJECT_TYPE_OBJECT:
+            pass
+        
+
+
+
     def verb_help(self, subject_name, subject_type):
         '''
         Print help. Gives a generic message if user tries to call help on a feature or object in the room/inventory,
@@ -426,7 +433,7 @@ class GameClient:
         :param subject_type: subject's type (object/feature) as passed back from language parser
         :return:
         '''
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             # Only print a hep message if the feature is part of current room to avoid confusion and player trying to
             # call the 'look at' verb on features in other rooms that they are not presently in
             room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
@@ -435,7 +442,7 @@ class GameClient:
                 self.ui.wait_for_enter()
                 return
 
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
             # Only display help on objects in the current room or player's inventory. Generic message but avoids people
             # mining for information by spamming 'help' I suppose
             obj = self.gamestate.get_current_room().get_object_by_name(subject_name)
@@ -520,7 +527,7 @@ class GameClient:
 
         logger.debug("Inside verb_take()")
 
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             logger.debug("verb_take() subject_type == 'feature'")
             room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
             if room_feature is None:
@@ -528,7 +535,7 @@ class GameClient:
             else:
                 wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
             logger.debug("verb_take() subject_type == 'object'")
             room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
 
@@ -553,10 +560,10 @@ class GameClient:
     def verb_use(self, subject_name, subject_type):
         use_success = True
 
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             wprint("You cannot use that.")
             use_success = False
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
             used_object = self.gamestate.player.inventory.get_object_by_name(subject_name)
 
             if used_object is not None:
@@ -644,11 +651,11 @@ class GameClient:
     def verb_steal(self, subject_name, subject_type):
         steal_success = False
 
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             wprint("You cannot steal that.")
             steal_success = False
 
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
 
             room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
 
