@@ -1,0 +1,2 @@
+MIN_ROWS = 38
+MIN_COLS = 73

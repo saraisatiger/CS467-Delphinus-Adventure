@@ -291,8 +291,6 @@ class GameClient:
             print(LOAD_GAME_NO_SAVES)
             return False
 
-        # TODO: This should ultimately result in a self.gamestate.initialize_load_game(filename) call (not implemented ((SSH))
-
     def save_game_menu(self):
         save_game = SaveGame(self.gamestate)
         file_name = ""
