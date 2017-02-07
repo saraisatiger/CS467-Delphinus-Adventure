@@ -54,7 +54,7 @@ class SaveGame:
         '''
         SAVING A SAVEGAME FROM GAMESTATE
             A SaveGame would be instantiated when a player chooses to 'save' their game. Pass in the gamestate object
-            from the GameClient and then parse through the verb_subject looking for the relevant data to save to file.
+            from the GameClient and then parse through the object looking for the relevant data to save to file.
 
             Once a SaveGame object is instantiated, you can call write_to_file() method to save the data.
         '''

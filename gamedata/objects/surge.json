@@ -4,5 +4,5 @@
   "short_description" : "A can of caffeinated drink",
   "default_location" : "Arcade",
   "details" : "increases speed",
-  "cost" : 0
+  "cost" : 2
 }

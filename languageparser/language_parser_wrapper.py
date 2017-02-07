@@ -28,6 +28,31 @@ class LanguageParserWrapper:
         self.targets = []
         self.preposition = ""
 
+    def __str__(self):
+        '''
+        override str() method for debug purposes
+        :return:
+        '''
+        str = "{\n\t'verb' : '" + self.verb + "'\n"
+        str += "\t'subject['name']' : '" + self.subject['name'] + "'\n"
+        str += "\t'subject['type']' : '" + self.subject['type'] + "'\n"
+        str += "\t'targets' : "
+        if self.targets:
+            for target in self.targets:
+                str += "\n\t{\n['name' : '" + target['name'] + "']\n"
+                str += "\t['type' : '" + target['type'] + "']\n},"
+        else:
+            str+= "\t\tNone\n"
+
+        str += "\t'preposition' : "
+        try:
+            str += "'" + self.preposition + "'\n"
+        except:
+            str += "None\n"
+
+        str += "}"
+        return str
+
     def set_verb(self, verb_string):
         self.verb = verb_string
 
@@ -54,3 +79,6 @@ class LanguageParserWrapper:
 
     def get_targets(self):
         return self.targets
+
+    def get_preposition(self):
+        return self.preposition

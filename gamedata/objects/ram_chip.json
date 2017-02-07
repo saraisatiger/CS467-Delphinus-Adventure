@@ -4,5 +4,5 @@
   "short_description" : "A green circuit board",
   "default_location" : "Pawn Shop",
   "details" : "build computer",
-  "cost" : 0
+  "cost" : 60
 }

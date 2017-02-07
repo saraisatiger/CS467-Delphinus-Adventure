@@ -13,13 +13,13 @@
 # DEV NOTES:
 # 1/22/17:
 # The language parser will have to return more than the verb. It will also need to identify the
-# subject (feature or verb_subject) and appropriate prepositions and such. At a minimum I'd expect the LP to
+# subject (feature or verb_subject_name) and appropriate prepositions and such. At a minimum I'd expect the LP to
 # return a python dictionary of a verb that's being called and one or more targets that are trying to
 # be interacted. For example "use broom on dusty floor" might return:
 #
 # {
 #     'verb' : 'use',
-#     'verb_subject' : 'broom',
+#     'verb_subject_name' : 'broom',
 #     'targets' : [
 #         'dusty floor'
 #     ]
@@ -60,10 +60,10 @@ class LanguageParser:
         subject = None
         targets = None
 
-        # Hacky way to parse a "look at" command to find the verb_subject/feature player wants to examine.
+        # Hacky way to parse a "look at" command to find the verb_subject_name/feature player wants to examine.
         # NOTE: Doesn't parse aliases
         if 'look at' in command:
-            subject = command.replace("look at ", "", 1) # replace "look at " with empty string - rest is the verb_subject
+            subject = command.replace("look at ", "", 1) # replace "look at " with empty string - rest is the verb_subject_name
             command = "look at"
 
         # hacky way to parse a 'take' command.
@@ -140,10 +140,11 @@ class LanguageParser:
         else:
             command = INVALID_INPUT
 
-        logger.debug("Returning: " + str(command) + ", " + str(subject) + ", " + str(targets))
         # return (command, subject, targets)
 
         results = LanguageParserWrapper()
         results.set_verb(str(command))
         results.set_subject(str(subject), str("object"))
+
+        logger.debug("Returning: \n" + str(results))
         return results

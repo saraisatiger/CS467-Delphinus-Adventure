@@ -73,7 +73,7 @@ class Room:
         Get the "short long_description" version of the room's long_description
         :return: string representing shortened long_description used after a room has been visited (visited is True)
         '''
-        full_description = self.short_description + self.get_supplemental_description()
+        full_description = self.short_description +"\n" + self.get_supplemental_description()
         return full_description
 
     def get_supplemental_description(self):
@@ -127,18 +127,18 @@ class Room:
         '''
         self.visited = visited
 
-    def get_feature(self, feature):
+    def get_feature_by_name(self, feature_name):
         '''
         If the feature is in the room, returns that Feature. Called by gameclient for 'look at' verb
-        :param feature: string. The name of the feature being searched for
+        :param feature_name: string. The name of the feature being searched for
         :return: The feature itself or null
         '''
         for room_feature in self.room_features:
-            logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() + "...")
-            if room_feature.get_name().lower() == feature.lower():
-                logger.debug("Match found!")
+            # logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() + "...")
+            if room_feature.get_name().lower() == feature_name.lower():
+                # logger.debug("Match found!")
                 return room_feature
-            else:
+            # else:
                 logger.debug("Not a match!")
 
         # If the room does not have a feature with that name, return None
