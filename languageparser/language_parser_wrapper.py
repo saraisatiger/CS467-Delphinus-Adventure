@@ -27,7 +27,7 @@ class LanguageParserWrapper:
         self.noun = {}
         self.extras = []
         self.preposition = ""
-        self.error_message = ""
+        self.error_message = None
 
     def __str__(self):
         '''
