@@ -49,10 +49,10 @@ STATUS_HEADER_CASH_LABEL = "\t\t[CASH]\t"
 
 DESCRIPTION_HEADER = "DESCRIPTION:"
 DESCRIPTION_FOOTER = "\n"
-EXITS_HEADER = "Always know your way out. You see a few ways to go from here:"
+EXITS_HEADER = "Always know your exits:"
 FEATURES_HEADER = "This area has the following interesting features:"
 FEATURES_LIST_PREFIX = " * "
-OBJECTS_HEADER = "You see the following interesting items in the area:"
+OBJECTS_HEADER = "You look around for anything not strapped down and you see:"
 OBJECTS_LIST_PREFIX = " * "
 CONNECTION_LIST_PREFIX = "  * ["
 CONNECTION_LIST_SEGWAY= "] is "
@@ -141,7 +141,7 @@ INVENTORY_EMPTY = "Empty... not even a floppy disk"
 GO_TO_JAIL_MESSAGE = "Your actions have landed you in jail, costing you valuable time!"
 
 # 'look' strings
-NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing else laying about worth taking."
+NO_INTERESTING_OBJECTS_MESSAGE = " ...Hmmm, nothing worth taking."
 NO_INTERESTING_FEATURES_MESSAGE = "You see nothing else worth checking out."
 
 

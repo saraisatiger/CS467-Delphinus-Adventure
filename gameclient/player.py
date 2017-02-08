@@ -87,7 +87,6 @@ class Inventory:
         :return:
         '''
 
-        # TODO: Make the strings pad a certain number of characters (spaces or periods) between item name and description
         if self.objects:
             inventory_size = len(self.objects)
             count = 0

@@ -308,7 +308,6 @@ class GameClient:
         self.ui.wait_for_enter()
 
     def go_to_jail(self):
-        #TODO Refactor this as a general purpose function? Take in the room name, the message, and the cost as parameters
         county_jail = self.gamestate.get_room_by_name("County Jail")
         self.gamestate.set_current_room(county_jail)
         wprint(GO_TO_JAIL_MESSAGE)
@@ -570,7 +569,7 @@ class GameClient:
 
             if used_object is not None:
                 obj_label = used_object.get_name().lower()
-                # "Cash" item logic
+
                 if obj_label == "crisp cash":
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
                     self.gamestate.player.update_cash(cash_gained)
@@ -583,9 +582,7 @@ class GameClient:
                     wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
                     # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
-                    # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
-
-                    # TODO: Refactor this check as a function ("player.has_all_pc_parts()" returns boolean)
+                    # and then update some game-state variable so that player can do things they can do if they have a PC
                     g_card = self.gamestate.player.inventory.get_object_by_name("graphics card")
                     ram_chip = self.gamestate.player.inventory.get_object_by_name("ram chip")
                     floppy_disk = self.gamestate.player.inventory.get_object_by_name("floppy disk")
@@ -693,7 +690,6 @@ class GameClient:
         self.verb_preposition = results.get_preposition()
 
 
-
 class GameState:
     '''
     Holds all of the variables that maintain the game's state
@@ -729,8 +725,8 @@ class GameState:
 
     def initialize_load_game(self, filename):
         # TODO: Finish fleshing out these ideas and test this function. Will require constant tweaking of this and the SaveGame
-        # TODO: class because of the interdependence, unless better plan is developed ((SSH))
-        # TODO: Write UNIT TESTS for this code, entirely untested
+        # class because of the interdependence, unless better plan is developed ((SSH))
+        # Write UNIT TESTS for this code, entirely untested
         self.set_room_vars_to_default()
 
         save_game = SaveGame(None)
@@ -760,7 +756,6 @@ class GameState:
 
         # Set the time_left
         self.time_left = save_game.get_time_left()
-
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\status_codes.py  ((SSH))
