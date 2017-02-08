@@ -144,7 +144,7 @@ class LanguageParser:
 
         results = LanguageParserWrapper()
         results.set_verb(str(command))
-        results.set_subject(str(subject), str("object"))
+        results.set_noun(str(subject), str("object"))
 
         logger.debug("Returning: \n" + str(results))
         return results
