@@ -149,10 +149,10 @@ class GameClient:
             return False
 
     def reset_input_and_command(self):
-        # Reset the input and command/verb_subject_name/targets from parser
+        # Reset the input and command/verb_noun_name/targets from parser
         self.user_input = None
-        self.verb_subject_name = None
-        self.verb_subject_type = None
+        self.verb_noun_name = None
+        self.verb_noun_type = None
         self.verb_targets = None
         self.verb_preposition = None
         self.command = INVALID_INPUT
@@ -194,29 +194,29 @@ class GameClient:
                 self.ui.clear_screen()
             # Verbs
             elif self.command is LOOK_AT:
-                self.verb_look_at(self.verb_subject_name, self.verb_subject_type)
+                self.verb_look_at(self.verb_noun_name, self.verb_noun_type)
             elif self.command is INVENTORY:
                 self.verb_inventory()
             elif self.command is TAKE:
-                self.verb_take(self.verb_subject_name, self.verb_subject_type)
+                self.verb_take(self.verb_noun_name, self.verb_noun_type)
             elif self.command is DROP:
-                self.verb_drop(self.verb_subject_name)
+                self.verb_drop(self.verb_noun_name)
             elif self.command is GO:
-                self.verb_go(self.verb_subject_name)
+                self.verb_go(self.verb_noun_name)
             elif self.command is HACK:
-                self.verb_hack(self.verb_subject_name, self.verb_subject_type)
+                self.verb_hack(self.verb_noun_name, self.verb_noun_type)
             elif self.command is STEAL:
-                self.verb_steal(self.verb_subject_name, self.verb_subject_type)
+                self.verb_steal(self.verb_noun_name, self.verb_noun_type)
             elif self.command is BUY:
-                self.verb_buy(self.verb_subject_name)
+                self.verb_buy(self.verb_noun_name)
             elif self.command is SPRAYPAINT:
                 # TODO: Finish implementing verb_spraypaint and remove the debug print
                 logger.debug("Spraypaint is not fully implemented yet.")
-                self.verb_spraypaint(self.verb_subject_name)
+                self.verb_spraypaint(self.verb_noun_name)
             elif self.command is USE:
-                self.verb_use(self.verb_subject_name, self.verb_subject_type)
+                self.verb_use(self.verb_noun_name, self.verb_noun_type)
             elif self.command is HELP:
-                self.verb_help(self.verb_subject_name, self.verb_subject_type)
+                self.verb_help(self.verb_noun_name, self.verb_noun_type)
             elif self.command is LOAD_GAME:
                 load_confirmed = self.verb_quit(LOAD_CONFIRM_PROMPT)
                 if load_confirmed == True:
@@ -314,19 +314,19 @@ class GameClient:
         wprint(GO_TO_JAIL_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
 
-    def verb_buy(self, subject_name):
+    def verb_buy(self, noun_name):
         '''
-        :param subject_name: string, name of the object desired
+        :param noun_name: string, name of the object desired
         :return: True if player bought object_name, false otherwise
         '''
         buy_succeeded = False
 
-        room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
+        room_feature = self.gamestate.get_current_room().get_feature_by_name(noun_name)
         if room_feature is not None:
             wprint(BUY_FEATURE_PREFIX + room_feature.get_name())
             buy_succeeded = False
         else:
-            object = self.gamestate.get_current_room().get_object_by_name(subject_name)
+            object = self.gamestate.get_current_room().get_object_by_name(noun_name)
             player_cash = self.gamestate.player.get_cash()
 
             if object is None:
@@ -376,10 +376,10 @@ class GameClient:
             elif inventory_object is not None:
                 self.gamestate.player.inventory.remove_object(inventory_object)
                 self.gamestate.get_current_room().add_object_to_room(inventory_object)
-                wprint(DROP_SUCCESS_PREFIX + self.verb_subject_name + DROP_SUCCESS_SUFFIX)
+                wprint(DROP_SUCCESS_PREFIX + self.verb_noun_name + DROP_SUCCESS_SUFFIX)
                 drop_success = True
             else:
-                wprint(DROP_FAILURE_PREFIX + self.verb_subject_name + DROP_FAILURE_SUFFIX)
+                wprint(DROP_FAILURE_PREFIX + self.verb_noun_name + DROP_FAILURE_SUFFIX)
 
         if drop_success:
             self.gamestate.update_time_left(DROP_COST)
@@ -410,42 +410,42 @@ class GameClient:
                     else:
                         logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
                         # If go failed to find the room / direction desired, print a failure message
-                        wprint(GO_FAILURE_PREFIX + self.verb_subject_name + GO_FAILURE_SUFFIX)
+                        wprint(GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX)
 
         self.ui.wait_for_enter()
         return go_success
 
-    def verb_hack(self, subject_name, subject_type):
+    def verb_hack(self, noun_name, noun_type):
         # TODO: Implement verb_hack
-        if subject_type == SUBJECT_TYPE_OBJECT:
+        if noun_type == NOUN_TYPE_FEATURE:
             pass
-        if subject_type == SUBJECT_TYPE_FEATURE:
+        if noun_type == NOUN_TYPE_FEATURE:
             pass
 
 
-    def verb_help(self, subject_name, subject_type):
+    def verb_help(self, noun_name, noun_type):
         '''
         Print help. Gives a generic message if user tries to call help on a feature or object in the room/inventory,
         otherwise just prints the generic help message.
-        :param subject_name: subject passed back by language parser
-        :param subject_type: subject's type (object/feature) as passed back from language parser
+        :param noun_name: subject passed back by language parser
+        :param noun_type: subject's type (object/feature) as passed back from language parser
         :return:
         '''
-        if subject_type == SUBJECT_TYPE_FEATURE:
+        if noun_type == NOUN_TYPE_FEATURE:
             # Only print a hep message if the feature is part of current room to avoid confusion and player trying to
             # call the 'look at' verb on features in other rooms that they are not presently in
-            room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
+            room_feature = self.gamestate.get_current_room().get_feature_by_name(noun_name)
             if room_feature is not None:
                 wprint(room_feature.get_name() + HELP_FEATURE_GENERIC)
                 self.ui.wait_for_enter()
                 return
 
-        elif subject_type == SUBJECT_TYPE_OBJECT:
+        elif noun_type == NOUN_TYPE_FEATURE:
             # Only display help on objects in the current room or player's inventory. Generic message but avoids people
             # mining for information by spamming 'help' I suppose
-            obj = self.gamestate.get_current_room().get_object_by_name(subject_name)
+            obj = self.gamestate.get_current_room().get_object_by_name(noun_name)
             if obj is None:
-                obj = self.gamestate.player.inventory.get_object_by_name(subject_name)
+                obj = self.gamestate.player.inventory.get_object_by_name(noun_name)
             if obj is not None:
                 wprint(obj.get_name() + HELP_OBJECT_GENERIC)
                 self.ui.wait_for_enter()
@@ -480,16 +480,16 @@ class GameClient:
         self.ui.print_room_description(description)
         self.gamestate.get_current_room().set_visited()
 
-    def verb_look_at(self, subject_name, subject_type):
+    def verb_look_at(self, noun_name, noun_type):
         '''
         Attempts to look at the subject
-        :param subject_name: Grammatical object at which player wishes to look.
+        :param noun_name: Grammatical object at which player wishes to look.
                             Could be a feature or an object in environment or in their inventory
         :return: None
         '''
-        room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
-        room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
-        player_object = self.gamestate.player.inventory.get_object_by_name(subject_name)
+        room_feature = self.gamestate.get_current_room().get_feature_by_name(noun_name)
+        room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
+        player_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
         if room_feature is not None:
             description = room_feature.get_description()
@@ -518,40 +518,40 @@ class GameClient:
             return True
         return False
 
-    def verb_take(self, subject_name, subject_type):
+    def verb_take(self, noun_name, noun_type):
         '''
         Evaluates a command to take object_name from the Room and if it exists (and is allowed by game rules) then
         object placed in inventory for the player
-        :param subject_name: string input by player in their command
+        :param noun_name: string input by player in their command
         :return: True (success), False ( fail, object_name not found in the room)
         '''
         take_success = False
 
         logger.debug("Inside verb_take()")
 
-        if subject_type == SUBJECT_TYPE_FEATURE:
-            logger.debug("verb_take() subject_type == 'feature'")
-            room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
+        if noun_type == NOUN_TYPE_FEATURE:
+            logger.debug("verb_take() noun_type == 'feature'")
+            room_feature = self.gamestate.get_current_room().get_feature_by_name(noun_name)
             if room_feature is None:
-                wprint("You don't see a " + subject_name + " to try and take.")
+                wprint("You don't see a " + noun_name + " to try and take.")
             else:
                 wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
-        elif subject_type == SUBJECT_TYPE_OBJECT:
-            logger.debug("verb_take() subject_type == 'object'")
-            room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
+        elif noun_type == NOUN_TYPE_FEATURE:
+            logger.debug("verb_take() noun_type == 'object'")
+            room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
                 if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
                     self.gamestate.get_current_room().remove_object_from_room(room_object)
                     self.gamestate.player.add_object_to_inventory(room_object)
-                    wprint(PICKUP_SUCCESS_PREFIX + self.verb_subject_name + PICKUP_SUCCESS_SUFFIX)
+                    wprint(PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
                     take_success = True
                 elif room_object.get_cost() > 0:
                     wprint(PICKUP_NOT_FREE)
             # Otherwise failed:
             else:
-                wprint(PICKUP_FAILURE_PREFIX + self.verb_subject_name + PICKUP_FAILURE_SUFFIX)
+                wprint(PICKUP_FAILURE_PREFIX + self.verb_noun_name + PICKUP_FAILURE_SUFFIX)
 
         if take_success:
             self.gamestate.update_time_left(TAKE_COST)
@@ -559,14 +559,14 @@ class GameClient:
         self.ui.wait_for_enter()
         return take_success
 
-    def verb_use(self, subject_name, subject_type):
+    def verb_use(self, noun_name, noun_type):
         use_success = True
 
-        if subject_type == SUBJECT_TYPE_FEATURE:
+        if noun_type == NOUN_TYPE_FEATURE:
             wprint("You cannot use that.")
             use_success = False
-        elif subject_type == SUBJECT_TYPE_OBJECT:
-            used_object = self.gamestate.player.inventory.get_object_by_name(subject_name)
+        elif noun_type == NOUN_TYPE_FEATURE:
+            used_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
             if used_object is not None:
                 obj_label = used_object.get_name().lower()
@@ -650,16 +650,16 @@ class GameClient:
         self.ui.wait_for_enter()
         return spraypaint_success
 
-    def verb_steal(self, subject_name, subject_type):
+    def verb_steal(self, noun_name, noun_type):
         steal_success = False
 
-        if subject_type == SUBJECT_TYPE_FEATURE:
+        if noun_type == NOUN_TYPE_FEATURE:
             wprint("You cannot steal that.")
             steal_success = False
 
-        elif subject_type == SUBJECT_TYPE_OBJECT:
+        elif noun_type == NOUN_TYPE_FEATURE:
 
-            room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
+            room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
                 if room_object.is_owned_by_player() is True:
@@ -687,9 +687,9 @@ class GameClient:
     def send_command_to_parser(self):
         results = self.lp.parse_command(self.user_input)
         self.command = results.get_verb()
-        self.verb_subject_name = results.get_subject()['name']
-        self.verb_subject_type = results.get_subject()['type']
-        self.targets = results.get_targets()
+        self.verb_noun_name = results.get_noun()['name']
+        self.verb_noun_type = results.get_noun()['type']
+        self.extras = results.get_extras()
         self.verb_preposition = results.get_preposition()
 
 
