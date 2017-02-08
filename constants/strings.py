@@ -12,6 +12,7 @@
 # CITE: Also this is similar to how our assembly programs stored strings in one spot and just referenced by name later
 
 from constants.constants import *
+import textwrap
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
@@ -36,42 +37,44 @@ MAIN_MENU_LINES = [
 
 # General UI strings
 PROMPT_TEXT = ">> "
-PRESS_KEY_TO_CONTINUE_MSG = "\n>>>> Press [Enter] to continue. <<<<"
+PRESS_KEY_TO_CONTINUE_MSG = "\n" + " Press [Enter] to continue ".center(80, "-")
+
+# Status header strings
 STATUS_HEADER_BAR = "=" * TEXT_WIDTH
+STATUS_HEADER_LOCATION_LABEL = "\t[LOCATION]\t"
+STATUS_HEADER_SPEED_LABEL = "\t[SPEED]\t\t"
+STATUS_HEADER_COOLNESS_LABEL = "\t[COOLNESS]\t"
+STATUS_HEADER_TIME_LABEL = "\t\t[TIME]\t"
+STATUS_HEADER_CASH_LABEL = "\t\t[CASH]\t"
+
 DESCRIPTION_HEADER = "DESCRIPTION:"
 DESCRIPTION_FOOTER = "\n"
 EXITS_HEADER = "Always know your way out. You see a few ways to go from here:"
 FEATURES_HEADER = "This area has the following interesting features:"
-FEATURES_LIST_PREFIX = "\t* "
+FEATURES_LIST_PREFIX = " * "
 OBJECTS_HEADER = "You see the following interesting items in the area:"
-OBJECTS_LIST_PREFIX = "\t* "
-CONNECTION_LIST_PREFIX = "\t* ["
+OBJECTS_LIST_PREFIX = " * "
+CONNECTION_LIST_PREFIX = "  * ["
 CONNECTION_LIST_SEGWAY= "] is "
 
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load saved game..."
+LOAD_FILENAME_PROMPT = "Enter the number of the filename you wish to load and press [Enter]"
+LOAD_CONFIRM_PROMPT = "Loading a game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
+LOAD_GAME_NO_SAVES = "There are no savegames available to load."
+LOAD_NOT_INTEGER = "That's not a valid integer. Enter the number and press enter."
+LOAD_OUT_OF_RANGE_MESSAGE = "That's not a valid menu option. Please choose an integer from the list to load the game"
 
 SAVE_GAME_PROMPT = "Name for your file: "
 SAVE_GAME_SUCCESS = "Saving game to filename: "
 SAVE_GAME_FAILED = "There was an error saving the game to filename: "
 SAVE_GAME_VALID_FILENAME_MESSAGE = "Something about the filename you provided was invalid."
-LOAD_CONFIRM_PROMPT = "Loading a game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
 QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
-LOAD_GAME_NO_SAVES = "There are no savegames available to load."
 YES_ALIASES = {'yes', 'y'}
 
 
-# The HELP message
-# TODO: Make this a lot more extensive
-HELP_MESSAGE_1 = "Here's the information on how to play the game..."
-HELP_MESSAGE_2 = "Type in a command. Valid commands are: "
-VALID_VERB_LIST = "newgame, loadgame, quit, help, look, look at <object>, go <direction or description>, take <object>, \ndrop <object>, inventory, hack, steal <object>, buy <object>, spraypaint, use <object or feature>\n"
-HELP_MESSAGE = [
-    HELP_MESSAGE_1,
-    HELP_MESSAGE_2,
-    VALID_VERB_LIST
-]
+
 
 # 'buy' strings
 BUY_NOT_IN_ROOM = "That doesn't seem to be something you can buy here."
@@ -80,6 +83,7 @@ BUY_INSUFFICIENT_CASH_PREFIX = "You lack the necessary funds to make that purcha
 BUY_INSUFFICIENT_CASH_SUFFIX = " to buy that."
 BUY_SUCCESS_PREFIX = "You hand over the cash and purchase the "
 BUY_SUCCESS_SUFFIX = ", then carefully place it in your bag."
+BUY_FEATURE_PREFIX = "You can't buy the "
 
 # 'drop' strings
 DROP_SUCCESS_PREFIX = "You drop the "
@@ -87,12 +91,46 @@ DROP_SUCCESS_SUFFIX = " on the ground."
 DROP_FAILURE_PREFIX = "Your attempt to drop a "
 DROP_FAILURE_SUFFIX = " fails because, alas, you do not have one."
 DROP_FAILURE_VIRTUALSPACE = "You can't drop things in the virtual space!"
+DROP_INVALID_PREFIX = "You can't drop the "
+DROP_INVALID_SUFFIX = " because you're not carrying it. Don't be silly!"
 
 # 'go' strings
 GO_SUCCESS_PREFIX = "You head off towards the "
 GO_SUCCESS_SUFFIX = " without a problem."
 GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
+GO_INVALID_PREFIX = "You can't go to the "
+GO_INVALID_SUFFIX = " because you're basically there already!"
+
+# 'help' strings
+HELP_HEADER_TEXT = "HELP"
+HELP_HEADER_TEXT_WIDTH = int((TEXT_WIDTH-(len(HELP_HEADER_TEXT)))/2)
+HELP_HEADER = "=" * HELP_HEADER_TEXT_WIDTH + HELP_HEADER_TEXT + "=" * HELP_HEADER_TEXT_WIDTH + "\n"
+HELP_MESSAGE = [
+    "Type in a command. Valid commands are:",
+    "* newgame:  Starts a new game when at the main menu",
+    "* loadgame:  Load a saved game",
+    "* savegame:  Save a game in progress",
+    "* quit:  Exit back to main menu or the program if already there",
+    "* help:  Prints this help message. Some hints can be found using 'help <object or feature'",
+    "* look:  Prints the long-form description of a room again after a room has been visited",
+    "* look at <object or feature>:  Looks at an object or feature",
+    "* go <direction or description>:  Go to the direction or room you type. Must be directly accessible from your current location.",
+    "* take <object>:  Take an object in the current room.",
+    "* drop <object>:  Drop an object in the current location. You can't drop items when you're inside the network.",
+    "* buy <object>:  Some objects cost money and cannot be taken.",
+    "* steal <object>  Sometimes you don't have enough money to buy an object.",
+    "* inventory  Look at all of the items youv'e collected so far.",
+    "* hack <feature>  Try and hack a feature in the room. Not everything can be hacked.",
+    "* spraypaint <feature>  If you have the necessary tools, you can paint the town red.",
+    "* use <object or feature>  Everything has a purpose. Well, not everything."
+]
+
+
+
+
+HELP_FEATURE_GENERIC = " is a feature of the room. 'Look at' it to learn more."
+HELP_OBJECT_GENERIC = " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'."
 
 # 'Inventory' strings
 INVENTORY_LIST_HEADER = STATUS_HEADER_BAR + "\nBackpack Contents\n" + STATUS_HEADER_BAR
