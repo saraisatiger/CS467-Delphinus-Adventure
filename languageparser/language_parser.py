@@ -95,6 +95,9 @@ class LanguageParser:
             subject = command.replace("steal ", "", 1)
             command = "steal"
 
+        elif 'hack' in command:
+            subject = command.replace("hack ", "", 1)
+            command = "hack"
         # This simple code just checks if the string entered by user us in one of several Lists defined in the resource
         # file constants/verbs.py. Each list is a set of aliases for each verb and it returns a simple string that
         # the gameclient is able to examine.
@@ -109,6 +112,8 @@ class LanguageParser:
             command = LOAD_GAME
         elif command in SAVE_GAME_ALIASES:
             command = SAVE_GAME
+        elif command in HACK_ALIASES:
+            command = HACK
         elif command in HELP_ALIASES:
             command = HELP
         elif command in LOOK_ALIASES:

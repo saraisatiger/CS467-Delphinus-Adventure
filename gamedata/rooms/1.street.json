@@ -13,6 +13,10 @@
       {
         "name" : "Guardrails",
         "description" : "These guardrails look perfect for grinding on with a skateboard!"
+      },
+      {
+        "name" : "Traffic Lights",
+        "description" : "There's a panel you could jack into and hack if you just knew how."
       }
   ],
   "room_connections" : [
