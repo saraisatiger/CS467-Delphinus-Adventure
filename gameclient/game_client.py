@@ -308,10 +308,9 @@ class GameClient:
         self.ui.wait_for_enter()
 
     def go_to_jail(self):
-        #TODO Refactor this as a general purpose function? Take in the room name, the message, and the cost as parameters
         county_jail = self.gamestate.get_room_by_name("County Jail")
         self.gamestate.set_current_room(county_jail)
-        wprint(GO_TO_JAIL_MESSAGE)
+        wprint(JAIL_GO_TO_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
 
     def verb_buy(self, noun_name):
@@ -416,11 +415,34 @@ class GameClient:
         return go_success
 
     def verb_hack(self, noun_name, noun_type):
-        # TODO: Implement verb_hack
-        if noun_type == NOUN_TYPE_FEATURE:
-            pass
-        if noun_type == NOUN_TYPE_FEATURE:
-            pass
+        # TODO: Finish implementing verb_hack
+        hack_success = False
+
+        if self.gamestate.player.can_hack() is False:
+            wprint(HACK_FAIL_NOSKILL)
+
+        else:
+            # TODO: Once noun_type is passed by language-parser, change this to use commneted out if statements
+            # if noun_type == NOUN_TYPE_OBJECT:
+            #     print(HACK_FAIL_INVALID_OBJECT)
+
+            # if noun_type == NOUN_TYPE_FEATURE:
+            if True:
+                cur_room = self.gamestate.get_current_room()
+                feature = cur_room.get_feature_by_name(noun_name)
+                feature_name = ""
+                try:
+                    feature_name = feature.get_name().lower()
+                except:
+                    wprint(HACK_FAIL_FEATURE_NOT_PRESENT)
+
+                # Room specific logic for hacking various features
+                if feature_name == "traffic lights":
+                    wprint(HACK_SUCCESS_TRAFFIC_LIGHTS)
+                    self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
+
+        self.ui.wait_for_enter()
+        return hack_success
 
 
     def verb_help(self, noun_name, noun_type):
@@ -440,7 +462,7 @@ class GameClient:
                 self.ui.wait_for_enter()
                 return
 
-        elif noun_type == NOUN_TYPE_FEATURE:
+        elif noun_type == NOUN_TYPE_OBJECT:
             # Only display help on objects in the current room or player's inventory. Generic message but avoids people
             # mining for information by spamming 'help' I suppose
             obj = self.gamestate.get_current_room().get_object_by_name(noun_name)
@@ -537,7 +559,7 @@ class GameClient:
             else:
                 wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
-        elif noun_type == NOUN_TYPE_FEATURE:
+        elif noun_type == NOUN_TYPE_OBJECT:
             logger.debug("verb_take() noun_type == 'object'")
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
@@ -565,12 +587,12 @@ class GameClient:
         if noun_type == NOUN_TYPE_FEATURE:
             wprint("You cannot use that.")
             use_success = False
-        elif noun_type == NOUN_TYPE_FEATURE:
+        elif noun_type == NOUN_TYPE_OBJECT:
             used_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
             if used_object is not None:
                 obj_label = used_object.get_name().lower()
-                # "Cash" item logic
+
                 if obj_label == "crisp cash":
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
                     self.gamestate.player.update_cash(cash_gained)
@@ -583,9 +605,7 @@ class GameClient:
                     wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
                     # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
-                    # TODO: and then update some game-state variable so that player can do things they can do if they have a PC
-
-                    # TODO: Refactor this check as a function ("player.has_all_pc_parts()" returns boolean)
+                    # and then update some game-state variable so that player can do things they can do if they have a PC
                     g_card = self.gamestate.player.inventory.get_object_by_name("graphics card")
                     ram_chip = self.gamestate.player.inventory.get_object_by_name("ram chip")
                     floppy_disk = self.gamestate.player.inventory.get_object_by_name("floppy disk")
@@ -606,13 +626,18 @@ class GameClient:
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
                     wprint(USE_SNACKS_SUCCESS)
                 elif obj_label == "skateboard":
+                    self.gamestate.player.set_has_skate_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
                     wprint(USE_SKATEBOARD_SUCCESS)
                 elif obj_label == "spray paint":
-                    self.gamestate.player.set_has_spraypaint(True)
+                    self.gamestate.player.set_has_spraypaint_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     wprint(USE_SPRAYPAINT_SUCCESS)
+                elif obj_label == "hacker manual":
+                    self.gamestate.player.set_has_hack_skill(True)
+                    self.gamestate.player.remove_object_from_inventory(used_object)
+                    wprint(USE_HACKERMANUAL_SUCCESS)
                 elif obj_label == "surge":
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
@@ -657,7 +682,7 @@ class GameClient:
             wprint("You cannot steal that.")
             steal_success = False
 
-        elif noun_type == NOUN_TYPE_FEATURE:
+        elif noun_type == NOUN_TYPE_OBJECT:
 
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
@@ -691,7 +716,6 @@ class GameClient:
         self.verb_noun_type = results.get_noun()['type']
         self.extras = results.get_extras()
         self.verb_preposition = results.get_preposition()
-
 
 
 class GameState:
@@ -729,8 +753,8 @@ class GameState:
 
     def initialize_load_game(self, filename):
         # TODO: Finish fleshing out these ideas and test this function. Will require constant tweaking of this and the SaveGame
-        # TODO: class because of the interdependence, unless better plan is developed ((SSH))
-        # TODO: Write UNIT TESTS for this code, entirely untested
+        # class because of the interdependence, unless better plan is developed ((SSH))
+        # Write UNIT TESTS for this code, entirely untested
         self.set_room_vars_to_default()
 
         save_game = SaveGame(None)
@@ -761,7 +785,6 @@ class GameState:
         # Set the time_left
         self.time_left = save_game.get_time_left()
 
-
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\status_codes.py  ((SSH))
         # This function should/will check if player has won or lost(died/whatever)
@@ -775,7 +798,10 @@ class GameState:
             'coolness' : self.player.coolness,
             'current_room' : self.current_room.get_name(),
             'time_left' : self.time_left,
-            'cash' : self.player.get_cash()
+            'cash' : self.player.get_cash(),
+            'hack_skill': self.player.can_hack(),
+            'skate_skill': self.player.can_skateboard(),
+            'spraypaint_skill' : self.player.can_spraypaint()
         }
         return header_info
 
@@ -823,8 +849,6 @@ class GameState:
 
     def get_time_left(self):
         return self.time_left
-
-
 
 
 class UserInterface:
@@ -884,6 +908,24 @@ class UserInterface:
         wprint(STATUS_HEADER_LOCATION_LABEL + str(info['current_room']))
         wprint(STATUS_HEADER_SPEED_LABEL + str(info['speed']) + STATUS_HEADER_TIME_LABEL + str(info['time_left']))
         wprint(STATUS_HEADER_COOLNESS_LABEL  + str(info['coolness']) + STATUS_HEADER_CASH_LABEL + str(info['cash']))
+
+        # conditionally print player's acquired abilities if they have them
+        skills_row_text = STATUS_HEADER_SKILLS_LABEL
+        has_hack_skill = info['hack_skill']
+        has_skate_skill = info['skate_skill']
+        has_spraypaint_skill = info['spraypaint_skill']
+
+        if has_hack_skill is False and has_skate_skill is False and has_spraypaint_skill is False:
+            logger.debug(has_hack_skill + has_spraypaint_skill + has_skate_skill)
+            skills_row_text += STATUS_NO_SKILLS
+        if has_hack_skill is True:
+            skills_row_text +=  "hack\t"
+        if has_skate_skill is True:
+            skills_row_text += "skate\t"
+        if has_spraypaint_skill is True:
+            skills_row_text += "spraypaint\t"
+        wprint(skills_row_text)
+
         wprint(STATUS_HEADER_BAR)
 
     def wait_for_enter(self):
@@ -900,7 +942,6 @@ class UserInterface:
         wprint(INVENTORY_LIST_FOOTER)
 
 
-
 class RandomEventGenerator:
     '''
     Used to generate / determine random event results within the game.
@@ -910,11 +951,18 @@ class RandomEventGenerator:
         # Defined in constants/probabilities.py
         # 100 is 100% chance, 75 = 75 chance, etc.
         self.steal_success_chance = STEAL_SUCCESS_CHANCE
+        self.hack_success_chance = HACK_SUCCESS_CHANCE
         random.seed()
 
     def attempt_steal(self):
         num = random.randint(1,100)
         if num <= self.steal_success_chance:
+            return True
+        return False
+
+    def attempt_hack(self):
+        num = random.randint(1,100)
+        if num <= self.hack_success_chance:
             return True
         return False
 

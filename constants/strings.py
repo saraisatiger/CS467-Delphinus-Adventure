@@ -15,6 +15,8 @@ from constants.constants import *
 import textwrap
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
+# TODO: Replace INTRO_STRING with the introduction information in the Descriptions google doc
+# URL: https://docs.google.com/document/d/1a4FziaNjpQGlQbCSIGH4rYGFegqCmM1LuPL1RIgQCLg/edit
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
 DEFAULT_ROOM = "Street"
 
@@ -46,13 +48,15 @@ STATUS_HEADER_SPEED_LABEL = "\t[SPEED]\t\t"
 STATUS_HEADER_COOLNESS_LABEL = "\t[COOLNESS]\t"
 STATUS_HEADER_TIME_LABEL = "\t\t[TIME]\t"
 STATUS_HEADER_CASH_LABEL = "\t\t[CASH]\t"
+STATUS_HEADER_SKILLS_LABEL = "\t[SKILLS]\t"
+STATUS_NO_SKILLS = "Nothing marketable!"
 
 DESCRIPTION_HEADER = "DESCRIPTION:"
 DESCRIPTION_FOOTER = "\n"
-EXITS_HEADER = "Always know your way out. You see a few ways to go from here:"
+EXITS_HEADER = "Always know your exits:"
 FEATURES_HEADER = "This area has the following interesting features:"
 FEATURES_LIST_PREFIX = " * "
-OBJECTS_HEADER = "You see the following interesting items in the area:"
+OBJECTS_HEADER = "You look around for anything not strapped down and you see:"
 OBJECTS_LIST_PREFIX = " * "
 CONNECTION_LIST_PREFIX = "  * ["
 CONNECTION_LIST_SEGWAY= "] is "
@@ -102,6 +106,12 @@ GO_FAILURE_SUFFIX = " but just can't find a way."
 GO_INVALID_PREFIX = "You can't go to the "
 GO_INVALID_SUFFIX = " because you're basically there already!"
 
+# 'hack' strings
+HACK_FAIL_NOSKILL = "You just don't know how to do that yet"
+HACK_FAIL_INVALID_OBJECT = "There's no way to hack that. Try hacking something useful!"
+HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
+HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should make things a lot faster for you."
+
 # 'help' strings
 HELP_HEADER_TEXT = "HELP"
 HELP_HEADER_TEXT_WIDTH = int((TEXT_WIDTH-(len(HELP_HEADER_TEXT)))/2)
@@ -138,10 +148,10 @@ INVENTORY_LIST_FOOTER = STATUS_HEADER_BAR
 INVENTORY_EMPTY = "Empty... not even a floppy disk"
 
 # 'jail' strings
-GO_TO_JAIL_MESSAGE = "Your actions have landed you in jail, costing you valuable time!"
+JAIL_GO_TO_MESSAGE = "Your actions have landed you in jail, costing you valuable time!"
 
 # 'look' strings
-NO_INTERESTING_OBJECTS_MESSAGE = "You see nothing else laying about worth taking."
+NO_INTERESTING_OBJECTS_MESSAGE = " ...Hmmm, nothing worth taking."
 NO_INTERESTING_FEATURES_MESSAGE = "You see nothing else worth checking out."
 
 
@@ -169,6 +179,7 @@ USE_CASH_SUCCESS_PREFIX = "You count the bills and put them in your wallet. You 
 USE_CASH_SUCCESS_SUFFIX = " dollars richer!"
 USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"
 USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide to Building Amazing Hacking Machines' to see what you need?"
+USE_HACKERMANUAL_SUCCESS = "You peruse the pages of the hacker manual and feel confident you can hack just about anything. Just don't get caught!"
 USE_SNACKS_SUCCESS = "Crunchy yet satisfying. You feel faster, do you Grok it?"
 USE_SKATEBOARD_SUCCESS = "Stepping onto the Skateboard, you feel as though you can do anything faster. Maybe that's just the Surge you drank for breakfast surging through your veins, though?"
 USE_SPRAYPAINT_SUCCESS = "You spend a few moments shaking the Spray Paint and test it out. You can now spraypaint the town red!"

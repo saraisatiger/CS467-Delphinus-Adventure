@@ -139,7 +139,7 @@ class Room:
         for room_feature in self.room_features:
             # logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() + "...")
             if room_feature.get_name().lower() == feature_name.lower():
-                # logger.debug("Match found!")
+                logger.debug("Match found!")
                 return room_feature
             # else:
             #     logger.debug("Not a match!")
