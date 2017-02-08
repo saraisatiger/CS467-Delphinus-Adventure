@@ -57,7 +57,6 @@ class GameClient:
         :return: N/A
         '''
 
-
         # Load data from files (Specifically rooms, but can do other files as well)
         # Gamestate level details will later be loaded in the main menu loop
         self.gamestate.rooms = self.gamestate.rb.load_room_data_from_file()
@@ -115,6 +114,7 @@ class GameClient:
         Prints the main menu and sets self.command until command is set to a proper value
         :return: indirectly - sets instance variable, self.command, to a valid command
         '''
+
         # first_pass logic is to ensure we don't print invalid command to the user unless it's their second attempt
         first_pass = True
         while not self.is_valid_menu_command(self.command):
@@ -127,7 +127,6 @@ class GameClient:
             self.main_menu_prompt()
 
             self.send_command_to_parser()
-
 
     def main_menu_prompt(self):
         '''
@@ -157,7 +156,6 @@ class GameClient:
         self.verb_targets = None
         self.verb_preposition = None
         self.command = INVALID_INPUT
-
 
     def play_game(self):
         '''
@@ -194,9 +192,9 @@ class GameClient:
                 print_long_description = True
                 self.gamestate.update_time_left(LOOK_COST)
                 self.ui.clear_screen()
-
+            # Verbs
             elif self.command is LOOK_AT:
-                self.verb_look_at(self.verb_subject_name)
+                self.verb_look_at(self.verb_subject_name, self.verb_subject_type)
             elif self.command is INVENTORY:
                 self.verb_inventory()
             elif self.command is TAKE:
@@ -206,8 +204,7 @@ class GameClient:
             elif self.command is GO:
                 self.verb_go(self.verb_subject_name)
             elif self.command is HACK:
-                # TODO: Implement HACK
-                logger.debug("Hack is not yet implemented.")
+                self.verb_hack(self.verb_subject_name, self.verb_subject_type)
             elif self.command is STEAL:
                 self.verb_steal(self.verb_subject_name, self.verb_subject_type)
             elif self.command is BUY:
@@ -266,20 +263,20 @@ class GameClient:
                     wprint(str(counter) + ": " + savegame)
                     counter += 1
 
-                wprint("Enter the number of the filename you wish to load and press [Enter]")
+                wprint(LOAD_FILENAME_PROMPT)
                 user_choice = self.ui.user_prompt()
 
                 # Cite: http://stackoverflow.com/questions/5424716/how-to-check-if-input-is-a-number
                 try:
                     option = int(user_choice)
                 except:
-                    wprint("That's not a valid integer. Enter the number and press enter.")
+                    wprint(LOAD_NOT_INTEGER)
                     input_is_valid = False
                     continue
 
                 option -= 1
                 if option < 0 or option >= len(savegame_list):
-                    wprint("That's not a valid menu option. Please choose an integer from the list to load the game")
+                    wprint(LOAD_OUT_OF_RANGE_MESSAGE)
                     input_is_valid = False
                     continue
 
@@ -326,7 +323,7 @@ class GameClient:
 
         room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
         if room_feature is not None:
-            wprint("You can't buy the " + room_feature.get_name())
+            wprint(BUY_FEATURE_PREFIX + room_feature.get_name())
             buy_succeeded = False
         else:
             object = self.gamestate.get_current_room().get_object_by_name(subject_name)
@@ -368,7 +365,7 @@ class GameClient:
 
         room_feature = self.gamestate.get_current_room().get_feature_by_name(object_name)
         if room_feature is not None:
-            wprint("You can't drop the " + room_feature.get_name() + " because you're not carrying it. Don't be silly!")
+            wprint(DROP_INVALID_PREFIX + room_feature.get_name() + DROP_INVALID_SUFFIX)
             drop_success = False
 
         else:
@@ -396,7 +393,7 @@ class GameClient:
 
         room_feature = self.gamestate.get_current_room().get_feature_by_name(destination)
         if room_feature is not None:
-            wprint("You can't go to the " + room_feature.get_name() + " because you're basically there already!")
+            wprint(GO_INVALID_PREFIX + room_feature.get_name() + GO_INVALID_SUFFIX)
             go_success = False
 
         else:
@@ -418,6 +415,14 @@ class GameClient:
         self.ui.wait_for_enter()
         return go_success
 
+    def verb_hack(self, subject_name, subject_type):
+        # TODO: Implement verb_hack
+        if subject_type == SUBJECT_TYPE_OBJECT:
+            pass
+        if subject_type == SUBJECT_TYPE_FEATURE:
+            pass
+
+
     def verb_help(self, subject_name, subject_type):
         '''
         Print help. Gives a generic message if user tries to call help on a feature or object in the room/inventory,
@@ -426,23 +431,23 @@ class GameClient:
         :param subject_type: subject's type (object/feature) as passed back from language parser
         :return:
         '''
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             # Only print a hep message if the feature is part of current room to avoid confusion and player trying to
             # call the 'look at' verb on features in other rooms that they are not presently in
             room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
             if room_feature is not None:
-                wprint(room_feature.get_name() + " is a feature of the room. 'Look at' it to learn more.")
+                wprint(room_feature.get_name() + HELP_FEATURE_GENERIC)
                 self.ui.wait_for_enter()
                 return
 
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
             # Only display help on objects in the current room or player's inventory. Generic message but avoids people
             # mining for information by spamming 'help' I suppose
             obj = self.gamestate.get_current_room().get_object_by_name(subject_name)
             if obj is None:
                 obj = self.gamestate.player.inventory.get_object_by_name(subject_name)
             if obj is not None:
-                wprint(obj.get_name() + " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'.")
+                wprint(obj.get_name() + HELP_OBJECT_GENERIC)
                 self.ui.wait_for_enter()
                 return
             else:
@@ -475,17 +480,16 @@ class GameClient:
         self.ui.print_room_description(description)
         self.gamestate.get_current_room().set_visited()
 
-    def verb_look_at(self, object_name):
+    def verb_look_at(self, subject_name, subject_type):
         '''
         Attempts to look at the subject
-        :param object_name: Grammatical object at which player wishes to look.
+        :param subject_name: Grammatical object at which player wishes to look.
                             Could be a feature or an object in environment or in their inventory
         :return: None
         '''
-
-        room_feature = self.gamestate.get_current_room().get_feature_by_name(object_name)
-        room_object = self.gamestate.get_current_room().get_object_by_name(object_name)
-        player_object = self.gamestate.player.inventory.get_object_by_name(object_name)
+        room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
+        room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
+        player_object = self.gamestate.player.inventory.get_object_by_name(subject_name)
 
         if room_feature is not None:
             description = room_feature.get_description()
@@ -502,6 +506,11 @@ class GameClient:
         self.ui.wait_for_enter()
 
     def verb_quit(self, message):
+        '''
+        Prints the message passed in then prompts user if they are sure they wish to quit
+        :param message: string
+        :return: message that should be printed
+        '''
         self.ui.clear_screen()
         self.ui.print_quit_confirm(message)
         confirm = self.ui.user_prompt().lower()
@@ -520,7 +529,7 @@ class GameClient:
 
         logger.debug("Inside verb_take()")
 
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             logger.debug("verb_take() subject_type == 'feature'")
             room_feature = self.gamestate.get_current_room().get_feature_by_name(subject_name)
             if room_feature is None:
@@ -528,7 +537,7 @@ class GameClient:
             else:
                 wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
             logger.debug("verb_take() subject_type == 'object'")
             room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
 
@@ -553,10 +562,10 @@ class GameClient:
     def verb_use(self, subject_name, subject_type):
         use_success = True
 
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             wprint("You cannot use that.")
             use_success = False
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
             used_object = self.gamestate.player.inventory.get_object_by_name(subject_name)
 
             if used_object is not None:
@@ -644,11 +653,11 @@ class GameClient:
     def verb_steal(self, subject_name, subject_type):
         steal_success = False
 
-        if subject_type == "feature":
+        if subject_type == SUBJECT_TYPE_FEATURE:
             wprint("You cannot steal that.")
             steal_success = False
 
-        elif subject_type == "object":
+        elif subject_type == SUBJECT_TYPE_OBJECT:
 
             room_object = self.gamestate.get_current_room().get_object_by_name(subject_name)
 
@@ -850,7 +859,7 @@ class UserInterface:
 
     def print_help_message(self):
         for line in HELP_MESSAGE:
-            wprint(line)
+            wprint(line) # Don't use wprint here, prefer linebreaks as defined in strings.py
         self.wait_for_enter()
 
     def print_quit_confirm(self, message):
@@ -872,9 +881,9 @@ class UserInterface:
 
     def print_status_header(self, info):
         wprint(STATUS_HEADER_BAR)
-        wprint("|\tSPEED: " + str(info['speed']) + "\t\tTIME LEFT: " + str(info['time_left']))
-        wprint("|\tCOOLNESS: " + str(info['coolness']) + "\t\tCASH: " + str(info['cash']))
-        wprint("|\tCURRENT LOCATION: " + str(info['current_room']))
+        wprint(STATUS_HEADER_LOCATION_LABEL + str(info['current_room']))
+        wprint(STATUS_HEADER_SPEED_LABEL + str(info['speed']) + STATUS_HEADER_TIME_LABEL + str(info['time_left']))
+        wprint(STATUS_HEADER_COOLNESS_LABEL  + str(info['coolness']) + STATUS_HEADER_CASH_LABEL + str(info['cash']))
         wprint(STATUS_HEADER_BAR)
 
     def wait_for_enter(self):
