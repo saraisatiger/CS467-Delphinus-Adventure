@@ -63,18 +63,19 @@ CONNECTION_LIST_SEGWAY= "] is "
 
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
-LOAD_GAME_MESSAGE = "Let's load saved game..."
+LOAD_GAME_MESSAGE = "Let's load your saved game..."
 LOAD_FILENAME_PROMPT = "Enter the number of the filename you wish to load and press [Enter]"
 LOAD_CONFIRM_PROMPT = "Loading a game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
-LOAD_GAME_NO_SAVES = "There are no savegames available to load."
+LOAD_GAME_NO_SAVES = "There are no saved games available to load."
 LOAD_NOT_INTEGER = "That's not a valid integer. Enter the number and press enter."
 LOAD_OUT_OF_RANGE_MESSAGE = "That's not a valid menu option. Please choose an integer from the list to load the game"
 
-SAVE_GAME_PROMPT = "Name for your file: "
+SAVE_GAME_PROMPT = "Name a file to save this game (no extension): "
 SAVE_GAME_SUCCESS = "Saving game to filename: "
 SAVE_GAME_FAILED = "There was an error saving the game to filename: "
 SAVE_GAME_VALID_FILENAME_MESSAGE = "Something about the filename you provided was invalid."
-QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
+# QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
+QUIT_CONFIRM_PROMPT = "Quitting the game...\nDo you wish to save this game? (Y)es or (N)o"
 YES_ALIASES = {'yes', 'y'}
 
 

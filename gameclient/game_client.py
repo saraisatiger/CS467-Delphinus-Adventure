@@ -89,7 +89,10 @@ class GameClient:
                 # We handle each case separately because if a player forfeits and does not save,
                 # it can have different logic than if they quit and save, etc.
                 # The constants are defined in constants\status_codes.py
-                exit_code = self.play_game()
+                if LOAD_GAME:
+                    saved = True
+                saved = False
+                exit_code = self.play_game(saved)
                 if exit_code is GAMEOVER_FORFEIT:
                     wprint("Game over: Forfeit")
                 elif exit_code is GAMEOVER_WIN:
@@ -102,7 +105,7 @@ class GameClient:
                     wprint("Game over: Player loading game")
                     self.load_game_menu()
                     self.reset_input_and_command()
-                    self.play_game()
+                    self.play_game(saved)
                 elif exit_code is GAMEOVER_QUIT:
                     wprint("Game over: Player quit")
                     self.reset_input_and_command()
@@ -157,14 +160,18 @@ class GameClient:
         self.verb_preposition = None
         self.command = INVALID_INPUT
 
-    def play_game(self):
+    def play_game(self, saved):
         '''
         Primary game loop that prints information to user, reads input, and reacts accordingly
         :return: a status code as defined in constants\status_codes.py, used by gameclient to determine how
         and/or why game ended.
         '''
 
-        self.ui.new_game_splash_screen()
+        if saved == True:
+            self.ui.saved_game_splash_screen()
+
+        else:
+            self.ui.new_game_splash_screen()
 
         status = GAME_CONTINUE          # Force entry into main loop
 
@@ -233,15 +240,22 @@ class GameClient:
 
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
+                # save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
+                # if quit_confirmed == True and save_game_prompt == False:
+                #     status = GAMEOVER_QUIT
+                # elif quit_confirmed == True and save_game_prompt == True:
+                #     status = SAVE_GAME
                 if quit_confirmed == True:
-                    status = GAMEOVER_QUIT
+                    status = SAVE_GAME
             else:
                 wprint(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
 
             # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
-            self.reset_input_and_command()
+            # self.reset_input_and_command()
         return status
+
+
 
     def load_game_menu(self):
         '''
@@ -281,6 +295,8 @@ class GameClient:
                     continue
 
             # If here we have a valid option
+            # DEBUG
+            print('Loading game from ' + savegame_list[option] + '...')
             self.gamestate.initialize_load_game(savegame_list[option])
             return True
 
@@ -295,7 +311,7 @@ class GameClient:
 
         while is_valid_filename is False:
             wprint(SAVE_GAME_PROMPT)
-            file_name = self.ui.user_prompt()
+            file_name = self.ui.user_prompt() + '.json'
             is_valid_filename = save_game.is_valid_filename(file_name)
             if is_valid_filename is False:
                 wprint(SAVE_GAME_VALID_FILENAME_MESSAGE)
@@ -758,12 +774,16 @@ class GameState:
         self.set_room_vars_to_default()
 
         save_game = SaveGame(None)
+        # DBBUG
+        print('Loading from file...')
         save_game.load_from_file(filename)
 
         # Set each room's visited status
         visited_rooms_list = save_game.get_visited_rooms_list()
         for room_name in visited_rooms_list:
             room = self.get_room_by_name(room_name)
+            # DEBUG
+            print(room_name)
             room.set_visited(True)
 
         # Retrieve the dictionary of room_name : [object_list] pairs and iterate through, setting each room's objects
@@ -899,8 +919,13 @@ class UserInterface:
             pass
 
     def new_game_splash_screen(self):
-        self.clear_screen()
+        # self.clear_screen()
         wprint(NEW_GAME_MESSAGE)  # Defined in constants\strings.py
+        self.wait_for_enter()
+
+    def saved_game_splash_screen(self):
+        # self.clear_screen()
+        wprint(LOAD_GAME_MESSAGE)  # Defined in constants\strings.py
         self.wait_for_enter()
 
     def print_status_header(self, info):
@@ -930,7 +955,7 @@ class UserInterface:
 
     def wait_for_enter(self):
         input(PRESS_KEY_TO_CONTINUE_MSG)
-        self.clear_screen()
+        # self.clear_screen()
 
     def print_room_description(self, description):
         wprint(DESCRIPTION_HEADER)
