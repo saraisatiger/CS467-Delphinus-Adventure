@@ -108,8 +108,10 @@ GO_INVALID_SUFFIX = " because you're basically there already!"
 
 # 'hack' strings
 HACK_FAIL_NOSKILL = "You just don't know how to do that yet"
-HACK_FAIL_INVALID_OBJECT = "There's no way to hack that. Try hacking something useful!"
+HACK_FAIL_INVALID_TARGET = "There's no way to hack that. Try hacking something useful!"
 HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
+HACK_FAIL_ALREADY_HACKED = "You've already hacked that."
+HACK_SUCCESS_ATM = "You jack into the system and withdraw some cash from the ATM... but not from your account. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww."
 HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should make things a lot faster for you."
 
 # 'help' strings
