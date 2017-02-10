@@ -7,15 +7,18 @@
   "room_features" : [
       {
         "name" : "Disk Drive",
-        "description" : "You can load your CD-ROMs in here."
+        "description" : "You can load your CD-ROMs in here.",
+        "hackable": false
       },
       {
         "name" : "Panel",
-        "description" : "Your Computer's ultimate backdoor. You can add some sweet new mods through here."
+        "description" : "Your Computer's ultimate backdoor. You can add some sweet new mods through here.",
+        "hackable": false
       },
       {
         "name" : "Terminal",
-        "description" : "\"Hello, World!\", it reads."
+        "description" : "\"Hello, World!\", it reads.",
+        "hackable": false
       }
   ],
   "room_connections" : [

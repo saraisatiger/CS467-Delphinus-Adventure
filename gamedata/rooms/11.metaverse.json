@@ -7,11 +7,13 @@
   "room_features" : [
       {
         "name" : "Bug",
-        "description" : "Oh no! Someone hacked autocorrect to change every word you type to \"butts\"!"
+        "description" : "Oh no! Someone hacked autocorrect to change every word you type to \"butts\"!",
+        "hackable": false
       },
       {
         "name" : "Firewall",
-        "description" : "Access denied?! Not today!"
+        "description" : "Access denied?! Not today!",
+        "hackable": false
       }
   ],
   "room_connections" : [
