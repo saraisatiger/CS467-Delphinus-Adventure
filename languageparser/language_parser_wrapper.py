@@ -41,10 +41,10 @@ class LanguageParserWrapper:
 
         if self.extras:
             for extra in self.extras:
-                str += "\n\t{\n['name' : '" + extra['name'] + "']\n"
-                str += "\t['type' : '" + extra['type'] + "']\n},"
+                str += "\n\t['name' : '" + extra['name'] + "']\n"
+                str += "\t['type' : '" + extra['type'] + "']\n,"
         else:
-            str+= "\t\tNone\n"
+            str+= "\tNone\n"
 
         str += "\t'preposition' : "
         try:
@@ -68,7 +68,7 @@ class LanguageParserWrapper:
         self.noun['name'] = noun_name_string
         self.noun['type'] = noun_type_string
 
-    def append_extra(self, extra_name_string, extra_type_string):
+    def set_extra(self, extra_name_string, extra_type_string):
         new_extra = {
             'name' : extra_name_string,
             'type' : extra_type_string
