@@ -21,33 +21,36 @@ class TestLanguageParser(unittest.TestCase):
     def test_lp_newgame_valid_strings(self):
         for test_string in NEW_GAME_ALIASES:
             result = self.LP.parse_command(test_string)
+            expected_noun = {'name': None, 'type': None}
             self.assertEquals(NEW_GAME, result.get_verb(), NEW_GAME + " does not match " + str(result.get_verb()))
-            self.assertEquals(None, result.get_noun())
-            self.assertEquals(None, result.get_extras())
-            self.assertEquals(None, result.get_preposition())
-            self.assertEquals(None, result.get_error_message())
+            self.assertEquals(expected_noun, result.get_noun())
+            self.assertIsNone(result.get_extras())
+            self.assertIsNone(result.get_preposition())
+            self.assertIsNone(result.get_error_message())
             logger.debug("Checking if string returns verb NEW_GAME: '" + test_string + "'")
             logger.debug("Passed.")
 
     def test_lp_loadgame_valid_strings(self):
         for test_string in LOAD_GAME_ALIASES:
             result = self.LP.parse_command(test_string)
+            expected_noun = {'name': None, 'type': None}
             self.assertEquals(LOAD_GAME, result.get_verb(), LOAD_GAME + " does not match " + str(result.get_verb()))
-            self.assertEquals(None, result.get_noun())
-            self.assertEquals(None, result.get_extras())
-            self.assertEquals(None, result.get_preposition())
-            self.assertEquals(None, result.get_error_message())
+            self.assertEquals(expected_noun, result.get_noun())
+            self.assertIsNone(result.get_extras())
+            self.assertIsNone(result.get_preposition())
+            self.assertIsNone(result.get_error_message())
             logger.debug("Checking if string returns verb LOAD_GAME: '" + test_string + "'")
             logger.debug("Passed.")
 
     def test_lp_help_valid_strings(self):
         for test_string in HELP_ALIASES:
             result = self.LP.parse_command(test_string)
+            expected_noun = {'name': None, 'type': None}
             self.assertEquals(HELP, result.get_verb(), HELP + " does not match " + str(result.get_verb()))
-            self.assertEquals(None, result.get_noun())
-            self.assertEquals(None, result.get_extras())
-            self.assertEquals(None, result.get_preposition())
-            self.assertEquals(None, result.get_error_message())
+            self.assertEquals(expected_noun, result.get_noun())
+            self.assertIsNone(result.get_extras())
+            self.assertIsNone(result.get_preposition())
+            self.assertIsNone(result.get_error_message())
             logger.debug("Checking if string returns verb HELP: '" + test_string + "'")
             logger.debug("Passed.")
 
@@ -55,10 +58,10 @@ class TestLanguageParser(unittest.TestCase):
         for test_string in QUIT_ALIASES:
             result = self.LP.parse_command(test_string)
             self.assertEquals(QUIT, result.get_verb(), QUIT + " does not match " + str(result.get_verb()))
-            self.assertEquals(None, result.get_noun())
-            self.assertEquals(None, result.get_extras())
-            self.assertEquals(None, result.get_preposition())
-            self.assertEquals(None, result.get_error_message())
+            self.assertIsNone(result.get_noun())
+            self.assertIsNone(result.get_extras())
+            self.assertIsNone(result.get_preposition())
+            self.assertIsNone(result.get_error_message())
             logger.debug("Checking if string returns verb QUIT: '" + test_string + "'")
             logger.debug("Passed.")
 
@@ -70,13 +73,32 @@ class TestLanguageParser(unittest.TestCase):
             result = self.LP.parse_command(test_string)
             self.assertEquals(BUY, result.get_verb(), BUY + " does not match " + str(result.get_verb()))
             self.assertEquals(expected_noun, result.get_noun())
-            self.assertEquals(None, result.get_extras())
-            self.assertEquals(None, result.get_preposition())
-            self.assertEquals(None, result.get_error_message())
+            self.assertIsNone(result.get_extras())
+            self.assertIsNone(result.get_preposition())
+            self.assertIsNone(result.get_error_message())
             logger.debug("Checking if string returns verb BUY: '" + test_string + "' and NOUN: '" + obj_name +"'")
             logger.debug("Passed.")
     
+    def test_lop_by_invalid_object_names(self):
+        invalid_object_names = [
+            '', ' ', '\n', '\t', 'hi', '  hi', 'flippers', 'two words'
+        ]
 
+        for obj_name in invalid_object_names:
+            test_string = "buy " + str(obj_name)
+            obj_name = obj_name.lower()
+            # TODO: Revise this unit test with revised language parser logic
+            # I think the language parser actually sets expected_noun to None instead of dictionary of None values?
+            expected_noun = {'name': None, 'type': None}
+            result = self.LP.parse_command(test_string)
+            self.assertEquals(BUY, result.get_verb(), INVALID_INPUT + " does not match " + str(result.get_verb()))
+            self.assertEquals(expected_noun, result.get_noun())
+            self.assertEquals(None, result.get_extras())
+            self.assertEquals(None, result.get_preposition())
+            # TODO: Update extras result with revised language parser
+            self.assertIsNone(result.get_extras())
+            logger.debug("Checking if string returns verb BUY: '" + test_string + "' and NOUN: '" + obj_name +"'")
+            logger.debug("Passed.")
 
 if __name__ == '__main__':
     unittest.main()

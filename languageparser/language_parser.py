@@ -173,7 +173,7 @@ class LanguageParser:
         results = LanguageParserWrapper()
         results.set_verb(str(verb))
         if noun is None:
-            results.noun = None
+            results.noun = {'name': None, 'type': None }
         else:
             results.set_noun(str(noun), str("object"))
         results.extras = None
