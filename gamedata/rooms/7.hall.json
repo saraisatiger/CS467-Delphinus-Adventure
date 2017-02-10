@@ -7,15 +7,18 @@
   "room_features" : [
       {
         "name" : "Locker",
-        "description" : "5... 29... 17... click... Aaand unlocked!"
+        "description" : "5... 29... 17... click... Aaand unlocked!",
+        "hackable": false
       },
 	  {
         "name" : "Teacher",
-        "description" : "I guess, maybe just some rando wandered in from the street? Do street randos shop at the Profresh Prof's Discount Suits? They should teach this in school."
+        "description" : "I guess, maybe just some rando wandered in from the street? Do street randos shop at the Profresh Prof's Discount Suits? They should teach this in school.",
+        "hackable": false
       },
       {
         "name" : "Fire Alarm",
-        "description" : "This could make an excellent diversion..."
+        "description" : "This could make an excellent diversion...",
+        "hackable": false
       }
   ],
   "room_connections" : [

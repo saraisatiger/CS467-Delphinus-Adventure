@@ -7,15 +7,19 @@
   "room_features" : [
       {
         "name" : "ATM",
-        "description" : "So much Cash in such a small machine..."
+        "description" : "So much Cash in such a small machine...",
+        "hackable": true,
+        "description_hacked" : "This ATM has already been depleted of its cash reserves."
       },
       {
         "name" : "Cash",
-        "description" : "Jackpot!"
+        "description" : "Jackpot!",
+        "hackable": false
       },
 	  {
         "name" : "Guard",
-        "description" : "A pile of aggressive flesh, worked into a rage from years of never guessing the answers to any Jeopardy questions. Good thing it likes naps."
+        "description" : "A pile of aggressive flesh, worked into a rage from years of never guessing the answers to any Jeopardy questions. Good thing it likes naps.",
+        "hackable": false
       }
   ],
   "room_connections" : [

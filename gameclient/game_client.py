@@ -419,28 +419,49 @@ class GameClient:
         hack_success = False
 
         if self.gamestate.player.can_hack() is False:
-            wprint(HACK_FAIL_NOSKILL)
+            message = HACK_FAIL_NOSKILL
 
         else:
             # TODO: Once noun_type is passed by language-parser, change this to use commneted out if statements
             # if noun_type == NOUN_TYPE_OBJECT:
-            #     print(HACK_FAIL_INVALID_OBJECT)
+            #     message = HACK_FAIL_INVALID_TARGET
+            #     hack_success = False
 
             # if noun_type == NOUN_TYPE_FEATURE:
-            if True:
+            if True: # Swap this with preceeding line later on
                 cur_room = self.gamestate.get_current_room()
-                feature = cur_room.get_feature_by_name(noun_name)
-                feature_name = ""
                 try:
+                    feature = cur_room.get_feature_by_name(noun_name)
+                    logger.debug("feature retreived by name " + noun_name)
                     feature_name = feature.get_name().lower()
+                    logger.debug("feature name.get_name() called: " + feature_name)
+                    if feature.is_hackable() is True:
+                        if feature.is_hacked() is True:
+                            message = HACK_FAIL_ALREADY_HACKED
+                        elif feature_name == "traffic lights":
+                            message = HACK_SUCCESS_TRAFFIC_LIGHTS
+                            self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
+                            hack_success = True
+                        elif feature_name == "atm":
+                            message = HACK_SUCCESS_ATM + ". You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
+                            self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
+                            hack_success = True
+                        else:
+                            message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
+                    else:
+                        message = HACK_FAIL_INVALID_TARGET
                 except:
-                    wprint(HACK_FAIL_FEATURE_NOT_PRESENT)
+                    message = HACK_FAIL_FEATURE_NOT_PRESENT
+            else: # TODO: Delete t his else statement once parser works with type/object identification
+                message = "This should never print."
 
-                # Room specific logic for hacking various features
-                if feature_name == "traffic lights":
-                    wprint(HACK_SUCCESS_TRAFFIC_LIGHTS)
-                    self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
+        if hack_success is True:
+            try:
+                feature.set_is_hacked(True)
+            except:
+                logger.debug("hack_success is True but failed to call feature.set_is_hacked(True)")
 
+        print(message)
         self.ui.wait_for_enter()
         return hack_success
 
@@ -711,11 +732,26 @@ class GameClient:
 
     def send_command_to_parser(self):
         results = self.lp.parse_command(self.user_input)
-        self.command = results.get_verb()
-        self.verb_noun_name = results.get_noun()['name']
-        self.verb_noun_type = results.get_noun()['type']
-        self.extras = results.get_extras()
-        self.verb_preposition = results.get_preposition()
+        try:
+            self.command = results.get_verb()
+        except:
+            self.command = INVALID_INPUT
+        try:
+            self.verb_noun_name = results.get_noun()['name']
+        except:
+            self.verb_noun_name = None
+        try:
+            self.verb_noun_type = results.get_noun()['type']
+        except:
+            self.verb_noun_type = None
+        try:
+            self.extras = results.get_extras()
+        except:
+            self.extras = None
+        try:
+            self.verb_preposition = results.get_preposition()
+        except:
+            self.verb_preposition = None
 
 
 class GameState:

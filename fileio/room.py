@@ -120,7 +120,7 @@ class Room:
         '''
         feature_string = ""
         for feature in self.room_features:
-            feature_string = feature_string + textwrap.fill(feature.get_feature_description(), TEXT_WIDTH) + "\n"
+            feature_string = feature_string + textwrap.fill(feature.get_feature_list_label(), TEXT_WIDTH) + "\n"
         return feature_string
 
     def set_visited(self, visited=True):
@@ -194,14 +194,24 @@ class RoomFeature:
     def __init__(self, properties):
         self.name = properties['name']
         self.description = properties['description']
+        self.hackable = properties['hackable']
+        if self.hackable is True:
+            self.description_hacked = properties['description_hacked']
+        else:
+            self.description_hacked = self.description # Shouldn't need this - here as a failsafe
+        self.hacked = False
 
     def get_name(self):
         return self.name
 
     def get_description(self):
-        return self.description
+        if self.is_hacked() is True:
+            return self.description_hacked
+        else:
+            return self.description
 
-    def get_feature_description(self):
+
+    def get_feature_list_label(self):
         '''
         Get the string for room features
         :return: string
@@ -209,6 +219,14 @@ class RoomFeature:
         description = FEATURES_LIST_PREFIX + "[" + self.name + "]"
         return description
 
+    def is_hackable(self):
+        return self.hackable
+
+    def is_hacked(self):
+        return self.hacked
+
+    def set_is_hacked(self, hacked=True):
+        self.hacked = hacked
 
 class RoomConnection:
     '''
