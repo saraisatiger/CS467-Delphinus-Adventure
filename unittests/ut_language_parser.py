@@ -6,10 +6,11 @@ from constants.verbs import *
 from languageparser.language_parser import *
 from fileio.object import *
 from debug.debug import *
+
 logger = logging.getLogger(__name__)
 
-class TestLanguageParser(unittest.TestCase):
 
+class TestLanguageParser(unittest.TestCase):
     def setUp(self):
         self.LP = LanguageParser()
         self.ObjectBuilder = ObjectBuilder()
@@ -58,7 +59,8 @@ class TestLanguageParser(unittest.TestCase):
         for test_string in QUIT_ALIASES:
             result = self.LP.parse_command(test_string)
             self.assertEquals(QUIT, result.get_verb(), QUIT + " does not match " + str(result.get_verb()))
-            self.assertIsNone(result.get_noun())
+            expected_noun = {'name': None, 'type': None}
+            self.assertEquals(expected_noun, result.get_noun())
             self.assertIsNone(result.get_extras())
             self.assertIsNone(result.get_preposition())
             self.assertIsNone(result.get_error_message())
@@ -76,9 +78,9 @@ class TestLanguageParser(unittest.TestCase):
             self.assertIsNone(result.get_extras())
             self.assertIsNone(result.get_preposition())
             self.assertIsNone(result.get_error_message())
-            logger.debug("Checking if string returns verb BUY: '" + test_string + "' and NOUN: '" + obj_name +"'")
+            logger.debug("Checking if string returns verb BUY: '" + test_string + "' and NOUN: '" + obj_name + "'")
             logger.debug("Passed.")
-    
+
     def test_lop_by_invalid_object_names(self):
         invalid_object_names = [
             '', ' ', '\n', '\t', 'hi', '  hi', 'flippers', 'two words'
@@ -89,16 +91,16 @@ class TestLanguageParser(unittest.TestCase):
             obj_name = obj_name.lower()
             # TODO: Revise this unit test with revised language parser logic
             # I think the language parser actually sets expected_noun to None instead of dictionary of None values?
-            expected_noun = {'name': None, 'type': None}
+            expected_noun = {'name': '', 'type': 'object'}
             result = self.LP.parse_command(test_string)
             self.assertEquals(BUY, result.get_verb(), INVALID_INPUT + " does not match " + str(result.get_verb()))
             self.assertEquals(expected_noun, result.get_noun())
             self.assertEquals(None, result.get_extras())
             self.assertEquals(None, result.get_preposition())
-            # TODO: Update extras result with revised language parser
             self.assertIsNone(result.get_extras())
-            logger.debug("Checking if string returns verb BUY: '" + test_string + "' and NOUN: '" + obj_name +"'")
+            logger.debug("Checking if string returns verb BUY: '" + test_string + "' and NOUN: '" + obj_name + "'")
             logger.debug("Passed.")
+
 
 if __name__ == '__main__':
     unittest.main()
