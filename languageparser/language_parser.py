@@ -33,6 +33,7 @@ class LanguageParser:
         verb = verb.lower().lstrip()
         noun = None
         targets = None
+        noun_type = 'object'
 
         # Hacky way to parse a "look at" command to find the verb_subject_name/feature player wants to examine.
         # NOTE: Doesn't parse aliases
@@ -105,6 +106,7 @@ class LanguageParser:
 
         elif verb in GO_ALIASES:
             verb = GO
+            noun_type = 'destination'
 
         elif verb in TAKE_ALIASES:
             verb = TAKE
@@ -148,7 +150,7 @@ class LanguageParser:
         if noun is None:
             results.noun = {'name': None, 'type': None }
         else:
-            results.set_noun(str(noun), str("object"))
+            results.set_noun(str(noun), noun_type)
         results.extras = None
         results.preposition = None
         results.error_message = None

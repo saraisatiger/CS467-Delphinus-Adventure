@@ -34,6 +34,8 @@ class TestLanguageParser(unittest.TestCase):
             for feature in room.room_features:
                 self.room_feature_names.append(feature.get_name())
 
+        self.cardinal_directions = ['north', 'south', 'east', 'west']
+
     def test_lp_newgame_valid_strings(self):
         for test_string in NEW_GAME_ALIASES:
             result = self.LP.parse_command(test_string)
@@ -193,6 +195,29 @@ class TestLanguageParser(unittest.TestCase):
 
                 logger.debug("Checking if string returns verb TAKE: '" + test_string + "' and NOUN: '" + obj_name + "'")
                 logger.debug("Passed.")
+
+    def test_lp_go(self):
+        destinations = self.cardinal_directions
+        for rm in self.room_names:
+            destinations.append(rm)
+
+        for go_word in GO_ALIASES:
+            for destination in destinations:
+                go_word = go_word.lower()
+                destination = destination.lower()
+                command = go_word + " " + destination
+                expected_noun = {'name': destination, 'type': 'destination'}
+                result = self.LP.parse_command(command)
+
+                self.assertEquals(GO, result.get_verb(), "Command '" + command + "' incorrectly returns verb: " + str(result.get_verb()))
+                self.assertEquals(expected_noun, result.get_noun(), "Command '" + command + "' incorrectly returns noun: " + str(result.get_noun()))
+                self.assertIsNone(result.get_extras())
+                self.assertIsNone(result.get_preposition())
+                self.assertIsNone(result.get_extras())
+
+                logger.debug("Checking if string returns verb INVENTORY: '" + go_word + "'")
+                logger.debug("Passed.")
+
 
 if __name__ == '__main__':
     unittest.main()
