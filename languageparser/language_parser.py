@@ -8,27 +8,6 @@
 #
 # CITATIONS
 # CITE:
-#
-# #########################################################################################################
-# DEV NOTES:
-# 1/22/17:
-# The language parser will have to return more than the verb. It will also need to identify the
-# subject (feature or verb_subject_name) and appropriate prepositions and such. At a minimum I'd expect the LP to
-# return a python dictionary of a verb that's being called and one or more targets that are trying to
-# be interacted. For example "use broom on dusty floor" might return:
-#
-# {
-#     'verb' : 'use',
-#     'verb_subject_name' : 'broom',
-#     'targets' : [
-#         'dusty floor'
-#     ]
-# }
-#
-# (SSH)
-#
-# #########################################################################################################
-
 
 from constants.verbs import *
 from languageparser.language_parser_wrapper import *
@@ -36,22 +15,16 @@ from debug.debug import *
 logger = logging.getLogger(__name__)
 
 
-
 class LanguageParser:
-    '''
-        TODO:
-
-    '''
     def __init__(self):
         # logger.debug("Language Parser initialized")
         pass
 
-
     def parse_command(self, verb):
         '''
-        Presently returning a constant defined in a constants/verbs.py file so that the
-        return values from parser can just be set. Thi is Shawn's temporary solution. Later on
-        we will need to send more than just the verb back (the subject etc. also needed). See Dev note near file head
+
+        :param verb:
+        :return:
         '''
 
         # Parse any command to all lowercase to reduce complexity of our parser.
@@ -165,7 +138,7 @@ class LanguageParser:
             noun = None
 
         else:
-            verb = INVALID_INPUT
+            verb = None
             noun = None
 
         # return (command, subject, targets)

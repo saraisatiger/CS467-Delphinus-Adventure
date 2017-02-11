@@ -259,13 +259,13 @@ class RoomBuilder:
         # logger.debug("RoomBuilder instantiated")
         pass
 
-    def load_room_data_from_file(self):
+    def load_room_data_from_file(self, dir="./gamedata/rooms/*.json"):
         '''
         Called by GameClient to instantiate all of the rooms. This is called whether the game is new
         or loaded. Returns ALL rooms as a list.
         '''
         rooms = []
-        rooms_dir = './gamedata/rooms/*.json'
+        rooms_dir = dir
         rooms_files =  glob.glob(rooms_dir)
 
         # Load room content from directory
