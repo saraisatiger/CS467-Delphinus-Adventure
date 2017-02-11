@@ -177,5 +177,22 @@ class TestLanguageParser(unittest.TestCase):
                 logger.debug("Checking if string returns verb TAKE: '" + test_string + "' and NOUN: '" + obj_name + "'")
                 logger.debug("Passed.")
 
+    def test_lp__drop_objects(self):
+        for obj_name in self.object_names:
+            for drop_word in DROP_ALIASES:
+                test_string = drop_word + " " + str(obj_name)
+                obj_name = obj_name.lower()
+                expected_noun = {'name': obj_name, 'type': "object"}
+                result = self.LP.parse_command(test_string)
+
+                self.assertEquals(DROP, result.get_verb(), "Command '" + test_string + "' incorrectly returns verb: " + str(result.get_verb()))
+                self.assertEquals(expected_noun, result.get_noun())
+                self.assertIsNone(result.get_extras())
+                self.assertIsNone(result.get_preposition())
+                self.assertIsNone(result.get_error_message())
+
+                logger.debug("Checking if string returns verb TAKE: '" + test_string + "' and NOUN: '" + obj_name + "'")
+                logger.debug("Passed.")
+
 if __name__ == '__main__':
     unittest.main()
