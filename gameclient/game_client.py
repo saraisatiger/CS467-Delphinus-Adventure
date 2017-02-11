@@ -91,6 +91,22 @@ class GameClient:
                 # The constants are defined in constants\status_codes.py
                 if LOAD_GAME:
                     saved = True
+                    exit_code = self.play_game(saved)
+                    if exit_code is GAMEOVER_FORFEIT:
+                        wprint("Game over: Forfeit")
+                    elif exit_code is GAMEOVER_WIN:
+                        wprint("Game over: Player won")
+                    elif exit_code is GAMEOVER_LOSE:
+                        wprint("Game over: Player lost")
+                    elif exit_code is GAMEOVER_SAVE:
+                        wprint("Game over: Player saved game")
+                    elif exit_code is GAMEOVER_LOAD:
+                        wprint("Game over: Player loading game")
+                        self.load_game_menu()
+                        self.reset_input_and_command()
+                        self.play_game(saved)
+                    elif exit_code is GAMEOVER_QUIT:
+                        wprint("Game over: Player quit")
                 saved = False
                 exit_code = self.play_game(saved)
                 if exit_code is GAMEOVER_FORFEIT:
@@ -262,7 +278,7 @@ class GameClient:
         Sets appropriate variables in the GameClient's gamestate instance
         :return:
         '''
-        wprint(LOAD_GAME_MESSAGE)
+        # wprint(LOAD_GAME_MESSAGE)
         savegame_list = SaveGame.get_savegame_filenames()
 
         if savegame_list:
@@ -774,8 +790,6 @@ class GameState:
         self.set_room_vars_to_default()
 
         save_game = SaveGame(None)
-        # DBBUG
-        print('Loading from file...')
         save_game.load_from_file(filename)
 
         # Set each room's visited status
@@ -799,6 +813,8 @@ class GameState:
 
         # Set the current_room
         current_room_name = save_game.get_current_room()
+        # DEBUG
+        # print(current_room_name)
         current_room = self.get_room_by_name(current_room_name)
         self.set_current_room(current_room)
 

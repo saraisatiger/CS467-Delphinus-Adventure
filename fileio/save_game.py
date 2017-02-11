@@ -28,7 +28,7 @@ class SaveGame:
 
         # These must be defined - the only reason I give them values here is so that I can test the loadgame/savegame
         # methods without having them actually read/write from/to real files
-        self.current_room = "Street"
+        self.current_room = ""
         self.visited_rooms = []
         self.objects_in_rooms = {}
         self.player_inventory = []
@@ -37,7 +37,9 @@ class SaveGame:
         # TODO: Write more UNIT TESTS for this code
         if gamestate:
             self.current_room = gamestate.get_current_room().get_name()
+            # self.current_room = self.gamestate['current_room']
             self.time_left = gamestate.get_time_left()
+            # self.time_left = self.gamestate['time_left']
 
             for room in gamestate.rooms:
                 if room.is_visited():
@@ -71,9 +73,6 @@ class SaveGame:
 
         write_successful = True
 
-        # if write failed
-        #   write_successful = False
-
         return write_successful
 
 
@@ -85,9 +84,6 @@ class SaveGame:
             to parse it for the data it wants and handle the logic of "repopulating" the GameState so that it matches
             the original savegame in a similar fashion as write_to_file
         '''
-        # saved_dir = './gamedata/savedgames/'
-        # saved_game_files =  glob.glob(saved_dir)
-        # self.gamestate = json.load(saved_game_file)
         filename = './gamedata/savedgames/' + filename
         self.gamestate = {}
         with open(filename, 'r') as savedgame:
@@ -96,38 +92,35 @@ class SaveGame:
         # DEBUG
         print(json.dumps(self.gamestate))
 
-        # Load saved game content from file
-        # for room in rooms_files:
-        #     with open(room) as room:
-        #         room_properties = json.load(room)
-        #         new_room = Room(room_properties)
-        #         rooms.append(new_room)
-
         return self.gamestate
-        # pass
 
     def get_visited_rooms_list(self):
-        if self.visited_rooms is not None:
+        if self.gamestate['visited_rooms'] is not None:
+            self.visited_rooms = self.gamestate['visited_rooms']
             return self.visited_rooms
         return None
 
     def get_objects_in_rooms(self):
-        if self.objects_in_rooms is not None:
+        if self.gamestate['objects_in_rooms'] is not None:
+            self.objects_in_rooms = self.gamestate['objects_in_rooms']
             return self.objects_in_rooms
         return None
 
     def get_player_inventory(self):
-        if self.player_inventory is not None:
+        if self.gamestate['player_inventory'] is not None:
+            self.player_inventory = self.gamestate['player_inventory']
             return self.player_inventory
         return None
 
     def get_current_room(self):
-        if self.current_room is not None:
+        if self.gamestate['current_room'] is not None:
+            self.current_room = self.gamestate['current_room']['name']
             return self.current_room
         return None
 
     def get_time_left(self):
-        if self.time_left is not None:
+        if self.gamestate['time_left'] is not None:
+            self.time_left = self.gamestate['time_left']
             return self.time_left
         return None
 
@@ -138,7 +131,6 @@ class SaveGame:
         :param file_name:
         :return: True if filename is valid, False if not valid
         '''
-        # savedgames = []
         savedgames = self.get_savegame_filenames()
 
         for savedgame in savedgames:
@@ -169,6 +161,6 @@ class SaveGame:
             with open(savedgame) as savedgame:
                 savedgames.append(savedgame)
                 # DEBUG
-                print(json.load(savedgame))
+                # print(json.load(savedgame))
 
         return savedgames_files
