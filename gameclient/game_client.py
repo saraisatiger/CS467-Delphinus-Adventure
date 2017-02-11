@@ -413,6 +413,8 @@ class GameClient:
                             else:
                                 self.gamestate.player.update_cash(SUBWAY_GO_DOLLAR_COST * -1)
                                 go_success = True
+                        else:
+                            go_success = True
                     else:
                         go_success = True
 
@@ -463,7 +465,7 @@ class GameClient:
                             hack_success = True
 
                         elif feature_name == "atm":
-                            message = HACK_SUCCESS_ATM + ". You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
+                            message = HACK_SUCCESS_ATM + " You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
                             self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
                             hack_success = True
 
