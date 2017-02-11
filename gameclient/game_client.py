@@ -387,8 +387,10 @@ class GameClient:
         return drop_success
 
     def verb_go(self, destination):
-
+        destination = destination.lower()
         go_success = False
+        cur_room = self.gamestate.get_current_room()
+        destination_room_name = None
 
         room_feature = self.gamestate.get_current_room().get_feature_by_name(destination)
         if room_feature is not None:
@@ -397,19 +399,35 @@ class GameClient:
 
         else:
             # See if the destination is the cardinal direction OR the name of one of the room_connections
-            for connection in self.gamestate.get_current_room().room_connections:
-                if connection.label.lower() == destination.lower() \
-                        or connection.cardinal_direction.lower() == destination.lower():
-                    new_room = self.gamestate.get_room_by_name(connection.destination.lower())
-                    if new_room:
-                        self.gamestate.set_current_room(new_room)
-                        wprint(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
-                        self.gamestate.update_time_left(GO_COST)
-                        go_success = True
+            for connection in cur_room.room_connections:
+                if connection.label.lower() == destination or connection.cardinal_direction.lower() == destination:
+                    destination_room_name = connection.destination.lower()
+                    # Handle sub-way logic:
+                    if cur_room.get_name().lower() == "subway":
+                        # It's free to go back where you came from, so check that first
+                        if destination_room_name.lower() == self.gamestate.get_prior_room().get_name().lower():
+                            go_success = True
+                        elif cur_room.get_feature_by_name("Turnstiles").is_hacked() is not True:
+                            if self.gamestate.player.get_cash() < SUBWAY_GO_DOLLAR_COST:
+                                wprint(GO_FAILURE_SUBWAY_CASH)
+                            else:
+                                self.gamestate.player.update_cash(SUBWAY_GO_DOLLAR_COST * -1)
+                                go_success = True
                     else:
-                        logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
-                        # If go failed to find the room / direction desired, print a failure message
-                        wprint(GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX)
+                        go_success = True
+
+
+        if go_success is True:
+            new_room = self.gamestate.get_room_by_name(destination_room_name)
+            if new_room:
+                self.gamestate.set_current_room(new_room)
+                wprint(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
+                self.gamestate.update_time_left(GO_COST)
+                go_success = True
+            else:
+                # If go failed to find the room / direction desired, print a failure message
+                logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
+                logger.debug(GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX)
 
         self.ui.wait_for_enter()
         return go_success
@@ -438,14 +456,21 @@ class GameClient:
                     if feature.is_hackable() is True:
                         if feature.is_hacked() is True:
                             message = HACK_FAIL_ALREADY_HACKED
+
                         elif feature_name == "traffic lights":
                             message = HACK_SUCCESS_TRAFFIC_LIGHTS
                             self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
                             hack_success = True
+
                         elif feature_name == "atm":
                             message = HACK_SUCCESS_ATM + ". You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
                             self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
                             hack_success = True
+
+                        elif feature_name == "turnstiles":
+                            message = HACK_SUCCESS_TURNSTILE
+                            hack_success = True
+
                         else:
                             message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
                     else:
@@ -765,6 +790,7 @@ class GameState:
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
         self.time_left = STARTING_TIME
+        self.prior_room = None
 
     def set_current_room(self, room):
         '''
@@ -772,6 +798,10 @@ class GameState:
         :param room: The room the player is in (actual room)
         :return: N/A
         '''
+        try:
+            self.prior_room = self.current_room
+        except:
+            self.prior_room = room
         self.current_room = room
 
     def get_room_by_name(self, room_name):
@@ -867,6 +897,9 @@ class GameState:
 
     def get_current_room(self):
         return self.current_room
+
+    def get_prior_room(self):
+        return self.prior_room
 
     def update_time_left(self, time_change):
         '''

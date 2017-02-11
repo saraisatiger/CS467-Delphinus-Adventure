@@ -103,6 +103,7 @@ GO_SUCCESS_PREFIX = "You head off towards the "
 GO_SUCCESS_SUFFIX = " without a problem."
 GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
+GO_FAILURE_SUBWAY_CASH = "You don't have enough cash to ride the subway. Maybe there's a way to ride without paying?"
 GO_INVALID_PREFIX = "You can't go to the "
 GO_INVALID_SUFFIX = " because you're basically there already!"
 
@@ -113,6 +114,7 @@ HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
 HACK_FAIL_ALREADY_HACKED = "You've already hacked that."
 HACK_SUCCESS_ATM = "You jack into the system and withdraw some cash from the ATM... but not from your account. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww."
 HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should make things a lot faster for you."
+HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You should be able to pass through the area without paying now."
 
 # 'help' strings
 HELP_HEADER_TEXT = "HELP"
