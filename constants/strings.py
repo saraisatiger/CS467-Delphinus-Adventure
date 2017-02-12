@@ -136,7 +136,7 @@ HELP_MESSAGE = [
     "* buy <object>:  Some objects cost money and cannot be taken.",
     "* steal <object>  Sometimes you don't have enough money to buy an object.",
     "* inventory  Look at all of the items youv'e collected so far.",
-    "* hack <feature>  Try and hack a feature in the room. Not everything can be hacked.",
+    "* hack <feature>  Try and hack a feature in the room. Not everything can be hacked, and you need to learn how to hack first.",
     "* spraypaint <feature>  If you have the necessary tools, you can paint the town red.",
     "* use <object or feature>  Everything has a purpose. Well, not everything."
 ]
@@ -162,6 +162,10 @@ NO_INTERESTING_FEATURES_MESSAGE = "You see nothing else worth checking out."
 
 # 'Look at' strings
 LOOK_AT_NOT_SEEN = "You do not see that here."
+LOOK_AT_TRASH_CAN_ALREADY_LOOTED = "You already dug through the trash can. There's nothing else worth taking."
+LOOK_AT_TRASH_CAN_PROMPT = "Do you want to dig deeper in the trash? You might get messy. (Y)es or (N)o."
+LOOK_AT_TRASH_SEARCHED = "You dig deeper into the trash and stain your shirt with mustard from an old hot dog. How uncool! But wait, there's a barely-used RAM chip in the trash! You wipe it off with an anti-static cloth and tuck it into your bag."
+LOOK_AT_TRASH_NOT_SEARCHED = "You see a partially eaten hot dog and a partially digested chicken bone laying on the top, but you can't bring yourself to dig deeper."
 
 # 'steal' strings
 STEAL_FAIL_ALREADY_OWNED = "You already own that. You can just take it!"

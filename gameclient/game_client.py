@@ -70,9 +70,15 @@ class GameClient:
 
             # Branch initializes a new game or ends up loading a game, quits, or just prints the help and loops
             if self.command is NEW_GAME:
-                self.gamestate.initialize_new_game()
+                try:
+                    self.gamestate.initialize_new_game()
+                except:
+                    logger.debug("initialize_new_game() exception")
             elif self.command is LOAD_GAME:
-                self.load_game_menu()
+                try:
+                    self.load_game_menu()
+                except:
+                    logger.debug("load_game_menu() exception")
             # Or exit the game...
             elif self.command is QUIT:
                 wprint(EXIT_MESSAGE)
@@ -434,6 +440,7 @@ class GameClient:
                 # If go failed to find the room / direction desired, print a failure message
                 logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
                 logger.debug(GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX)
+                message = GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX
 
         wprint(message)
         self.ui.wait_for_enter()
@@ -566,12 +573,28 @@ class GameClient:
         room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
+        looked_at_trash_can = False
+
         if room_feature is not None:
-            description = room_feature.get_description()
+            try:
+                description = room_feature.get_description()
+                if room_feature.get_name().lower() == "trash can":
+                    looked_at_trash_can = True
+            except:
+                logger.debug("verb_look_at(): room_feature.get_description() exception")
+                description = "Uh oh, something has gone wrong. Contact the developer!"
         elif room_object is not None:
-            description = room_object.get_long_description()
+            try:
+                description = room_object.get_long_description()
+            except:
+                logger.debug("verb_look_at(): room_object.get_description() exception")
+                description = "Uh oh, something has gone wrong. Contact the developer!"
         elif player_object is not None:
-            description = player_object.get_long_description()
+            try:
+                description = player_object.get_long_description()
+            except:
+                logger.debug("verb_look_at(): player_object.get_description() exception")
+                description = "Uh oh, something has gone wrong. Contact the developer!"
         else:
             description = LOOK_AT_NOT_SEEN
 
@@ -579,6 +602,9 @@ class GameClient:
         description = textwrap.fill(description, TEXT_WIDTH)
         print(description) # Don't use wprint() or it will remove linebreaks
         self.ui.wait_for_enter()
+
+        if looked_at_trash_can:
+            self.search_trash_can()
 
     def verb_quit(self, message):
         '''
@@ -602,10 +628,8 @@ class GameClient:
         '''
         take_success = False
 
-        logger.debug("Inside verb_take()")
-
         if noun_type == NOUN_TYPE_FEATURE:
-            logger.debug("verb_take() noun_type == 'feature'")
+            # logger.debug("verb_take() noun_type == 'feature'")
             room_feature = self.gamestate.get_current_room().get_feature_by_name(noun_name)
             if room_feature is None:
                 wprint("You don't see a " + noun_name + " to try and take.")
@@ -613,7 +637,7 @@ class GameClient:
                 wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
         elif noun_type == NOUN_TYPE_OBJECT:
-            logger.debug("verb_take() noun_type == 'object'")
+            # logger.debug("verb_take() noun_type == 'object'")
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
@@ -785,6 +809,24 @@ class GameClient:
         except:
             self.verb_preposition = None
 
+    def search_trash_can(self):
+        if self.gamestate.is_trash_can_looted is True:
+            message = LOOK_AT_TRASH_CAN_ALREADY_LOOTED
+        else:
+            wprint(LOOK_AT_TRASH_CAN_PROMPT)
+            confirm = self.ui.user_prompt().lower()
+            if confirm in YES_ALIASES:
+                message = LOOK_AT_TRASH_SEARCHED
+                ram_chip = self.gamestate.get_object_by_name("RAM Chip")
+                self.gamestate.player.add_object_to_inventory(ram_chip )
+                self.gamestate.player.update_coolness(TRASH_CAN_SEARCH_COOLNESS_COST)
+                self.gamestate.is_trash_can_looted = True
+            else:
+                message = LOOK_AT_TRASH_NOT_SEARCHED
+
+        wprint(message)
+        self.ui.wait_for_enter()
+
 
 class GameState:
     '''
@@ -798,6 +840,7 @@ class GameState:
         self.rb = RoomBuilder()
         self.time_left = STARTING_TIME
         self.prior_room = None
+        self.is_trash_can_looted = False
 
     def set_current_room(self, room):
         '''
@@ -815,6 +858,12 @@ class GameState:
         for room in self.rooms:
             if room.name.lower() == room_name.lower():
                 return room
+        return None
+
+    def get_object_by_name(self, object_name):
+        for room_object in self.objects:
+            if room_object.get_name().lower() == object_name.lower():
+                return room_object
         return None
 
     def initialize_new_game(self):
@@ -893,14 +942,22 @@ class GameState:
 
     def place_objects_in_rooms(self, game_objects):
         for game_object in game_objects:
-            room_name = game_object.get_default_location_name()
-            if room_name:
-                if room_name.lower() == "inventory":
-                    self.player.add_object_to_inventory(game_object)
+            # Cash wad is "hidden" in the trash can so you won't see it in the room in the normal fashion.
+            object_location = game_object.get_default_location_name().lower()
+            try:
+                if object_location == "inventory":
+                    try:
+                        self.player.add_object_to_inventory(game_object)
+                    except:
+                        logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " in inventory")
                 else:
-                    room = self.get_room_by_name(room_name)
-                    if room:
+                    try:
+                        room = self.get_room_by_name(object_location)
                         room.add_object_to_room(game_object)
+                    except:
+                        logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " because room_name " + object_location + " does not exist.")
+            except:
+                logger.debug("place_objects_in_rooms() failed for some unknown reason")
 
     def get_current_room(self):
         return self.current_room
@@ -939,10 +996,10 @@ class UserInterface:
         # CITE: http://stackoverflow.com/questions/1854/how-to-check-what-os-am-i-running-on-in-python
         operating_system = platform.system()
         if operating_system == 'Linux':
-            logger.debug("System is Linux")
+            # logger.debug("System is Linux")
             self.op_system = 'Linux'
         elif operating_system == 'Windows':
-            logger.debug("System is Windows")
+            # logger.debug("System is Windows")
             self.op_system = 'Windows'
 
 
@@ -992,7 +1049,7 @@ class UserInterface:
         has_spraypaint_skill = info['spraypaint_skill']
 
         if has_hack_skill is False and has_skate_skill is False and has_spraypaint_skill is False:
-            logger.debug(has_hack_skill + has_spraypaint_skill + has_skate_skill)
+            # logger.debug(has_hack_skill + has_spraypaint_skill + has_skate_skill)
             skills_row_text += STATUS_NO_SKILLS
         if has_hack_skill is True:
             skills_row_text +=  "hack\t"
