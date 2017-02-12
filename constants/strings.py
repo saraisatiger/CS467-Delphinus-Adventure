@@ -101,6 +101,7 @@ DROP_INVALID_SUFFIX = " because you're not carrying it. Don't be silly!"
 # 'go' strings
 GO_SUCCESS_PREFIX = "You head off towards the "
 GO_SUCCESS_SUFFIX = " without a problem."
+GO_FAILURE_DESTINATION_MISSING = "You need to say where you're trying to go!"
 GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
 GO_FAILURE_SUBWAY_CASH = "You don't have enough cash to ride the subway. Maybe there's a way to ride without paying?"

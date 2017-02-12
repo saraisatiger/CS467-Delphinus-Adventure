@@ -392,10 +392,12 @@ class GameClient:
         cur_room = self.gamestate.get_current_room()
         destination_room_name = None
 
+        if destination is None or destination.isspace():
+           message = GO_FAILURE_DESTINATION_MISSING
+
         room_feature = self.gamestate.get_current_room().get_feature_by_name(destination)
         if room_feature is not None:
-            wprint(GO_INVALID_PREFIX + room_feature.get_name() + GO_INVALID_SUFFIX)
-            go_success = False
+            message = GO_INVALID_PREFIX + room_feature.get_name() + GO_INVALID_SUFFIX
 
         else:
             # See if the destination is the cardinal direction OR the name of one of the room_connections
@@ -409,7 +411,7 @@ class GameClient:
                             go_success = True
                         elif cur_room.get_feature_by_name("Turnstiles").is_hacked() is not True:
                             if self.gamestate.player.get_cash() < SUBWAY_GO_DOLLAR_COST:
-                                wprint(GO_FAILURE_SUBWAY_CASH)
+                                message = GO_FAILURE_SUBWAY_CASH
                             else:
                                 self.gamestate.player.update_cash(SUBWAY_GO_DOLLAR_COST * -1)
                                 go_success = True
@@ -417,13 +419,15 @@ class GameClient:
                             go_success = True
                     else:
                         go_success = True
+                else:
+                    message = GO_FAILURE_PREFIX
 
 
         if go_success is True:
             new_room = self.gamestate.get_room_by_name(destination_room_name)
             if new_room:
                 self.gamestate.set_current_room(new_room)
-                wprint(GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX)
+                message = GO_SUCCESS_PREFIX + new_room.get_name() + GO_SUCCESS_SUFFIX
                 self.gamestate.update_time_left(GO_COST)
                 go_success = True
             else:
@@ -431,6 +435,7 @@ class GameClient:
                 logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
                 logger.debug(GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX)
 
+        wprint(message)
         self.ui.wait_for_enter()
         return go_success
 
