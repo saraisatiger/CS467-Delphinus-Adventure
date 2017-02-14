@@ -9,8 +9,14 @@
 # CITATIONS
 # CITE: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
 # CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
+# CITE: http://stackoverflow.com/questions/7935972/writing-to-a-new-directory-in-python-without-changing-directory
+# CITE: http://stackoverflow.com/questions/2835559/parsing-values-from-a-json-file-using-python
+# CITE: http://stackoverflow.com/questions/30876497/open-a-file-from-user-input-in-python-2-7
 
 from constants.action_costs import STARTING_TIME
+import json
+import glob
+import os
 
 class SaveGame:
     def __init__(self, gamestate):
@@ -23,7 +29,7 @@ class SaveGame:
 
         # These must be defined - the only reason I give them values here is so that I can test the loadgame/savegame
         # methods without having them actually read/write from/to real files
-        self.current_room = "Street"
+        self.current_room = ""
         self.visited_rooms = []
         self.objects_in_rooms = {}
         self.player_inventory = []
@@ -50,7 +56,7 @@ class SaveGame:
 
 
 
-    def write_to_file(self, filename):
+    def write_to_file(self, filename, game_state):
         '''
         SAVING A SAVEGAME FROM GAMESTATE
             A SaveGame would be instantiated when a player chooses to 'save' their game. Pass in the gamestate object
@@ -58,10 +64,13 @@ class SaveGame:
 
             Once a SaveGame object is instantiated, you can call write_to_file() method to save the data.
         '''
-        write_successful = True
+        saved_dir = './gamedata/savedgames/'
+        filename = filename + '.json'
 
-        # if write failed
-        #   write_successful = False
+        with open(os.path.join(saved_dir, filename), 'w') as saved_game_file:
+            json.dump(game_state, saved_game_file)
+
+        write_successful = True
 
         return write_successful
 
@@ -74,48 +83,94 @@ class SaveGame:
             to parse it for the data it wants and handle the logic of "repopulating" the GameState so that it matches
             the original savegame in a similar fashion as write_to_file
         '''
-        pass
+        filename = './gamedata/savedgames/' + filename
+        self.gamestate = {}
+        with open(filename, 'r') as savedgame:
+            self.gamestate = json.load(savedgame)
+
+        return self.gamestate
 
     def get_visited_rooms_list(self):
-        if self.visited_rooms is not None:
+        if self.gamestate['visited_rooms'] is not None:
+            self.visited_rooms = self.gamestate['visited_rooms']
             return self.visited_rooms
         return None
 
-    def get_objects_in_rooms(self):
-        if self.objects_in_rooms is not None:
-            return self.objects_in_rooms
-        return None
+    # DEPRECATED
+    # def get_objects_in_rooms(self):
+    #     if self.gamestate['objects_in_rooms'] is not None:
+    #         self.objects_in_rooms = self.gamestate['objects_in_rooms']
+    #         return self.objects_in_rooms
+    #     return None
 
     def get_player_inventory(self):
-        if self.player_inventory is not None:
+        if self.gamestate['player_inventory'] is not None:
+            self.player_inventory = self.gamestate['player_inventory']
             return self.player_inventory
         return None
 
     def get_current_room(self):
-        if self.current_room is not None:
+        if self.gamestate['current_room'] is not None:
+            self.current_room = self.gamestate['current_room']
             return self.current_room
         return None
 
     def get_time_left(self):
-        if self.time_left is not None:
+        if self.gamestate['time_left'] is not None:
+            self.time_left = self.gamestate['time_left']
             return self.time_left
         return None
 
-    def is_valid_filename(self, file_name):
+    def is_valid_saved_game(self, file_name):
         '''
         Pass in a string and validate if the filename is valid
         Invalid might be because string is an invalid filename in the op system or some other reason(s)
         :param file_name:
         :return: True if filename is valid, False if not valid
         '''
-        pass
+        savedgames = self.get_savegame_filenames()
+
+        for savedgame in savedgames:
+            if str(savedgame) == str(file_name):
+                return True
+
+        return False
+
+    def is_existing_saved_game(self, file_name):
+        '''
+        Pass in a string and validate if the filename is valid
+        Invalid might be because string is an invalid filename in the op system or some other reason(s)
+        :param file_name:
+        :return: True if filename is does not already exist, False if exists
+        '''
+        savedgames = self.get_savegame_filenames()
+
+        for savedgame in savedgames:
+            if str(savedgame) == str(file_name):
+                return False
+
+        return True
 
     @staticmethod
     def get_savegame_filenames():
         '''
         Returns a list of the filenames in the savegame folder
-        :return: All files in the savegame folder
+        :return: All files in the savedgame folder
         '''
         # TODO: Implement this
-        savegames = ["todo1", "todo2", "todo3"]
-        return savegames
+        savedgames = []
+        savedgames_dir = './gamedata/savedgames/*.json'
+        savedgames_files_path =  glob.glob(savedgames_dir)
+
+        # Trim preceding path from filename strings
+        savedgames_files = []
+        for file in savedgames_files_path:
+            file = file[22:]
+            savedgames_files.append(file)
+
+        # Load saved game content from directory
+        for savedgame in savedgames_files_path:
+            with open(savedgame) as savedgame:
+                savedgames.append(savedgame)
+
+        return savedgames_files
