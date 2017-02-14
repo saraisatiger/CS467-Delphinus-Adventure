@@ -75,10 +75,10 @@ class GameClient:
                 except:
                     logger.debug("initialize_new_game() exception")
             elif self.command is LOAD_GAME:
-                try:
-                    self.load_game_menu()
-                except:
-                    logger.debug("load_game_menu() exception")
+                # try:
+                self.load_game_menu()
+                # except:
+                #     logger.debug("load_game_menu() exception")
             # Or exit the game...
             elif self.command is QUIT:
                 wprint(EXIT_MESSAGE)
@@ -95,66 +95,24 @@ class GameClient:
                 # We handle each case separately because if a player forfeits and does not save,
                 # it can have different logic than if they quit and save, etc.
                 # The constants are defined in constants\status_codes.py
-                if NEW_GAME:
-                    saved = True
-                    exit_code = self.play_game(saved)
-                    if exit_code is GAMEOVER_FORFEIT:
-                        wprint("Game over: Forfeit")
-                    elif exit_code is GAMEOVER_WIN:
-                        wprint("Game over: Player won")
-                    elif exit_code is GAMEOVER_LOSE:
-                        wprint("Game over: Player lost")
-                    elif exit_code is GAMEOVER_SAVE:
-                        self.save_game_menu()
-                        wprint("Game over: Player saved game")
-                    elif exit_code is GAMEOVER_LOAD:
-                        wprint("Game over: Player loading game")
-                        self.load_game_menu()
-                        self.reset_input_and_command()
-                        self.play_game(saved)
-                    elif exit_code is GAMEOVER_QUIT:
-                        wprint("Game over: Player quit")
-                elif LOAD_GAME:
-                    saved = True
-                    exit_code = self.play_game(saved)
-                    if exit_code is GAMEOVER_FORFEIT:
-                        wprint("Game over: Forfeit")
-                    elif exit_code is GAMEOVER_WIN:
-                        wprint("Game over: Player won")
-                    elif exit_code is GAMEOVER_LOSE:
-                        wprint("Game over: Player lost")
-                    elif exit_code is GAMEOVER_SAVE:
-                        self.save_game_menu()
-                        wprint("Game over: Player saved game")
-                    elif exit_code is GAMEOVER_LOAD:
-                        wprint("Game over: Player loading game")
-                        self.load_game_menu()
-                        self.reset_input_and_command()
-                        self.play_game(saved)
-                    elif exit_code is GAMEOVER_QUIT:
-                        wprint("Game over: Player quit")
-                saved = False
-                exit_code = self.play_game(saved)
+
+                exit_code = self.play_game()
                 if exit_code is GAMEOVER_FORFEIT:
                     wprint("Game over: Forfeit")
-                    sys.exit()
                 elif exit_code is GAMEOVER_WIN:
                     wprint("Game over: Player won")
-                    sys.exit()
                 elif exit_code is GAMEOVER_LOSE:
                     wprint("Game over: Player lost")
-                    sys.exit()
                 elif exit_code is GAMEOVER_SAVE:
                     # DEBUG
                     print("ABOUT TO SAVE THIS GAME...")
                     self.save_game_menu()
                     wprint("Game over: Player saved game")
-                    sys.exit()
                 elif exit_code is GAMEOVER_LOAD:
                     wprint("Game over: Player loading game")
-                    self.load_game_menu()
                     self.reset_input_and_command()
-                    self.play_game(saved)
+                    self.command = LOAD_GAME
+                    continue
                 elif exit_code is GAMEOVER_QUIT:
                     wprint("Game over: Player quit")
                     self.reset_input_and_command()
@@ -209,182 +167,95 @@ class GameClient:
         self.verb_preposition = None
         self.command = INVALID_INPUT
 
-    def play_game(self, saved):
+    def play_game(self):
         '''
         Primary game loop that prints information to user, reads input, and reacts accordingly
         :return: a status code as defined in constants\status_codes.py, used by gameclient to determine how
         and/or why game ended.
         '''
+        self.ui.new_game_splash_screen()
 
-        if saved == True:
-            self.ui.saved_game_splash_screen()
+        status = GAME_CONTINUE          # Force entry into main loop
 
-            status = GAME_CONTINUE  # Force entry into main loop
+        print_long_description = False  # Override if user just typed the 'look' command
 
-            print_long_description = False  # Override if user just typed the 'look' command
+        # Game will loop until a 'Gameover' condition is met
+        while status is GAME_CONTINUE:
+            # Check game status; if Gameover, leave game loop and return status code
+            status = self.gamestate.game_status()
 
-            # Game will loop until a 'Gameover' condition is met
-            while status is GAME_CONTINUE:
-                # Check game status; if Gameover, leave game loop and return status code
-                status = self.gamestate.game_status()
+            if status in GAMEOVER_STATES:  # list as defined in constants\status_codes.py
+                return status
 
-                if status in GAMEOVER_STATES:  # list as defined in constants\status_codes.py
-                    return status
+            # Print the current room's appropriate long_description
+            self.verb_look(print_long_description)
+            print_long_description = False # Reset this to false after printing
 
-                # Print the current room's appropriate long_description
-                self.verb_look(print_long_description)
-                print_long_description = False  # Reset this to false after printing
+            # Prompt user for input and parse the command
+            self.user_input = self.ui.user_prompt()
+            self.send_command_to_parser()
 
-                # Prompt user for input and parse the command
-                self.user_input = self.ui.user_prompt()
-                self.send_command_to_parser()
+            # Conditionally handle each possible verb / command
+            if self.command is LOOK:
+                # The verb_look() method is called at the top of each loop, so not explicitly called here
+                print_long_description = True
+                self.gamestate.update_time_left(LOOK_COST)
+                self.ui.clear_screen()
+            # Verbs
+            elif self.command is LOOK_AT:
+                self.verb_look_at(self.verb_noun_name, self.verb_noun_type)
+            elif self.command is INVENTORY:
+                self.verb_inventory()
+            elif self.command is TAKE:
+                self.verb_take(self.verb_noun_name, self.verb_noun_type)
+            elif self.command is DROP:
+                self.verb_drop(self.verb_noun_name)
+            elif self.command is GO:
+                self.verb_go(self.verb_noun_name)
+            elif self.command is HACK:
+                self.verb_hack(self.verb_noun_name, self.verb_noun_type)
+            elif self.command is STEAL:
+                self.verb_steal(self.verb_noun_name, self.verb_noun_type)
+            elif self.command is BUY:
+                self.verb_buy(self.verb_noun_name)
+            elif self.command is SPRAYPAINT:
+                # TODO: Finish implementing verb_spraypaint and remove the debug print
+                logger.debug("Spraypaint is not fully implemented yet.")
+                self.verb_spraypaint(self.verb_noun_name)
+            elif self.command is USE:
+                self.verb_use(self.verb_noun_name, self.verb_noun_type)
+            elif self.command is HELP:
+                self.verb_help(self.verb_noun_name, self.verb_noun_type)
+            elif self.command is LOAD_GAME:
+                load_confirmed = self.verb_quit(LOAD_CONFIRM_PROMPT)
+                if load_confirmed == True:
+                    status = GAMEOVER_LOAD
 
-                # Conditionally handle each possible verb / command
-                if self.command is LOOK:
-                    # The verb_look() method is called at the top of each loop, so not explicitly called here
-                    print_long_description = True
-                    self.gamestate.update_time_left(LOOK_COST)
-                    self.ui.clear_screen()
-                # Verbs
-                elif self.command is LOOK_AT:
-                    self.verb_look_at(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is INVENTORY:
-                    self.verb_inventory()
-                elif self.command is TAKE:
-                    self.verb_take(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is DROP:
-                    self.verb_drop(self.verb_noun_name)
-                elif self.command is GO:
-                    self.verb_go(self.verb_noun_name)
-                elif self.command is HACK:
-                    self.verb_hack(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is STEAL:
-                    self.verb_steal(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is BUY:
-                    self.verb_buy(self.verb_noun_name)
-                elif self.command is SPRAYPAINT:
-                    # TODO: Finish implementing verb_spraypaint and remove the debug print
-                    logger.debug("Spraypaint is not fully implemented yet.")
-                    self.verb_spraypaint(self.verb_noun_name)
-                elif self.command is USE:
-                    self.verb_use(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is HELP:
-                    self.verb_help(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is LOAD_GAME:
-                    load_confirmed = self.verb_quit(LOAD_CONFIRM_PROMPT)
-                    if load_confirmed == True:
-                        status = GAMEOVER_LOAD
+            elif self.command is SAVE_GAME:
+                self.save_game_menu()
 
-                # elif self.command is SAVE_GAME:
-                #     self.save_game_menu()
+            elif self.command is CHEATCODE_WIN:
+                status = self.verb_cheat_win()
 
-                elif self.command is CHEATCODE_WIN:
-                    status = self.verb_cheat_win()
+            elif self.command is CHEATCODE_LOSE:
+                status = self.verb_cheat_lose()
 
-                elif self.command is CHEATCODE_LOSE:
-                    status = self.verb_cheat_lose()
-
-                elif self.command is QUIT:
-                    quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
-                    save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
-                    if quit_confirmed == True and save_game_prompt == False:
-                        status = GAMEOVER_QUIT
-                    elif quit_confirmed == True and save_game_prompt == True:
-                        # Save game to file and exit
-                        status = GAMEOVER_SAVE
+            elif self.command is QUIT:
+                quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
+                save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
+                if quit_confirmed == True and save_game_prompt == False:
+                    status = GAMEOVER_QUIT
+                elif quit_confirmed == True and save_game_prompt == True:
+                    # Save game to file and exit
+                    status = GAMEOVER_SAVE
                     # if quit_confirmed == True:
                     #     status = SAVE_GAME
-                else:
-                    wprint(COMMAND_NOT_UNDERSTOOD)
-                    self.ui.wait_for_enter()
+            else:
+                wprint(COMMAND_NOT_UNDERSTOOD)
+                self.ui.wait_for_enter()
 
-                    # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
-                    # self.reset_input_and_command()
-
-        else:
-            self.ui.new_game_splash_screen()
-
-            status = GAME_CONTINUE          # Force entry into main loop
-
-            print_long_description = False  # Override if user just typed the 'look' command
-
-            # Game will loop until a 'Gameover' condition is met
-            while status is GAME_CONTINUE:
-                # Check game status; if Gameover, leave game loop and return status code
-                status = self.gamestate.game_status()
-
-                if status in GAMEOVER_STATES:  # list as defined in constants\status_codes.py
-                    return status
-
-                # Print the current room's appropriate long_description
-                self.verb_look(print_long_description)
-                print_long_description = False # Reset this to false after printing
-
-                # Prompt user for input and parse the command
-                self.user_input = self.ui.user_prompt()
-                self.send_command_to_parser()
-
-                # Conditionally handle each possible verb / command
-                if self.command is LOOK:
-                    # The verb_look() method is called at the top of each loop, so not explicitly called here
-                    print_long_description = True
-                    self.gamestate.update_time_left(LOOK_COST)
-                    self.ui.clear_screen()
-                # Verbs
-                elif self.command is LOOK_AT:
-                    self.verb_look_at(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is INVENTORY:
-                    self.verb_inventory()
-                elif self.command is TAKE:
-                    self.verb_take(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is DROP:
-                    self.verb_drop(self.verb_noun_name)
-                elif self.command is GO:
-                    self.verb_go(self.verb_noun_name)
-                elif self.command is HACK:
-                    self.verb_hack(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is STEAL:
-                    self.verb_steal(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is BUY:
-                    self.verb_buy(self.verb_noun_name)
-                elif self.command is SPRAYPAINT:
-                    # TODO: Finish implementing verb_spraypaint and remove the debug print
-                    logger.debug("Spraypaint is not fully implemented yet.")
-                    self.verb_spraypaint(self.verb_noun_name)
-                elif self.command is USE:
-                    self.verb_use(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is HELP:
-                    self.verb_help(self.verb_noun_name, self.verb_noun_type)
-                elif self.command is LOAD_GAME:
-                    load_confirmed = self.verb_quit(LOAD_CONFIRM_PROMPT)
-                    if load_confirmed == True:
-                        status = GAMEOVER_LOAD
-
-                # elif self.command is SAVE_GAME:
-                #     self.save_game_menu()
-
-                elif self.command is CHEATCODE_WIN:
-                    status = self.verb_cheat_win()
-
-                elif self.command is CHEATCODE_LOSE:
-                    status = self.verb_cheat_lose()
-
-                elif self.command is QUIT:
-                    quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
-                    save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
-                    if quit_confirmed == True and save_game_prompt == False:
-                        status = GAMEOVER_QUIT
-                    elif quit_confirmed == True and save_game_prompt == True:
-                        # Save game to file and exit
-                        status = GAMEOVER_SAVE
-                        # if quit_confirmed == True:
-                        #     status = SAVE_GAME
-                else:
-                    wprint(COMMAND_NOT_UNDERSTOOD)
-                    self.ui.wait_for_enter()
-
-                # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
-                # self.reset_input_and_command()
+            # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
+            # self.reset_input_and_command()
         return status
 
     def load_game_menu(self):
@@ -397,7 +268,6 @@ class GameClient:
 
         if savegame_list:
             input_is_valid = False
-            user_choice = ""
             option = -1
 
             while input_is_valid is False:
@@ -434,8 +304,6 @@ class GameClient:
 
     def save_game_menu(self):
         save_game = SaveGame(self.gamestate)
-        # DEBUG
-        print(json.dumps(save_game))
         file_name = ""
         valid_filename = False
 
@@ -446,7 +314,7 @@ class GameClient:
             if valid_filename is False:
                 wprint(SAVE_GAME_VALID_FILENAME_MESSAGE)
 
-        if save_game.write_to_file(file_name, self.gamestate) is True:
+        if save_game.write_to_file(file_name) is True:
             wprint(SAVE_GAME_SUCCESS + file_name)
         else:
             wprint(SAVE_GAME_FAILED + file_name)
@@ -995,7 +863,6 @@ class GameState:
         self.time_left = STARTING_TIME
         self.prior_room = None
         self.is_trash_can_looted = False
-        self.gamestate = {}
 
     def set_current_room(self, room):
         '''
@@ -1034,34 +901,52 @@ class GameState:
         # Write UNIT TESTS for this code, entirely untested
         self.set_room_vars_to_default()
 
-        save_game = SaveGame(None)
-        save_game.load_from_file(filename)
+        save_data = SaveGame(None)
+        save_data.load_from_file(filename)
 
-        # Set each room's visited status
-        visited_rooms_list = save_game.get_visited_rooms_list()
-        for room_name in visited_rooms_list:
+        # Room information
+        current_room_name = save_data.get_current_room()
+        self.current_room = self.get_room_by_name(current_room_name)
+        visited_rooms_names = save_data.get_visited_rooms_list()
+        for room_name in visited_rooms_names:
             room = self.get_room_by_name(room_name)
-            room.set_visited(True)
+            room.set_is_visited(True)
+        prior_room_name = save_data.get_prior_room()
+        try:
+            self.prior_room = self.get_room_by_name(prior_room_name)
+        except:
+            self.prior_room = None
 
-        # Retrieve the dictionary of room_name : [object_list] pairs and iterate through, setting each room's objects
-        # to the list in the SaveGame object
-        room_objects_dictionary = save_game.get_objects_in_rooms()
-        for room_name in room_objects_dictionary:
-            room = self.get_room_by_name(room_name)
-            if room:
-                for room_objects in room_objects_dictionary[room_name]:
-                    room.set_objects(room_objects)
-            else:
-                logger.debug("Error finding the room stored in a SaveGame object")
+        # Special booleans
+        self.is_trash_can_looted = save_data.get_is_trash_can_looted()
 
-        # Set the current_room
-        current_room_name = save_game.get_current_room()
-        for room in self.rooms:
-            if current_room_name == room.get_name():
-                self.set_current_room(room)
+        # Objects in rooms and inventory
+        objects_room_mapping = save_data.get_objects_room_mapping()
+        print(objects_room_mapping)
+        for room_name in objects_room_mapping:
+            for object_name in objects_room_mapping[room_name]:
+                obj = self.get_object_by_name(object_name)
+                room = self.get_room_by_name(room_name)
+                room.add_object_to_room(obj)
+                logger.debug("Adding object " + obj.get_name() + " to room " + room.get_name() + ".")
 
-        # Set the time_left
-        self.time_left = save_game.get_time_left()
+        player_inventory_list = save_data.get_player_inventory()
+        for object_name in player_inventory_list:
+            obj = self.get_object_by_name(object_name)
+            self.player.add_object_to_inventory(obj)
+            logger.debug("Adding object " + obj.get_name() + " to player's bag.")
+
+        # Player variables
+        self.player_cash = save_data.get_player_cash()
+        self.player_coolness = save_data.get_player_coolness()
+        self.player_speed = save_data.get_player_speed()
+        self.player.set_has_hack_skill(save_data.get_player_has_hack_skill())
+        self.player.set_has_skate_skill(save_data.get_player_has_skate_skill())
+        self.player.set_has_spraypaint_skill(save_data.get_player_has_spraypaint_skill())
+
+        # Other variables stored in GameState
+        self.time_left = save_data.get_time_left()
+
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\status_codes.py  ((SSH))
@@ -1138,20 +1023,6 @@ class GameState:
 
     def get_time_left(self):
         return self.time_left
-
-    def set_game_state(self):
-        setattr(self.gamestate, 'current_room', self.current_room.get_name())
-        setattr(self.gamestate, 'visited_rooms', [])
-        for room in self.rooms:
-            if room.is_visited is True:
-                self.gamestate['visited_rooms'].append(room)
-        setattr(self.gamestate, 'player_inventory', [])
-        for item in self.player.inventory:
-            self.gamestate['player_inventory'].append(item)
-        setattr(self.gamestate, 'time_left', self.time_left)
-
-    def get_game_state(self):
-        return self.gamestate
 
 
 class UserInterface:

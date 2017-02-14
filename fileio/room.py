@@ -179,6 +179,9 @@ class Room:
     def is_visited(self):
         return self.visited
 
+    def set_is_visited(self, is_visited=True):
+        self.visited = is_visited
+
     def is_virtual_space(self):
         return self.virtual_space
 
