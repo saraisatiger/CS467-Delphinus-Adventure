@@ -917,12 +917,19 @@ class GameState:
         except:
             self.prior_room = None
 
+        # Hacked features
+        hacked_feature_mapping = save_data.get_hacked_feature_mapping()
+        for room_name in hacked_feature_mapping:
+            for feature_name in hacked_feature_mapping[room_name]:
+                room = self.get_room_by_name(room_name)
+                feature = room.get_feature_by_name(feature_name)
+                feature.set_is_hacked(True)
+
         # Special booleans
         self.is_trash_can_looted = save_data.get_is_trash_can_looted()
 
         # Objects in rooms and inventory
         objects_room_mapping = save_data.get_objects_room_mapping()
-        print(objects_room_mapping)
         for room_name in objects_room_mapping:
             for object_name in objects_room_mapping[room_name]:
                 obj = self.get_object_by_name(object_name)

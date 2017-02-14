@@ -39,6 +39,7 @@ class SaveGame:
 
             self.visited_rooms = []
             self.object_room_mapping = {}
+            self.features_hacked_mapping = {}
             for room in gamestate.rooms:
                 if room.is_visited():
                     self.visited_rooms.append(room.get_name())
@@ -48,6 +49,13 @@ class SaveGame:
                 for room_object in room.objects:
                     room_objects.append(room_object.get_name())
                 self.object_room_mapping[room.get_name()] = room_objects
+
+                # Remember which room features have been hacked
+                hacked_features = []
+                for room_feature in room.room_features:
+                    if room_feature.is_hackable() is True:
+                        self.features_hacked_mapping[room.get_name()] = { room_feature.get_name() : room_feature.is_hacked() }
+
 
             # Special booleans
             self.is_trash_can_looted = gamestate.is_trash_can_looted
@@ -84,6 +92,7 @@ class SaveGame:
             'current_room' : self.current_room_name,
             'prior_room': self.prior_room,
             'visited_rooms': self.visited_rooms,
+            'hacked_features' : self.features_hacked_mapping,
 
             # Special booleans
             'is_trash_can_looted': self.is_trash_can_looted,
@@ -130,6 +139,9 @@ class SaveGame:
         self.visited_rooms = self.save_data['visited_rooms']
         self.prior_room = self.save_data['prior_room']
 
+        # Hacked features
+        self.features_hacked_mapping = self.save_data['hacked_features']
+
         # Special booleans
         self.is_trash_can_looted = self.save_data['is_trash_can_looted']
 
@@ -153,6 +165,12 @@ class SaveGame:
             return self.current_room_name
         except:
             return "Street"
+
+    def get_hacked_feature_mapping(self):
+        try:
+            return self.features_hacked_mapping
+        except:
+            return False
 
     def get_is_trash_can_looted(self):
         try:
