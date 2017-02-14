@@ -16,6 +16,7 @@
 from constants.action_costs import STARTING_TIME
 import json
 import glob
+import os
 
 class SaveGame:
     def __init__(self, gamestate):
@@ -37,9 +38,7 @@ class SaveGame:
         # TODO: Write more UNIT TESTS for this code
         if gamestate:
             self.current_room = gamestate.get_current_room().get_name()
-            # self.current_room = self.gamestate['current_room']
             self.time_left = gamestate.get_time_left()
-            # self.time_left = self.gamestate['time_left']
 
             for room in gamestate.rooms:
                 if room.is_visited():
@@ -57,7 +56,7 @@ class SaveGame:
 
 
 
-    def write_to_file(self, filename):
+    def write_to_file(self, filename, game_state):
         '''
         SAVING A SAVEGAME FROM GAMESTATE
             A SaveGame would be instantiated when a player chooses to 'save' their game. Pass in the gamestate object
@@ -69,7 +68,7 @@ class SaveGame:
         filename = filename + '.json'
 
         with open(os.path.join(saved_dir, filename), 'w') as saved_game_file:
-            json.dump(self, saved_game_file)
+            json.dump(game_state, saved_game_file)
 
         write_successful = True
 
@@ -89,9 +88,6 @@ class SaveGame:
         with open(filename, 'r') as savedgame:
             self.gamestate = json.load(savedgame)
 
-        # DEBUG
-        print(json.dumps(self.gamestate))
-
         return self.gamestate
 
     def get_visited_rooms_list(self):
@@ -100,11 +96,12 @@ class SaveGame:
             return self.visited_rooms
         return None
 
-    def get_objects_in_rooms(self):
-        if self.gamestate['objects_in_rooms'] is not None:
-            self.objects_in_rooms = self.gamestate['objects_in_rooms']
-            return self.objects_in_rooms
-        return None
+    # DEPRECATED
+    # def get_objects_in_rooms(self):
+    #     if self.gamestate['objects_in_rooms'] is not None:
+    #         self.objects_in_rooms = self.gamestate['objects_in_rooms']
+    #         return self.objects_in_rooms
+    #     return None
 
     def get_player_inventory(self):
         if self.gamestate['player_inventory'] is not None:
@@ -114,7 +111,7 @@ class SaveGame:
 
     def get_current_room(self):
         if self.gamestate['current_room'] is not None:
-            self.current_room = self.gamestate['current_room']['name']
+            self.current_room = self.gamestate['current_room']
             return self.current_room
         return None
 
@@ -124,7 +121,7 @@ class SaveGame:
             return self.time_left
         return None
 
-    def is_valid_filename(self, file_name):
+    def is_valid_saved_game(self, file_name):
         '''
         Pass in a string and validate if the filename is valid
         Invalid might be because string is an invalid filename in the op system or some other reason(s)
@@ -138,6 +135,21 @@ class SaveGame:
                 return True
 
         return False
+
+    def is_existing_saved_game(self, file_name):
+        '''
+        Pass in a string and validate if the filename is valid
+        Invalid might be because string is an invalid filename in the op system or some other reason(s)
+        :param file_name:
+        :return: True if filename is does not already exist, False if exists
+        '''
+        savedgames = self.get_savegame_filenames()
+
+        for savedgame in savedgames:
+            if str(savedgame) == str(file_name):
+                return False
+
+        return True
 
     @staticmethod
     def get_savegame_filenames():
@@ -160,7 +172,5 @@ class SaveGame:
         for savedgame in savedgames_files_path:
             with open(savedgame) as savedgame:
                 savedgames.append(savedgame)
-                # DEBUG
-                # print(json.load(savedgame))
 
         return savedgames_files

@@ -1,7 +1,6 @@
 {
   "current_room" : "Street",
   "visited_rooms" : [],
-  "objects_in_rooms" : {},
   "player_inventory" : [],
   "time_left" : 0
 }
