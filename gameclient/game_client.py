@@ -427,8 +427,7 @@ class GameClient:
             return False
 
     def save_game_menu(self):
-        # save_game = SaveGame(self.gamestate)
-        save_game = self.gamestate
+        save_game = SaveGame(self.gamestate)
         # DEBUG
         print(json.dumps(save_game))
         file_name = ""
