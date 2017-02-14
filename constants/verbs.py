@@ -10,6 +10,10 @@
 # CITATIONS
 # CITE: None
 #Additions of subjects & prepositions add to language parser functionality, though they don't do much for the file name -NV
+#Added directions as well -NV
+DIRECTIONS = ['north', 'south', 'east', 'west']
+
+
 #subjects- objects and features
 #objects and aliases
 CASH_CRISP = 'crisp cash'
@@ -61,13 +65,13 @@ PREPOSITIONS = ['on', 'in', 'onto', 'into', 'below', 'behind', 'above', 'over', 
 # In alphabetical order
 BUY = 'buy'
 BUY_ALIASES = ['buy', 'purchase', 'pay for']
-CHEATCODE_LOSE = 'cheatcode lose'
-CHEATCODE_LOSE_ALIASES = ['cheatcode lose', 'mess with the best']
+CHEATCODE_LOSE = 'lose cheatcode'
+CHEATCODE_LOSE_ALIASES = ['cheatcode lose', 'lose cheatcode', 'mess with the best']
 CHEATCODE_WIN = 'cheatcode win'
-CHEATCODE_WIN_ALIASES = ['cheatcode win', 'die like the rest']
+CHEATCODE_WIN_ALIASES = ['cheatcode win', 'win cheatcode', 'die like the rest']
 DROP = 'drop'
 DROP_ALIASES = ['drop', 'put down', 'let go', 'leave']
-GO = "go"
+GO = 'go'
 GO_ALIASES = ['go', 'move', 'walk', 'run']
 HACK = 'hack'
 HACK_ALIASES = ['hack']
@@ -83,14 +87,8 @@ TAKE = 'take'
 TAKE_ALIASES = ['take', 'pick up', 'grab', 'acquire']
 INVENTORY = 'inventory'
 INVENTORY_ALIASES = ['inventory', 'backpack', 'bag']
-INVALID_INPUT = 'invalid command'
-INVALID_NO_VERB = 'invalid command: please enter a verb'
-INVALID_MULTIPLE_VERBS = 'invalid command: please only use one verb at a time, k?'
-INVALID_EXTRA_NOUNS = 'invalid command: woah, there are like 3+ nouns, that is hard to compute, yo.'
-INVALID_EXTRA_PREPOSITONS = 'invalid command: please limit yourself to one preposition, if you please'
-INVALID_PREPOSITION_NO_NOUN = 'invalid command: uh, what you want to do with that preposition? Noun please'
 NEW_GAME = 'new game'
-NEW_GAME_ALIASES = [ 'new game', 'new', 'newgame', 'new game', "hacktheplanet"]
+NEW_GAME_ALIASES = [ 'new game', 'new', 'newgame', 'new game', 'hacktheplanet', 'hack the planet']
 QUIT = 'quit'
 QUIT_ALIASES = ['quit', 'exit', 'bye', 'goodbye', 'leave game']
 SAVE_GAME = 'save game'
@@ -103,4 +101,16 @@ USE = 'use'
 USE_ALIASES = ['use']
 
 
-VERB_ALIASES = [BUY_ALIASES, CHEATCODE_LOSE_ALIASES, CHEATCODE_WIN_ALIASES, DROP_ALIASES, GO_ALIASES, HACK_ALIASES, HELP_ALIASES, LOAD_GAME_ALIASES, LOOK_ALIASES, LOOK_AT_ALIASES, TAKE_ALIASES, INVENTORY_ALIASES, NEW_GAME_ALIASES, QUIT_ALIASES, SAVE_GAME_ALIASES, SPRAYPAINT_ALIASES, STEAL_ALIASES, USE_ALIASES]
+VERB_ALIASES = [BUY_ALIASES, CHEATCODE_LOSE_ALIASES, CHEATCODE_WIN_ALIASES, DROP_ALIASES, GO_ALIASES, HACK_ALIASES, HELP_ALIASES, LOAD_GAME_ALIASES, LOOK_AT_ALIASES, LOOK_ALIASES, TAKE_ALIASES, INVENTORY_ALIASES, NEW_GAME_ALIASES, QUIT_ALIASES, SAVE_GAME_ALIASES, SPRAYPAINT_ALIASES, STEAL_ALIASES, USE_ALIASES]
+
+#Invalid strings
+INVALID_INPUT = 'invalid command'
+INVALID_EMPTY = 'invalid command: You uh, wanna type with some letters?'
+INVALID_EXTRA_VERBS = 'invalid command: please only use one verb at a time, k?'
+INVALID_EXTRA_DIRECTIONS= 'invalid command: woah, can be everywhere at once, pick one direction'
+INVALID_GO_NO_DIRECTION = 'invalid command: what direction would you like to go?'
+INVALID_NO_VERB = 'invalid command: please enter a verb'
+INVALID_EXTRA_NOUNS = 'invalid command: woah, there are like 3+ nouns, that is hard to compute, yo.'
+INVALID_EXTRA_PREPOSITONS = 'invalid command: please limit yourself to one preposition, if you please'
+INVALID_PREPOSITION_NO_NOUN = 'invalid command: uh, what you want to do with that preposition? Noun please'
+INVALID_DOUBLE = 'invalid command: no need to repeat the same thing twice- simply your life, yo'

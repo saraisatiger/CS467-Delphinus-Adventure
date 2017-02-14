@@ -57,97 +57,187 @@ class LanguageParser:
 		# Parse any command to all lowercase to reduce complexity of our parser.
 		# TODO: Might also want to strip trailing whitespace (SSH)
 		# l.strip() strips the left-side whitespace, not sure on right side whitespace (SSH)
+		if command == '':
+			error = INVALID_EMPTY
+			
 		command = command.lower().lstrip()
 		object = None
 		targets = None
 		
 		# New Logic -NV///////////////////////////////////////////////////
-		# parse command into words
-		words = command.split()
-		
+
 		# Go through list of words and try to pull out each significant word in VERB-NOUN-PREPOSTION-TARGET order 
 		# Note: we are using 'TARGET' to mean 'object of the preposition' to avoid confusion with objects
 		# STRETCH GOAL: account for NEGATIONS
 		# STRETCH GOAL: account for other word sentence structure
 		verb = None
+		special_verb = False
 		noun = None
 		noun_is = None
 		preposition = None
 		target = None
 		target_is = None
-		cur_idx = 0
 		error = None
+		verb_idx = -1
 		prep_idx = -1
 		noun_idx = -1
 		targ_idx = -1
+		last_idx = -1
 
-		# First significant word must be the VERB
-		for idx, word in enumerate(words):
-			for alias_array in VERB_ALIASES:
-				for verb_alias in alias_array:
-					if word == verb_alias:
-						if verb == None:
-							# the alias arrays always store the base word at index 0
-							verb = str(alias_array[0])
-							# index = next word in command we are parsing
-							cur_index = idx + 1
-						else:
-							error = INVALID_MULTIPLE_VERBS
+		# Check for empty string
+		if command == '':
+			error = INVALID_EMPTY
+			
+		# parse command into words
+		words = command.split()
 		
-		if verb == None:
-			error = INVALID_NO_VERB
-
-		# Second word can be a SUBJECT or PREPOSTION  
+		# VERB check: must have a verb unless we have a direction
 		if error == None:
-		
+			for idx, word in enumerate(words):
+				for alias_array in VERB_ALIASES:
+					for verb_alias in alias_array:
+						num_words_in_alias = len(verb_alias.split())
+						words_sublist = words[idx: (idx + num_words_in_alias)]
+						words_sublist_string = ' '.join(words_sublist)
+						if words_sublist_string == verb_alias:
+							logger.debug("v: " + words_sublist_string + " / " + verb_alias)
+							if verb == None:
+								# the alias arrays always store the base word at index 0
+								verb = str(alias_array[0])
+								# index = next word in command we are parsing
+								verb_idx = idx 
+								last_idx = idx + num_words_in_alias - 1
+							elif idx > last_idx:
+								if words_sublist_string == verb:
+									error = INVALID_DOUBLE
+								else:
+									error = INVALID_EXTRA_VERBS
+								
+		# DIRECTION check: the model is VERB(GO)-> DIRECTION or just a DIRECTION
+		if error == None and (verb == None or verb == GO):
+			for word in words:
+				if word in DIRECTIONS:
+					if noun == None:
+						noun = word
+						noun_is ='direction'
+					else:
+						error = INVALID_EXTRA_DIRECTIONS
+		# ERROR check: no verb or direction issue
+		if error == None and noun == None and (verb == None or verb == GO):
+			if verb == GO:
+				error = INVALID_GO_NO_DIRECTION	
+			else:
+				error = INVALID_NO_VERB
+	
+
+		# SUBJECT or PREPOSTION check: the model is VERB-> (PREPOSITION ANY SUBSEQUENT LOCATION) + NOUN-> TARGET
+		if error == None and verb != GO and noun_is != 'direction':
+
 			# use new var to avoid incorrect list slicing 
-			i = cur_index
+			start_idx = verb_idx + 1
 			
 			# for each word in the remaining string, check if noun (object or feature) or preposition
-			for idx, word in enumerate(words[i:]):
-			
-			#VERB-PREP-NOUN
-			#VERB-NOUN-PREP-TARGET
-			
+			for idx, word in enumerate(words[start_idx:]):
+		
 				#PREPOSITION check
 				if word in PREPOSITIONS:
-					#currently can only use one
+					# currently can only use one
 					if preposition == None:
 						preposition = word
-						prep_idx = idx
+						prep_idx = start_idx + idx
 					else:
 						error = INVALID_EXTRA_PREPOSITIONS
 				#NOUN and TARGET checks
 				for obj_alias_array in OBJECT_ALIASES:
 					for obj_alias in obj_alias_array:
-						if word == obj_alias:
+						# check number of words in alias so we can compare correct number of words from command
+						num_words_in_alias = len(obj_alias.split())
+						words_sublist = words[(start_idx + idx): (start_idx + idx + num_words_in_alias)]
+						words_sublist_string = ' '.join(words_sublist)
+						if words_sublist_string == obj_alias:
+							logger.debug("o: " + words_sublist_string + " / " + obj_alias)
 							# only save  the first occurance of object or feature
 							if noun == None:
 								# the alias arrays always store the base word at index 0
 								noun = str(obj_alias_array[0])
 								noun_is = 'object'
-								noun_idx = idx
-							# second occurance will be the target
-							elif target == None:
+								noun_idx = start_idx + idx
+								#last index is the last index of the last noun or target we found
+								last_idx = start_idx + idx + num_words_in_alias - 1 
+							# second occurance will be the target and cannot also be the noun
+							elif target == None and noun != str(obj_alias_array[0]):
 								target = str(obj_alias_array[0])
 								target_is = 'object'
-								targ_idx = idx
-							else:
-								error = INVALID_EXTRA_NOUNS
+								targ_idx = start_idx + idx
+								last_idx = start_idx + idx + num_words_in_alias - 1 
+							# current index must > last one we found a noun or target in
+							elif start_idx + idx > last_idx:
+								if str(obj_alias_array[0]) == noun or str(obj_alias_array[0]) == target:
+									error = INVALID_DOUBLE
+								else:
+									error = INVALID_EXTRA_NOUNS
+							# else it is just a double, such as 'floppy disk' which could be 'floppy' and 'disk'
 								
 				for feat_alias_array in FEATURES:
 					for feat_alias in feat_alias_array:
-						if word == feat_alias:
+						num_words_in_alias = len(feat_alias.split())
+						words_sublist = words[(start_idx + idx): (start_idx + idx + num_words_in_alias)]
+						words_sublist_string = ' '.join(words_sublist)
+						if words_sublist_string == feat_alias:
+							logger.debug("f: " + words_sublist_string + " / " + feat_alias)
 							if noun == None:
-								noun = word
+								noun = words_sublist_string
 								noun_is = 'feature'
-								noun_idx = idx
-							elif target == None:
-								target = word
+								noun_idx = start_idx + idx
+								last_idx = start_idx + idx + num_words_in_alias - 1 
+							elif target == None and noun != words_sublist_string:
+								target = words_sublist_string
 								target_is = 'feature'
-								targ_idx = idx
-							else:
-								error = INVALID_EXTRA_NOUNS
+								targ_idx = start_idx + idx
+								last_idx = start_idx + idx + num_words_in_alias - 1 
+							elif start_idx + idx > last_idx:
+								if words_sublist_string == noun or words_sublist_string == target:
+									error = INVALID_DOUBLE
+								else:
+									error = INVALID_EXTRA_NOUNS
+		
+		'''
+		#Still working on this logic
+		
+		#SENTENCE STRUCTURE & SPECIAL VERB check:
+		if error = None:
+			#***Valid Structures***
+			#DIRECTION
+			#VERB(GO)-DIRECTION
+
+			#VERB-NOUN
+			#VERB-PREP-NOUN
+			
+			#VERB-NOUN-TARGET
+			#VERB-NOUN-PREP-TARGET
+			#VERB-PREP-NOUN-TARGET
+			#**********************
+			
+			#SPECIAL VERB check:
+			
+
+			if VERB == SPRAYPAINT
+				special_verb = True
+				#VERB(SPRAYPAINT)-PREP-NOUN-TARGET("MESSAGE STRING WHICH CAN BE ANYTHING SO TARGET DOESN'T MATTER")		
+				#VERB(SPRAYPAINT)-NOUN-PREP-TARGET("MESSAGE STRING WHICH CAN BE ANYTHING SO TARGET DOESN'T MATTER")
+				
+
+			#INVALID SENTENCE STRUCTURE check: check for these if not handled by special verbs above:
+			
+			#INVALID: VERB NOUN PREP
+			elif special_verb = False and verb != None and noun != None and preposition != None:
+				if prep_idx > noun_idx:
+					error = INVALID_SENTENCE_STRUCTURE
+			#INVALID: VERB NOUN TARGET PREP
+			elif special_verb = False and verb != None and noun != None and target != None and preposition != None:
+				if prep_idx > target_idx:
+					error = INVALID_SENTENCE_STRUCTURE
+		'''
 		
 		R = LanguageParserWrapper()
 		if error != None:
