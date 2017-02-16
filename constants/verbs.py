@@ -22,6 +22,8 @@ CASH_WAD = 'cash wad'
 CASH_WAD_ALIASES = ['cash wad', 'wad of cash', 'wad of money', 'money wad']
 SKATEBOARD = 'skateboard'
 SKATEBORD_ALIASES = ['skateboard', 'board', 'plank']
+HACKER_MANUAL = 'hacker manual'
+HACKER_MANUAL_ALIASES = ['hacker manual']
 HACKERSNACKS = 'hackersnacks'
 HACKERSNACKS_ALIASES = ['hackersnacks', 'snacks', 'munchies']
 SURGE = 'surge'
@@ -35,11 +37,11 @@ GRAPHICS_CARD_ALIASES = ['graphics card', 'card', 'graphics']
 RAM = 'ram chip'
 RAM_ALIASES = ['ram chip', 'random access memory', 'memory', 'chip', 'ram']
 
-OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES,  SKATEBORD_ALIASES, HACKERSNACKS_ALIASES, SURGE_ALIASES, SPRAY_PAINT_ALIASES, FLOPPY_DISK_ALIASES, GRAPHICS_CARD_ALIASES, RAM_ALIASES]
+OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES,  SKATEBORD_ALIASES, HACKERSNACKS_ALIASES, HACKER_MANUAL_ALIASES, SURGE_ALIASES, SPRAY_PAINT_ALIASES, FLOPPY_DISK_ALIASES, GRAPHICS_CARD_ALIASES, RAM_ALIASES]
 
 #features 
 #TODO: add aliases, simple 'look at' features and descriptions to ROOMS, then add logic here
-R1_F = ['no skateboarding sign', 'gaurdrails']
+R1_F = ['no skateboarding sign', 'guardrails']
 R2_F = ['phone booth', 'trash can']
 R3_F = ['ramp', 'death to the patriarchy']
 R4_F = ['counter', 'shelves', 'store clerk']
