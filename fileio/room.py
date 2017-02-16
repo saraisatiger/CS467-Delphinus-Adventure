@@ -68,6 +68,7 @@ class Room:
         Get the "long long_description" version of the room's long_description
         :return: string representing full length long_description
         '''
+        # full_description = textwrap.fill(self.long_description, TEXT_WIDTH, replace_whitespace=False) + "\n" + self.get_supplemental_description()
         full_description = textwrap.fill(self.long_description, TEXT_WIDTH) + "\n" + self.get_supplemental_description()
         return full_description
 
@@ -177,6 +178,9 @@ class Room:
 
     def is_visited(self):
         return self.visited
+
+    def set_is_visited(self, is_visited=True):
+        self.visited = is_visited
 
     def is_virtual_space(self):
         return self.virtual_space

@@ -20,7 +20,7 @@ def ut_savegame():
     print("Current Room:")
     pp.pprint(sg.get_current_room())
     print("Objects in Rooms:")
-    pp.pprint(sg.get_objects_in_rooms())
+    pp.pprint(sg.get_objects_room_mapping())
     print("Player inventory:")
     pp.pprint(sg.get_player_inventory())
     print("List of visited rooms:")
