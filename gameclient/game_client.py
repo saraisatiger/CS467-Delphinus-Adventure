@@ -195,6 +195,8 @@ class GameClient:
             self.user_input = self.ui.user_prompt()
             self.send_command_to_parser()
 
+
+            # TODO: Refactor verb_*() methods to check the parser_error_message before proceeding
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 # The verb_look() method is called at the top of each loop, so not explicitly called here
@@ -211,7 +213,7 @@ class GameClient:
             elif self.command is DROP:
                 self.verb_drop(self.verb_noun_name)
             elif self.command is GO:
-                self.verb_go(self.verb_noun_name)
+                self.verb_go(self.verb_noun_name, self.parser_error_message)
             elif self.command is HACK:
                 self.verb_hack(self.verb_noun_name, self.verb_noun_type)
             elif self.command is STEAL:
@@ -400,9 +402,16 @@ class GameClient:
         self.ui.wait_for_enter()
         return drop_success
 
-    def verb_go(self, destination):
-        destination = destination.lower()
+    def verb_go(self, destination, error_message):
         go_success = False
+
+        if error_message is not None:
+            wprint(error_message)
+            wprint("This is probably because typing a destination that is multiple words, like 'pawn shop', is not yet implemented")
+            self.ui.wait_for_enter()
+            return go_success
+
+        destination = destination.lower()
         cur_room = self.gamestate.get_current_room()
         destination_room_name = None
 
@@ -423,16 +432,22 @@ class GameClient:
                         # It's free to go back where you came from, so check that first
                         if destination_room_name.lower() == self.gamestate.get_prior_room().get_name().lower():
                             go_success = True
+                            break
                         elif cur_room.get_feature_by_name("Turnstiles").is_hacked() is not True:
                             if self.gamestate.player.get_cash() < SUBWAY_GO_DOLLAR_COST:
                                 message = GO_FAILURE_SUBWAY_CASH
+                                go_success = False
+                                break
                             else:
                                 self.gamestate.player.update_cash(SUBWAY_GO_DOLLAR_COST * -1)
                                 go_success = True
+                                break
                         else:
                             go_success = True
+                            break
                     else:
                         go_success = True
+                        break
 
         if go_success is True:
             new_room = self.gamestate.get_room_by_name(destination_room_name)
@@ -446,6 +461,8 @@ class GameClient:
                 logger.debug("The 'go' command almost worked, but the destination room isn't in the GameState.rooms list")
                 logger.debug(GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX)
                 message = GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX
+
+
 
         wprint(message)
         self.ui.wait_for_enter()
@@ -826,6 +843,10 @@ class GameClient:
             self.verb_preposition = results.get_preposition()
         except:
             self.verb_preposition = None
+        try:
+            self.parser_error_message = results.get_error_message()
+        except:
+            self.parser_error_message = None
 
     def search_trash_can(self):
         if self.gamestate.is_trash_can_looted is True:

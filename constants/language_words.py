@@ -48,7 +48,7 @@ OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES,  SKATEBORD_ALIASES, HAC
 #features 
 #TODO: add aliases, simple 'look at' features and descriptions to ROOMS, then add logic here
 R1_F = ['"no skateboarding" sign', 'guardrails', 'traffic lights']
-R2_F = ['phone booth', 'trash can']
+R2_F = ['phone booth', 'trash can', 'turnstiles']
 R3_F = ['ramp', 'death to the patriarchy']
 R4_F = ['counter', 'shelves', 'store clerk']
 R5_F = ['atm', 'money', 'guard']
