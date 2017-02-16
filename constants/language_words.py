@@ -16,7 +16,7 @@ DESTINATIONS = [
     'north', 'south', 'east', 'west',
     # room names
     # TODO: Update language parser to allow multi-word destinations to be typed in alone and still move player ('county jail' for example is unrecognized command)
-    'street', 'subway', 'arcade', 'pawn shop', 'evilCorp bank', 'county jail', 'hall', 'office', '"pool" on the roof', 'your computer', 'inside the metaverse', 'chat room', 'evil computer', 'secret files', 'virus room', 'actual pool on the roof'
+    # 'street', 'subway', 'arcade', 'pawn shop', 'evilCorp bank', 'county jail', 'hall', 'office', '"pool" on the roof', 'your computer', 'inside the metaverse', 'chat room', 'evil computer', 'secret files', 'virus room', 'actual pool on the roof'
 ]
 
 
