@@ -12,7 +12,7 @@
 # #########################################################################################################
 
 
-from constants.verbs import *
+from constants.language_words import *
 from languageparser.language_parser_wrapper import *
 from fileio.room import *
 from fileio.object import *

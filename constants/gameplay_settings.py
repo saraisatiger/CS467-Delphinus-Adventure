@@ -2,7 +2,7 @@
 # CS 467 - Winter 2017
 # Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 
-# action_costs.py
+# gameplay_settings.py
 # Description: Defines how much it costs to complete each of the actions in the game
 # In general we can tweak this file to change the difficulty of the game and action economy
 # Principal Author of this file per Project plan: Shawn Hillyer

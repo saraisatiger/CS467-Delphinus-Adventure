@@ -2,7 +2,7 @@
 # CS 467 - Winter 2017
 # Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 #
-# verbs.py
+# language_words.py
 # Description:  Used by language parser - possibly a temporary solution to parsing the commands.
 # Principal Author of this file per Project plan: Shawn Hillyer (Shawn conceived this to help in developing the language
 #  parser enough to implement the game engine)
@@ -11,7 +11,13 @@
 # CITE: None
 #Additions of subjects & prepositions add to language parser functionality, though they don't do much for the file name -NV
 #Added directions as well -NV
-DESTINATIONS = ['north', 'south', 'east', 'west']
+DESTINATIONS = [
+    #cardinal directions
+    'north', 'south', 'east', 'west',
+    # room names
+    # TODO: Update language parser to allow multi-word destinations to be typed in alone and still move player ('county jail' for example is unrecognized command)
+    'street', 'subway', 'arcade', 'pawn shop', 'evilCorp bank', 'county jail', 'hall', 'office', '"pool" on the roof', 'your computer', 'inside the metaverse', 'chat room', 'evil computer', 'secret files', 'virus room', 'actual pool on the roof'
+]
 
 
 #subjects- objects and features

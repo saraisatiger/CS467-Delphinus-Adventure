@@ -16,10 +16,10 @@ import platform
 import random
 
 from constants.strings import *
-from constants.action_costs import *
+from constants.gameplay_settings import *
 from constants.probabilities import *
-from constants.status_codes import *
-from constants.verbs import *
+from constants.gameover_status_codes import *
+from constants.language_words import *
 from fileio.save_game import *
 from fileio.room import *
 from fileio.object import *
@@ -94,7 +94,7 @@ class GameClient:
                 # Actually playing the game will eventually terminate for one of the below reasons
                 # We handle each case separately because if a player forfeits and does not save,
                 # it can have different logic than if they quit and save, etc.
-                # The constants are defined in constants\status_codes.py
+                # The constants are defined in constants\gameover_status_codes.py
 
                 exit_code = self.play_game()
                 if exit_code is GAMEOVER_FORFEIT:
@@ -184,7 +184,7 @@ class GameClient:
             # Check game status; if Gameover, leave game loop and return status code
             status = self.gamestate.game_status()
 
-            if status in GAMEOVER_STATES:  # list as defined in constants\status_codes.py
+            if status in GAMEOVER_STATES:  # list as defined in constants\gameover_status_codes.py
                 return status
 
             # Print the current room's appropriate long_description
@@ -956,7 +956,7 @@ class GameState:
 
 
     def game_status(self):
-        # TODO: Implement this properly. Status codes in constants\status_codes.py  ((SSH))
+        # TODO: Implement this properly. Status codes in constants\gameover_status_codes.py  ((SSH))
         # This function should/will check if player has won or lost(died/whatever)
         if self.time_left is 0:
             return GAMEOVER_LOSE

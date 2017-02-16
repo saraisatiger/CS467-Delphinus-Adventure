@@ -11,7 +11,7 @@
 # of the strings here to one file so we can easily modify things without having to dig through code to find strings (SSH)
 # CITE: Also this is similar to how our assembly programs stored strings in one spot and just referenced by name later
 
-from constants.constants import *
+from constants.game_engine_constants import *
 import textwrap
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired

@@ -15,7 +15,7 @@
 #
 # results = LanguageParserWrapper
 # results.set_verb(STEAL)
-# results.set_noun("graphics card", OBJECT_TYPE)    # Need to define OBJECT_TYPE in the 'verbs.py' file
+# results.set_noun("graphics card", OBJECT_TYPE)    # Need to define OBJECT_TYPE in the 'language_words.py' file
 #
 # You could also add extras. Let's say you had 3 extras, you could do a loop:
 # for subject in extras:

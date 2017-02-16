@@ -12,7 +12,7 @@
 # CITE: https://jsonformatter.curiousconcept.com/
 
 from constants.strings import *
-from constants.constants import *
+from constants.game_engine_constants import *
 from fileio.object import *
 import textwrap
 
