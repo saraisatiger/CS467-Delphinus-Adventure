@@ -27,6 +27,8 @@
 #
 # (SSH)
 #
+# UPDATE: Old logic commented out and full dictionary returned with parsing results -NV
+#
 # #########################################################################################################
 
 
@@ -52,26 +54,31 @@ class LanguageParser:
 		Presently returning a constant defined in a constants/verbs.py file so that the
 		return values from parser can just be set. Thi is Shawn's temporary solution. Later on
 		we will need to send more than just the verb back (the subject etc. also needed). See Dev note near file head
-		'''
+
 
 		# Parse any command to all lowercase to reduce complexity of our parser.
 		# TODO: Might also want to strip trailing whitespace (SSH)
 		# l.strip() strips the left-side whitespace, not sure on right side whitespace (SSH)
+		command = command.lower().lstrip()
+		object = None
+		targets = None
+
+		'''
+		
+		# New Logic -NV
+
+		# Go through list of words and try to pull out each significant word in VERB-NOUN-PREPOSTION-TARGET order 
+		# Note: we are using 'TARGET' to mean 'object of the preposition' to avoid confusion with objects
+		# TODO: Deal with punctuation accounting for it in messages
+		# STRETCH GOAL (finished): account for NEGATIONS
+		# STRETCH GOAL (finished): account for other word sentence structure
 		if command == '':
 			error = INVALID_EMPTY
 			
 		command = command.lower().lstrip()
-		object = None
-		targets = None
-		
-		# New Logic -NV///////////////////////////////////////////////////
 
-		# Go through list of words and try to pull out each significant word in VERB-NOUN-PREPOSTION-TARGET order 
-		# Note: we are using 'TARGET' to mean 'object of the preposition' to avoid confusion with objects
-		# STRETCH GOAL: account for NEGATIONS
-		# STRETCH GOAL: account for other word sentence structure
 		verb = None
-		special_verb = False
+		verb_is_special = False
 		noun = None
 		noun_is = None
 		preposition = None
@@ -91,7 +98,7 @@ class LanguageParser:
 		# parse command into words
 		words = command.split()
 		
-		# VERB check: must have a verb unless we have a direction
+		# VERB check: must have a verb unless we have a destination
 		if error == None:
 			for idx, word in enumerate(words):
 				for alias_array in VERB_ALIASES:
@@ -100,53 +107,63 @@ class LanguageParser:
 						words_sublist = words[idx: (idx + num_words_in_alias)]
 						words_sublist_string = ' '.join(words_sublist)
 						if words_sublist_string == verb_alias:
-							logger.debug("v: " + words_sublist_string + " / " + verb_alias)
 							if verb == None:
 								# the alias arrays always store the base word at index 0
 								verb = str(alias_array[0])
 								# index = next word in command we are parsing
-								verb_idx = idx 
-								last_idx = idx + num_words_in_alias - 1
+								verb_idx = last_idx = idx + num_words_in_alias - 1
 							elif idx > last_idx:
 								if words_sublist_string == verb:
 									error = INVALID_DOUBLE
 								else:
 									error = INVALID_EXTRA_VERBS
-								
-		# DIRECTION check: the model is VERB(GO)-> DIRECTION or just a DIRECTION
+		
+		# TODO: deal with room names
+		# Get all of the rooms by name
+		self.rooms = self.RoomBuilder.load_room_data_from_file("../gamedata/rooms/*.json")
+		for room in self.rooms:
+			DESTINATIONS.append(room.get_name())
+
+		# DESTINATION check: the model is VERB(GO)-> DESTINATION or just a DESTINATION
 		if error == None and (verb == None or verb == GO):
 			for word in words:
-				if word in DIRECTIONS:
+				if word in DESTINATIONS:
 					if noun == None:
+						verb_is_special = True
 						noun = word
-						noun_is ='direction'
+						noun_is ='destination'
 					else:
-						error = INVALID_EXTRA_DIRECTIONS
-		# ERROR check: no verb or direction issue
+						error = INVALID_EXTRA_DESTINATIONS
+		# ERROR check: no verb or destination issue
 		if error == None and noun == None and (verb == None or verb == GO):
 			if verb == GO:
-				error = INVALID_GO_NO_DIRECTION	
+				error = INVALID_GO_NO_DESTINATION
 			else:
 				error = INVALID_NO_VERB
 	
 
 		# SUBJECT or PREPOSTION check: the model is VERB-> (PREPOSITION ANY SUBSEQUENT LOCATION) + NOUN-> TARGET
-		if error == None and verb != GO and noun_is != 'direction':
+		if error == None and verb != GO and noun_is != 'destination':
 
 			# use new var to avoid incorrect list slicing 
-			start_idx = verb_idx + 1
+			start_idx = last_idx + 1
 			
 			# for each word in the remaining string, check if noun (object or feature) or preposition
 			for idx, word in enumerate(words[start_idx:]):
 		
 				#PREPOSITION check
-				if word in PREPOSITIONS:
-					# currently can only use one
-					if preposition == None:
-						preposition = word
-						prep_idx = start_idx + idx
-					else:
-						error = INVALID_EXTRA_PREPOSITIONS
+				for prep_name in PREPOSITIONS:
+					# check number of words in name so we can compare correct number of words from command
+					num_words_in_name = len(prep_name.split())
+					words_sublist = words[(start_idx + idx): (start_idx + idx + num_words_in_name)]
+					words_sublist_string = ' '.join(words_sublist)
+					if words_sublist_string == prep_name:
+						if preposition == None:
+							preposition = words_sublist_string
+							prep_idx = last_idx = start_idx + idx + num_words_in_name - 1 
+						# currently can only use one
+						else:
+							error = INVALID_EXTRA_PREPOSITIONS
 				#NOUN and TARGET checks
 				for obj_alias_array in OBJECT_ALIASES:
 					for obj_alias in obj_alias_array:
@@ -155,21 +172,18 @@ class LanguageParser:
 						words_sublist = words[(start_idx + idx): (start_idx + idx + num_words_in_alias)]
 						words_sublist_string = ' '.join(words_sublist)
 						if words_sublist_string == obj_alias:
-							logger.debug("o: " + words_sublist_string + " / " + obj_alias)
 							# only save  the first occurance of object or feature
 							if noun == None:
 								# the alias arrays always store the base word at index 0
 								noun = str(obj_alias_array[0])
 								noun_is = 'object'
-								noun_idx = start_idx + idx
 								#last index is the last index of the last noun or target we found
-								last_idx = start_idx + idx + num_words_in_alias - 1 
+								noun_idx = last_idx = start_idx + idx + num_words_in_alias - 1 
 							# second occurance will be the target and cannot also be the noun
 							elif target == None and noun != str(obj_alias_array[0]):
 								target = str(obj_alias_array[0])
 								target_is = 'object'
-								targ_idx = start_idx + idx
-								last_idx = start_idx + idx + num_words_in_alias - 1 
+								targ_idx = last_idx = start_idx + idx + num_words_in_alias - 1 
 							# current index must > last one we found a noun or target in
 							elif start_idx + idx > last_idx:
 								if str(obj_alias_array[0]) == noun or str(obj_alias_array[0]) == target:
@@ -178,37 +192,34 @@ class LanguageParser:
 									error = INVALID_EXTRA_NOUNS
 							# else it is just a double, such as 'floppy disk' which could be 'floppy' and 'disk'
 								
-				for feat_alias_array in FEATURES:
-					for feat_alias in feat_alias_array:
-						num_words_in_alias = len(feat_alias.split())
-						words_sublist = words[(start_idx + idx): (start_idx + idx + num_words_in_alias)]
+				for feat_name_array in FEATURES:
+					for feat_name in feat_name_array:
+						num_words_in_name = len(feat_name.split())
+						words_sublist = words[(start_idx + idx): (start_idx + idx + num_words_in_name)]
 						words_sublist_string = ' '.join(words_sublist)
-						if words_sublist_string == feat_alias:
-							logger.debug("f: " + words_sublist_string + " / " + feat_alias)
+						if words_sublist_string == feat_name:
 							if noun == None:
 								noun = words_sublist_string
 								noun_is = 'feature'
-								noun_idx = start_idx + idx
-								last_idx = start_idx + idx + num_words_in_alias - 1 
+								noun_idx = last_idx = start_idx + idx + num_words_in_name - 1 
 							elif target == None and noun != words_sublist_string:
 								target = words_sublist_string
 								target_is = 'feature'
-								targ_idx = start_idx + idx
-								last_idx = start_idx + idx + num_words_in_alias - 1 
+								targ_idx = last_idx = start_idx + idx + num_words_in_name - 1 
 							elif start_idx + idx > last_idx:
 								if words_sublist_string == noun or words_sublist_string == target:
 									error = INVALID_DOUBLE
 								else:
 									error = INVALID_EXTRA_NOUNS
 		
-		'''
-		#Still working on this logic
+
+		#TODO: possibly add TALK to special verbs
 		
-		#SENTENCE STRUCTURE & SPECIAL VERB check:
-		if error = None:
+		#SPECIAL VERB check:
+		if error == None:
 			#***Valid Structures***
-			#DIRECTION
-			#VERB(GO)-DIRECTION
+			#DESTINATION
+			#VERB(GO)-DESTINATION
 
 			#VERB-NOUN
 			#VERB-PREP-NOUN
@@ -219,25 +230,45 @@ class LanguageParser:
 			#**********************
 			
 			#SPECIAL VERB check:
+			#TARGET must be a message string
+			if verb == SPRAYPAINT:
+				#TO DO: Add additional special verb functionality
+				verb_is_special = True
+				#VERB(SPRAYPAINT)-TARGET 
+				if noun == None:
+					if verb_idx + 1 < len(words):
+						start_idx = verb_idx + 1
+						words_sublist = words[start_idx :]
+						target = ' '.join(words_sublist)
+						target_is = 'message'
+					else:
+						error = INVALID_SPRAYPAINT_NO_MESSAGE
+				#VERB(SPRAYPAINT)-NOUN-TARGET
+				#VERB(SPRAYPAINT)-PREP-NOUN-TARGET
+				elif preposition == None or prep_idx < noun_idx:
+					if noun_idx + 1 < len(words):
+						start_idx = noun_idx + 1
+						words_sublist = words[start_idx :]
+						target = ' '.join(words_sublist)
+						target_is = 'message'
+					else:
+						error = INVALID_SPRAYPAINT_NO_MESSAGE
 			
-
-			if VERB == SPRAYPAINT
-				special_verb = True
-				#VERB(SPRAYPAINT)-PREP-NOUN-TARGET("MESSAGE STRING WHICH CAN BE ANYTHING SO TARGET DOESN'T MATTER")		
-				#VERB(SPRAYPAINT)-NOUN-PREP-TARGET("MESSAGE STRING WHICH CAN BE ANYTHING SO TARGET DOESN'T MATTER")
-				
-
-			#INVALID SENTENCE STRUCTURE check: check for these if not handled by special verbs above:
-			
-			#INVALID: VERB NOUN PREP
-			elif special_verb = False and verb != None and noun != None and preposition != None:
+		#INVALID SENTENCE STRUCTURE check: check for these if not handled by special verbs above:
+		if error == None and verb_is_special == False:
+			#INVALID: VERB NOUN PREP (no TARGET)
+			if noun != None and preposition != None and target == None:
 				if prep_idx > noun_idx:
 					error = INVALID_SENTENCE_STRUCTURE
 			#INVALID: VERB NOUN TARGET PREP
-			elif special_verb = False and verb != None and noun != None and target != None and preposition != None:
+			elif noun != None and target != None and preposition != None:
 				if prep_idx > target_idx:
 					error = INVALID_SENTENCE_STRUCTURE
-		'''
+			#NEGATION Check: If we have a non special verb sentence, there shouldn't be any negations
+			for word in words:
+				if word in NEGATIONS:
+					error = INVALID_NEGATION
+		return R
 		
 		R = LanguageParserWrapper()
 		if error != None:
@@ -260,12 +291,10 @@ class LanguageParser:
 			R.set_extra(str(target), str(target_is))
 			
 		logger.debug("Returning New Logic: \n" + str(R))
-
 		
 
-		#END New logic/////////////////////////////////////////////////
-		
 
+		'''
 		# Hacky way to parse a "look at" command to find the verb_object/feature player wants to examine.
 		# NOTE: Doesn't parse aliases
 		if 'look at' in command:
@@ -347,3 +376,4 @@ class LanguageParser:
 
 		#logger.debug("Returning: \n" + str(results))
 		return results
+		'''
