@@ -433,9 +433,6 @@ class GameClient:
                             go_success = True
                     else:
                         go_success = True
-                else:
-                    message = GO_FAILURE_PREFIX
-
 
         if go_success is True:
             new_room = self.gamestate.get_room_by_name(destination_room_name)
