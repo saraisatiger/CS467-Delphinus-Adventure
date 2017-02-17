@@ -325,6 +325,7 @@ class GameClient:
         self.gamestate.set_current_room(county_jail)
         wprint(JAIL_GO_TO_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
+        self.ui.wait_for_enter()
 
     def verb_buy(self, noun_name):
         '''
