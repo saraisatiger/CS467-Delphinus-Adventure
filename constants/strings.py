@@ -64,6 +64,7 @@ CONNECTION_LIST_SEGWAY= "] is "
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
 LOAD_GAME_MESSAGE = "Let's load your saved game..."
+LOAD_GAME_SPLASH = "You've loaded your game... prepare to hack the planet once more!"
 LOAD_FILENAME_PROMPT = "Enter the number of the filename you wish to load and press [Enter]"
 LOAD_CONFIRM_PROMPT = "Loading a game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
 LOAD_GAME_NO_SAVES = "There are no saved games available to load."

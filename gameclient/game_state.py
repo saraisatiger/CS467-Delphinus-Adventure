@@ -119,9 +119,10 @@ class GameState:
             logger.debug("Adding object " + obj.get_name() + " to player's bag.")
 
         # Player variables
-        self.player_cash = save_data.get_player_cash()
-        self.player_coolness = save_data.get_player_coolness()
-        self.player_speed = save_data.get_player_speed()
+        logger.debug("self.player_cash = save_data.get_player_cash() = " + str(save_data.get_player_cash()))
+        self.player.cash = save_data.get_player_cash()
+        self.player.coolness = save_data.get_player_coolness()
+        self.player.speed = save_data.get_player_speed()
         self.player.set_has_hack_skill(save_data.get_player_has_hack_skill())
         self.player.set_has_skate_skill(save_data.get_player_has_skate_skill())
         self.player.set_has_spraypaint_skill(save_data.get_player_has_spraypaint_skill())

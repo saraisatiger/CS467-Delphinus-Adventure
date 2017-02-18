@@ -83,9 +83,10 @@ class GameClient:
                 # it can have different logic than if they quit and save, etc.
                 # The constants are defined in constants\gameover_status_codes.py
 
-
                 if self.command is NEW_GAME:
-                    self.gamestate.initialize_new_game()
+                    self.ui.print_splash_screen_new_game()
+                elif self.command is LOAD_GAME:
+                    self.ui.print_splash_screen_load_game()
 
                 exit_code = self.play_game()
                 if exit_code is GAMEOVER_FORFEIT:
@@ -164,7 +165,6 @@ class GameClient:
         :return: a status code as defined in constants\status_codes.py, used by gameclient to determine how
         and/or why game ended.
         '''
-        self.ui.new_game_splash_screen()
 
         status = GAME_CONTINUE          # Force entry into main loop
 
@@ -257,6 +257,7 @@ class GameClient:
         :return:
         '''
         wprint(LOAD_GAME_MESSAGE)
+
         savegame_list = SaveGame.get_savegame_filenames()
 
         if savegame_list:
@@ -288,7 +289,6 @@ class GameClient:
                     continue
 
             # If here we have a valid option
-            self.gamestate.initialize_gamestate()
             self.gamestate.initialize_load_game(savegame_list[option])
             return True
 
