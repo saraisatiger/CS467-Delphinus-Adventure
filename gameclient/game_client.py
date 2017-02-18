@@ -11,13 +11,8 @@
 # CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
 # CITE: https://docs.python.org/3.3/library/random.html
 
-
-
 from constants.gameplay_settings import *
-from constants.gameover_status_codes import *
 from constants.language_words import *
-from fileio.room import *
-from fileio.object import *
 from gameclient.game_state import *
 from gameclient.random_event_generator import *
 from gameclient.user_interface import *
@@ -54,11 +49,6 @@ class GameClient:
         :return: N/A
         '''
 
-        # Load data from files (Specifically rooms, but can do other files as well)
-        # Gamestate level details will later be loaded in the main menu loop
-        self.gamestate.rooms = self.gamestate.rb.load_room_data_from_file()
-        self.gamestate.objects = self.gamestate.ob.load_object_data_from_file() # Being done in the initialize_new_game()
-
         # Outer loop makes game play until user decides to quit from the main menu
         while self.command is not QUIT:
 
@@ -70,12 +60,12 @@ class GameClient:
                 try:
                     self.gamestate.initialize_new_game()
                 except:
-                    logger.debug("initialize_new_game() exception")
+                    logger.debug("initialize_gamestate() exception")
             elif self.command is LOAD_GAME:
-                # try:
-                self.load_game_menu()
-                # except:
-                #     logger.debug("load_game_menu() exception")
+                try:
+                    self.load_game_menu()
+                except:
+                    logger.debug("load_game_menu() exception")
             # Or exit the game...
             elif self.command is QUIT:
                 wprint(EXIT_MESSAGE)
@@ -92,6 +82,10 @@ class GameClient:
                 # We handle each case separately because if a player forfeits and does not save,
                 # it can have different logic than if they quit and save, etc.
                 # The constants are defined in constants\gameover_status_codes.py
+
+
+                if self.command is NEW_GAME:
+                    self.gamestate.initialize_new_game()
 
                 exit_code = self.play_game()
                 if exit_code is GAMEOVER_FORFEIT:
@@ -294,6 +288,7 @@ class GameClient:
                     continue
 
             # If here we have a valid option
+            self.gamestate.initialize_gamestate()
             self.gamestate.initialize_load_game(savegame_list[option])
             return True
 

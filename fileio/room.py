@@ -174,9 +174,10 @@ class Room:
             return True
         return False
 
-    def set_objects(self, object_list):
-        # Used by initialize_new_game() method in GameState class
-        self.objects = object_list
+    # TODO: Deprecated. Delete. --SSH
+    # def set_objects(self, object_list):
+        # Used by initialize_gamestate() method in GameState class
+        # self.objects = object_list
 
     def is_visited(self):
         return self.visited
