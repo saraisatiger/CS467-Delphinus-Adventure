@@ -19,15 +19,9 @@ class GameState:
     Holds all of the variables that maintain the game's state
     '''
     def __init__(self):
-        self.current_room = None
-        self.rooms = []
-        self.objects = []
-        self.player = Player()
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
-        self.time_left = STARTING_TIME
-        self.prior_room = None
-        self.is_trash_can_looted = False
+        self.initialize_gamestate()
 
     def set_current_room(self, room):
         '''
@@ -53,16 +47,34 @@ class GameState:
                 return room_object
         return None
 
-    def initialize_new_game(self):
-        self.set_room_vars_to_default()
-        self.set_object_vars_to_default()
-        self.set_default_room(DEFAULT_ROOM)
+    def initialize_gamestate(self):
+        self.current_room = None
+        self.prior_room = None
+        self.rooms = []
+        self.objects = []
+        self.player = Player()
         self.time_left = STARTING_TIME
+        self.is_trash_can_looted = False
+
+    def load_rooms_and_objects_from_file(self):
+        # Initialize the rooms and objects to their defaults
+        self.rooms = self.rb.load_room_data_from_file()
+        self.objects = self.ob.load_object_data_from_file()  # Being done in the initialize_gamestate()
+
+    def initialize_new_game(self):
+        self.initialize_gamestate()
+        self.load_rooms_and_objects_from_file()
+
+        # Still need to set the default room and put the objects in the rooms
+        self.set_default_room_by_name(DEFAULT_ROOM)
         self.place_objects_in_rooms(self.objects)
 
     def initialize_load_game(self, filename):
         # TODO: Need to set the property is_owned_by_player on objects in the game world in the save and load functions
-        self.set_room_vars_to_default()
+
+        # Clear all of the variables by calling what is essentially the constructor
+        self.initialize_gamestate()
+        self.load_rooms_and_objects_from_file()
 
         save_data = SaveGame(None)
         save_data.load_from_file(filename)
@@ -107,9 +119,10 @@ class GameState:
             logger.debug("Adding object " + obj.get_name() + " to player's bag.")
 
         # Player variables
-        self.player_cash = save_data.get_player_cash()
-        self.player_coolness = save_data.get_player_coolness()
-        self.player_speed = save_data.get_player_speed()
+        logger.debug("self.player_cash = save_data.get_player_cash() = " + str(save_data.get_player_cash()))
+        self.player.cash = save_data.get_player_cash()
+        self.player.coolness = save_data.get_player_coolness()
+        self.player.speed = save_data.get_player_speed()
         self.player.set_has_hack_skill(save_data.get_player_has_hack_skill())
         self.player.set_has_skate_skill(save_data.get_player_has_skate_skill())
         self.player.set_has_spraypaint_skill(save_data.get_player_has_spraypaint_skill())
@@ -137,16 +150,17 @@ class GameState:
         }
         return header_info
 
-    def set_room_vars_to_default(self):
-        for room in self.rooms:
-            room.set_visited(False)
-            room.objects = []
+    # DEPRECATED
+    # def set_room_vars_to_default(self):
+    #     for room in self.rooms:
+    #         room.set_visited(False)
+    #         room.objects = []
 
     def set_object_vars_to_default(self):
         for obj in self.objects:
             obj.set_is_owned_by_player(False)
 
-    def set_default_room(self, room_name):
+    def set_default_room_by_name(self, room_name):
         default_room = self.get_room_by_name(room_name)
         self.set_current_room(default_room)
 
@@ -154,9 +168,12 @@ class GameState:
         for game_object in game_objects:
             # Cash wad is "hidden" in the trash can so you won't see it in the room in the normal fashion.
             object_location = game_object.get_default_location_name().lower()
+            # logger.debug("object_location = " + object_location)
             try:
                 if object_location == "inventory":
+                    # logger.debug("Location is inventory, trying to add it...")
                     try:
+                        # logger.debug("Added to inventory...")
                         self.player.add_object_to_inventory(game_object)
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " in inventory")
@@ -164,6 +181,7 @@ class GameState:
                     try:
                         room = self.get_room_by_name(object_location)
                         room.add_object_to_room(game_object)
+                        # logger.debug("Success??")
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " because room_name " + object_location + " does not exist.")
             except:

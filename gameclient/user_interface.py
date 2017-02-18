@@ -66,9 +66,14 @@ class UserInterface:
         else:
             pass
 
-    def new_game_splash_screen(self):
+    def print_splash_screen_new_game(self):
         self.clear_screen()
         wprint(NEW_GAME_MESSAGE)  # Defined in constants\strings.py
+        self.wait_for_enter()
+
+    def print_splash_screen_load_game(self):
+        self.clear_screen()
+        wprint(LOAD_GAME_SPLASH)
         self.wait_for_enter()
 
     def saved_game_splash_screen(self):
