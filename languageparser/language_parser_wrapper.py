@@ -71,7 +71,7 @@ class LanguageParserWrapper:
         self.noun['name'] = noun_name_string
         self.noun['type'] = noun_type_string
 
-    def append_extra(self, extra_name_string, extra_type_string):
+    def set_extra(self, extra_name_string, extra_type_string):
         new_extra = {
             'name' : extra_name_string,
             'type' : extra_type_string
