@@ -858,7 +858,7 @@ class GameClient:
             if confirm in YES_ALIASES:
                 message = LOOK_AT_TRASH_SEARCHED
                 ram_chip = self.gamestate.get_object_by_name("RAM Chip")
-                self.gamestate.player.add_object_to_inventory(ram_chip )
+                self.gamestate.player.add_object_to_inventory(ram_chip)
                 self.gamestate.player.update_coolness(TRASH_CAN_SEARCH_COOLNESS_COST)
                 self.gamestate.is_trash_can_looted = True
             else:

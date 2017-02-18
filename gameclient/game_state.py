@@ -154,9 +154,12 @@ class GameState:
         for game_object in game_objects:
             # Cash wad is "hidden" in the trash can so you won't see it in the room in the normal fashion.
             object_location = game_object.get_default_location_name().lower()
+            # logger.debug("object_location = " + object_location)
             try:
                 if object_location == "inventory":
+                    # logger.debug("Location is inventory, trying to add it...")
                     try:
+                        # logger.debug("Added to inventory...")
                         self.player.add_object_to_inventory(game_object)
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " in inventory")
@@ -164,6 +167,7 @@ class GameState:
                     try:
                         room = self.get_room_by_name(object_location)
                         room.add_object_to_room(game_object)
+                        # logger.debug("Success??")
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " because room_name " + object_location + " does not exist.")
             except:

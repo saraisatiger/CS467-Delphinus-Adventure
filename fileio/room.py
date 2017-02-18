@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 import json
 import glob
-
+import copy
 
 
 class Room:
@@ -160,12 +160,14 @@ class Room:
         return None
 
     def add_object_to_room(self, object):
-        self.objects.append(object)
+        copy_of_object = copy.copy(object)
+        self.objects.append(copy_of_object)
 
     def remove_object_from_room(self, object):
         self.objects.remove(object)
 
     def remove_object_from_room_by_name(self, object_name):
+        # TODO: This method is never called as of 2-17-2017, commenting out. Can uncomment later if needed.
         object_to_remove = self.get_object_by_name(object_name)
         if object_to_remove is not None:
             self.remove_object_from_room(object_to_remove)
