@@ -15,8 +15,6 @@ from constants.game_engine_constants import *
 import textwrap
 
 # This string should introduce the game once at loadup. Could replace with ASCII art if desired
-# TODO: Replace INTRO_STRING with the introduction information in the Descriptions google doc
-# URL: https://docs.google.com/document/d/1a4FziaNjpQGlQbCSIGH4rYGFegqCmM1LuPL1RIgQCLg/edit
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
 INTRO_SEQUENCE = [
     "Last night you were eating pizza and hacking the system, everything totally rad. Slash/slash/hack!hack! it was just a usual night in the metaverse and you were a computer hacking teen legend! The best of the best!! For real.",
