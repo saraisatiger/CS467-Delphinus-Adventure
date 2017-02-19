@@ -18,6 +18,14 @@ import textwrap
 # TODO: Replace INTRO_STRING with the introduction information in the Descriptions google doc
 # URL: https://docs.google.com/document/d/1a4FziaNjpQGlQbCSIGH4rYGFegqCmM1LuPL1RIgQCLg/edit
 INTRO_STRING = "Welcome to Hacker: The Movie: The Adventure Game: The Sequel"
+INTRO_SEQUENCE = [
+    "Last night you were eating pizza and hacking the system, everything totally rad. Slash/slash/hack!hack! it was just a usual night in the metaverse and you were a computer hacking teen legend! The best of the best!! For real.",
+    "Your eyes shined bright in the green glow of the screen and your fingers flew over the numbers and letters in a flash of algorithms, each one quicker than the last. The chatroom were buzzing with hashtags and likes for your glorious brilliance!! Well, that was last night- but one move wrong stroke of the keyboard and all was changed forever....",
+    "See, it like, was hardly your fault at all- you were just hungry and that Uncle Enzo’s Pizza Palace had just put up a really gnarly firewall. Normally you would have just crashed override right through it, but remember how like, you were super hungry ? It seemed a lot quicker to hack that bogus Evil Corps Bank and just pay with a bit of computer credit. You hacked through that corporate code in microseconds- and after ordering a large pepperoni with extra pineapple, who wouldn’t have snooped around a skosh?",
+    "That’s when you saw it- nuclear launch codes that could wipe out the whole world! They must be blackmailing, like, the entire government- no wonder politics is so screwed! That bourgeoisie bank was so not going to get away with this, but just as you were about to delete the files and send the info to the FEDs, they found you!! Whatever, you were totally distracted, any hacker could be caught in such a crazy sit. Before you knew what was happening you were booted out of the system and your computer was fried, totally toasted- the 32gram Graphics Card, the RAMxl Chip, even the friggin’ Floppy Disk was all wasted. No way you could log back into the metaverse with your system after an attack like that!!",
+    "Such a bummer. So yeah, now you are like, a teen hacking legend with a crashed computer and serious intell. If only you could repair your sweet machine and figure out some way to bring that corrupt Evil Corps to justice! And like, it would be great to get a date- seriously, are you the only teen hacking legend who can never get a date? That cannot be right.",
+]
+
 DEFAULT_ROOM = "Street"
 
 INVALID_MENU_COMMAND_MESSAGE = " is not a valid command at the main menu"
