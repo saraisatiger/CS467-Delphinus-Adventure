@@ -71,7 +71,7 @@ class UserInterface:
     def print_splash_screen_new_game(self):
         self.clear_screen()
         self.print_introduction()
-        self.wait_for_enter()
+
 
     def print_splash_screen_load_game(self):
         self.clear_screen()
