@@ -162,7 +162,6 @@ class LanguageParser:
 		if error == None and cheat == None and verb_is_special == False:
 		
 			words = words[verb_idx + 1: ]
-			logger.debug(words)
 		
 			# for each word in the remaining string, check if noun (object or feature) or preposition
 			for idx, word in enumerate(words):
