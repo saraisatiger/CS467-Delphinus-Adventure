@@ -12,8 +12,12 @@
 # CITE: http://stackoverflow.com/questions/7935972/writing-to-a-new-directory-in-python-without-changing-directory
 # CITE: http://stackoverflow.com/questions/2835559/parsing-values-from-a-json-file-using-python
 # CITE: http://stackoverflow.com/questions/30876497/open-a-file-from-user-input-in-python-2-7
+# CITE: http://stackoverflow.com/questions/1976007/what-characters-are-forbidden-in-windows-and-linux-directory-names
+# CITE:
 
-from constants.gameplay_settings import STARTING_TIME
+# from constants.gameplay_settings import STARTING_TIME
+from constants.strings import *
+from gameclient.wprint import *
 import json
 import glob
 import os
@@ -65,6 +69,9 @@ class SaveGame:
             for inventory_object in gamestate.player.get_inventory_objects():
                 self.player_inventory.append(inventory_object.get_name())
 
+            # Objects owned, and possibly dropped, by player
+            self.is_owned_by_player = []
+
             # Player variables
             self.player_cash = gamestate.player.get_cash()
             self.player_coolness = gamestate.player.get_coolness()
@@ -86,7 +93,15 @@ class SaveGame:
             Once a SaveGame object is instantiated, you can call write_to_file() method to save the data.
         '''
         saved_dir = './gamedata/savedgames/'
-        filename = filename
+        # Set of invalid characters
+        invalid_chars = [' ', '\r', '\t', '\n', '/', '\\', '/0', '>', '<', ':', '|', '?', '*', '%']
+
+        # Contains invalid characters
+        for i in invalid_chars:
+            if i in filename:
+                return False
+
+        filename = filename + '.json'
 
         json_savegame = {
             'current_room' : self.current_room_name,
@@ -100,6 +115,7 @@ class SaveGame:
             # Objects in rooms and inventory
             'objects_in_rooms': self.object_room_mapping,
             'player_inventory': self.player_inventory,
+            'owned' : self.is_owned_by_player,
 
             # Player variables
             'player_cash': self.player_cash,
@@ -226,6 +242,12 @@ class SaveGame:
         except:
             return None
 
+    def get_owned_by_player(self):
+        try:
+            return self.is_owned_by_player
+        except:
+            return None
+
     def get_prior_room(self):
         try:
             if self.prior_room == "":
@@ -269,6 +291,7 @@ class SaveGame:
         :param file_name:
         :return: True if filename is does not already exist, False if exists
         '''
+        file_name = file_name + '.json'
         savedgames = self.get_savegame_filenames()
 
         for savedgame in savedgames:
@@ -283,7 +306,6 @@ class SaveGame:
         Returns a list of the filenames in the savegame folder
         :return: All files in the savedgame folder
         '''
-        # TODO: Implement this
         savedgames = []
         savedgames_dir = './gamedata/savedgames/*.json'
         savedgames_files_path =  glob.glob(savedgames_dir)

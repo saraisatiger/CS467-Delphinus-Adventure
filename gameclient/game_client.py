@@ -96,8 +96,6 @@ class GameClient:
                 elif exit_code is GAMEOVER_LOSE:
                     wprint("Game over: Player lost")
                 elif exit_code is GAMEOVER_SAVE:
-                    # DEBUG
-                    print("ABOUT TO SAVE THIS GAME...")
                     self.save_game_menu()
                     wprint("Game over: Player saved game")
                 elif exit_code is GAMEOVER_LOAD:
@@ -303,16 +301,27 @@ class GameClient:
 
         while valid_filename is False or file_name == "":
             wprint(SAVE_GAME_FILE_PROMPT)
-            file_name = self.ui.user_prompt() + '.json'
+            file_name = self.ui.user_prompt()
             valid_filename = save_game.is_existing_saved_game(file_name)
-            if valid_filename is False:
-                wprint(SAVE_GAME_VALID_FILENAME_MESSAGE)
+            while valid_filename is False:
+                wprint(SAVE_GAME_INVALID_EXISTS)
+                wprint(SAVE_GAME_AGAIN)
+                file_name = self.ui.user_prompt()
+                valid_filename = save_game.is_existing_saved_game(file_name)
 
-        if save_game.write_to_file(file_name) is True:
-            wprint(SAVE_GAME_SUCCESS + file_name)
-        else:
-            wprint(SAVE_GAME_FAILED + file_name)
+        while save_game.write_to_file(file_name) is False:
+            wprint(SAVE_GAME_INVALID_CHARACTERS)
+            wprint(SAVE_GAME_FAILED + file_name + '.json')
+            wprint(SAVE_GAME_AGAIN)
+            file_name = self.ui.user_prompt()
+            valid_filename = save_game.is_existing_saved_game(file_name)
+            while valid_filename is False:
+                wprint(SAVE_GAME_INVALID_EXISTS)
+                wprint(SAVE_GAME_AGAIN)
+                file_name = self.ui.user_prompt()
+                valid_filename = save_game.is_existing_saved_game(file_name)
 
+        wprint(SAVE_GAME_SUCCESS + file_name + '.json')
         self.ui.wait_for_enter()
 
     def go_to_jail(self):

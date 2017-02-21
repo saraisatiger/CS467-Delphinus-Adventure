@@ -6,6 +6,7 @@
 # Description: GameState class that encapsulates all things that can be changed in the game world
 # Principal Author of this file per Project plan: Shawn Hillyer
 
+from constants.gameplay_settings import STARTING_TIME
 from constants.gameover_status_codes import *
 from fileio.room import *
 from fileio.object import *
@@ -118,6 +119,14 @@ class GameState:
             self.player.add_object_to_inventory(obj)
             logger.debug("Adding object " + obj.get_name() + " to player's bag.")
 
+        # TODO
+        # Objects owned by player
+        owned_list = save_data.get_owned_by_player()
+        for object_name in player_inventory_list:
+            obj = self.get_object_by_name(object_name)
+            self.player.add_object_to_owned_list(obj)
+            logger.debug("Adding object " + obj.get_name() + " to player's 'owned' list.")
+
         # Player variables
         logger.debug("self.player_cash = save_data.get_player_cash() = " + str(save_data.get_player_cash()))
         self.player.cash = save_data.get_player_cash()
@@ -149,12 +158,6 @@ class GameState:
             'spraypaint_skill' : self.player.can_spraypaint()
         }
         return header_info
-
-    # DEPRECATED
-    # def set_room_vars_to_default(self):
-    #     for room in self.rooms:
-    #         room.set_visited(False)
-    #         room.objects = []
 
     def set_object_vars_to_default(self):
         for obj in self.objects:
