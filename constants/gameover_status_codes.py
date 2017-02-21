@@ -2,7 +2,7 @@
 # CS 467 - Winter 2017
 # Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 #
-# status_codes.py
+# gameover_status_codes.py
 # Description:  Used by game engine
 # Principal Author of this file per Project plan: Shawn Hillyer
 #

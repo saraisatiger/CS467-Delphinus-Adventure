@@ -4,3 +4,4 @@ TEXT_WIDTH = 80
 
 NOUN_TYPE_OBJECT = "object"
 NOUN_TYPE_FEATURE = "feature"
+NOUN_TYPE_DESTINATION = "destination"
