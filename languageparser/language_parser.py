@@ -118,7 +118,6 @@ class LanguageParser:
 								verb_idx = last_idx = idx + num_words_in_alias - 1
 							elif idx > last_idx:
 								if words_sublist_string == verb:
-									logger.debug("verb: " + verb)
 									error = INVALID_DOUBLE
 								else:
 									error = INVALID_EXTRA_VERBS
@@ -206,18 +205,14 @@ class LanguageParser:
 							# current index must > last one we found a noun or target in
 							elif idx > last_idx:
 								if str(obj_alias_array[0]) == noun or str(obj_alias_array[0]) == target:
-									logger.debug("object: " + str(obj_alias_array[0]))
 									error = INVALID_DOUBLE
 								else:
 									error = INVALID_EXTRA_NOUNS
 							# else it is just a double, such as 'floppy disk' which could be 'floppy' and 'disk'
 								
 				for feat_alias_arrays in FEATURES_ALIASES_ARRAYS:
-					#logger.debug("feature 1: " + str(feat_alias_arrays))
 					for feat_alias_array in feat_alias_arrays:
-						#logger.debug("feature 2: " + str(feat_alias_array))
 						for feat_alias in feat_alias_array:
-							#logger.debug("feature 3: " + str(feat_alias))
 							num_words_in_name = len(feat_alias.split())
 							words_sublist = words[idx: idx + num_words_in_name]
 							words_sublist_string = ' '.join(words_sublist)
@@ -233,7 +228,6 @@ class LanguageParser:
 									targ_idx = last_idx = idx + num_words_in_name - 1 
 								elif idx > last_idx:
 									if str(feat_alias_array[0]) == noun or str(feat_alias_array[0]) == target:
-										logger.debug("feature: " + str(feat_alias_array[0]))
 										error = INVALID_DOUBLE
 									else:
 										error = INVALID_EXTRA_NOUNS
