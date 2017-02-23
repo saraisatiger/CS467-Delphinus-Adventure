@@ -120,3 +120,8 @@ class UserInterface:
         wprint(INVENTORY_LIST_HEADER)
         print(inventory_description)
         wprint(INVENTORY_LIST_FOOTER)
+
+    def print_graffiti(self, spray_painted_message):
+        wprint(GRAFFITI_HEADER)
+        wprint(spray_painted_message)
+        wprint(GRAFFITI_FOOTER)
