@@ -212,8 +212,6 @@ class GameClient:
             elif self.command is BUY:
                 self.verb_buy(self.verb_noun_name)
             elif self.command is SPRAYPAINT:
-                # TODO: Finish implementing verb_spraypaint and remove the debug print
-                logger.debug("Spray paint is not fully implemented yet.")
                 self.verb_spraypaint(self.verb_noun_name, self.extras)
             elif self.command is USE:
                 self.verb_use(self.verb_noun_name, self.verb_noun_type)
@@ -245,8 +243,6 @@ class GameClient:
                 wprint(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
 
-            # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
-            # self.reset_input_and_command()
         return status
 
     def load_game_menu(self):
@@ -468,15 +464,11 @@ class GameClient:
 
         if self.gamestate.player.can_hack() is False:
             message = HACK_FAIL_NOSKILL
-
         else:
-            # TODO: Once noun_type is passed by language-parser, change this to use commneted out if statements
-            # if noun_type == NOUN_TYPE_OBJECT:
-            #     message = HACK_FAIL_INVALID_TARGET
-            #     hack_success = False
-
-            # if noun_type == NOUN_TYPE_FEATURE:
-            if True: # Swap this with preceeding line later on
+            if noun_type == NOUN_TYPE_OBJECT:
+                message = HACK_FAIL_INVALID_TARGET
+                hack_success = False
+            elif noun_type == NOUN_TYPE_FEATURE:
                 cur_room = self.gamestate.get_current_room()
                 try:
                     feature = cur_room.get_feature_by_name(noun_name)
@@ -507,8 +499,6 @@ class GameClient:
                         message = HACK_FAIL_INVALID_TARGET
                 except:
                     message = HACK_FAIL_FEATURE_NOT_PRESENT
-            else: # TODO: Delete t his else statement once parser works with type/object identification
-                message = "This should never print."
 
         if hack_success is True:
             try:
