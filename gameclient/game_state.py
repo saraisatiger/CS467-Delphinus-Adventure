@@ -121,10 +121,11 @@ class GameState:
 
         # TODO
         # Objects owned by player
-        owned_list = save_data.get_owned_by_player()
-        for object_name in player_inventory_list:
+        player_owned = save_data.get_owned()
+        for object_name in player_owned:
             obj = self.get_object_by_name(object_name)
-            self.player.add_object_to_owned_list(obj)
+            copy_of_object = copy.copy(object)
+            player_owned.add_object(copy_of_object)
             logger.debug("Adding object " + obj.get_name() + " to player's 'owned' list.")
 
         # Player variables

@@ -59,6 +59,7 @@ class SaveGame:
                 for room_feature in room.room_features:
                     if room_feature.is_hackable() is True:
                         self.features_hacked_mapping[room.get_name()] = { room_feature.get_name() : room_feature.is_hacked() }
+                        # hacked_features.append()
 
 
             # Special booleans
@@ -66,11 +67,10 @@ class SaveGame:
 
             # Objects in inventory
             self.player_inventory = []
+            self.owned = []
             for inventory_object in gamestate.player.get_inventory_objects():
                 self.player_inventory.append(inventory_object.get_name())
-
-            # Objects owned, and possibly dropped, by player
-            self.is_owned_by_player = []
+                self.owned.append(inventory_object.get_name())
 
             # Player variables
             self.player_cash = gamestate.player.get_cash()
@@ -115,7 +115,7 @@ class SaveGame:
             # Objects in rooms and inventory
             'objects_in_rooms': self.object_room_mapping,
             'player_inventory': self.player_inventory,
-            'owned' : self.is_owned_by_player,
+            'owned' : self.owned,
 
             # Player variables
             'player_cash': self.player_cash,
@@ -164,6 +164,7 @@ class SaveGame:
         # Objects in rooms and inventory
         self.object_room_mapping = self.save_data['objects_in_rooms']
         self.player_inventory = self.save_data['player_inventory']
+        self.owned = self.save_data['owned']
 
         # Player variables
         self.player_cash = self.save_data['player_cash']
@@ -242,9 +243,9 @@ class SaveGame:
         except:
             return None
 
-    def get_owned_by_player(self):
+    def get_owned(self):
         try:
-            return self.is_owned_by_player
+            return self.owned
         except:
             return None
 

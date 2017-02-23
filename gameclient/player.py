@@ -30,14 +30,7 @@ class Player:
     def add_object_to_inventory(self, object):
         if object:
             copy_of_object = copy.copy(object)
-            copy_of_object.set_is_owned_by_player()
             self.inventory.add_object(copy_of_object)
-
-    # Only called when loading a game
-    def add_object_to_owned_list(self, object):
-        if object:
-            copy_of_object = copy.copy(object)
-            copy_of_object.set_is_owned_by_player()
             self.owned.add_object(copy_of_object)
 
     def remove_object_from_inventory(self, object):

@@ -59,6 +59,8 @@ class UserInterface:
 
     def clear_screen(self):
         # Cite: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
+        # DEBUG Disable clear screen
+        # pass
         if self.op_system == "Windows":
             os.system('cls')
         elif self.op_system == "Linux":

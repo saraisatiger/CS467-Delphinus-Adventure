@@ -350,8 +350,8 @@ class GameClient:
                 wprint(BUY_NOT_IN_ROOM)
             elif object.get_cost() is 0:
                 wprint(BUY_FREE_ITEM)
-            elif object.is_owned_by_player() is True:
-                wprint(BUY_FREE_ITEM)
+            # elif object.is_owned_by_player() is True:
+            #     wprint(BUY_FREE_ITEM)
             elif object.get_cost() > player_cash:
                 wprint(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
             else:
@@ -392,6 +392,8 @@ class GameClient:
                 wprint(DROP_FAILURE_VIRTUALSPACE)
             elif inventory_object is not None:
                 self.gamestate.player.inventory.remove_object(inventory_object)
+                # DEBUG Print owned array
+                # print(self.gamestate.player.owned.get_inventory_string())
                 self.gamestate.get_current_room().add_object_to_room(inventory_object)
                 wprint(DROP_SUCCESS_PREFIX + self.verb_noun_name + DROP_SUCCESS_SUFFIX)
                 drop_success = True
@@ -681,7 +683,8 @@ class GameClient:
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
-                if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
+                # if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
+                if room_object.get_cost() is 0 or room_object in self.gamestate.player.owned:
                     self.gamestate.get_current_room().remove_object_from_room(room_object)
                     self.gamestate.player.add_object_to_inventory(room_object)
                     wprint(PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
@@ -804,9 +807,10 @@ class GameClient:
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
-                if room_object.is_owned_by_player() is True:
-                    wprint(STEAL_FAIL_ALREADY_OWNED)
-                elif room_object.get_cost() is 0:
+                # if room_object.is_owned_by_player() is True:
+                #     wprint(STEAL_FAIL_ALREADY_OWNED)
+                # elif room_object.get_cost() is 0:
+                if room_object.get_cost() is 0:
                     wprint(STEAL_FAIL_FREE_ITEM)
                 elif room_object.get_cost() > 0:
                     if (self.rand_event.attempt_steal() is True):
