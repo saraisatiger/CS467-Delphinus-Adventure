@@ -713,22 +713,22 @@ class GameClient:
             if used_object is not None:
                 obj_label = used_object.get_name().lower()
 
-                if obj_label == "crisp cash":
+                if obj_label == CASH_CRISP.lower():
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
                     self.gamestate.player.update_cash(cash_gained)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
-                elif obj_label == "cash wad":
+                elif obj_label == CASH_WAD.lower():
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
                     self.gamestate.player.update_cash(cash_gained )
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
-                elif obj_label in {"graphics card", "ram chip", "floppy disk"}:
+                elif obj_label in {GRAPHICS_CARD.lower(), RAM.lower(), FLOPPY_DISK.lower()}:
                     # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
                     # and then update some game-state variable so that player can do things they can do if they have a PC
-                    g_card = self.gamestate.player.inventory.get_object_by_name("graphics card")
-                    ram_chip = self.gamestate.player.inventory.get_object_by_name("ram chip")
-                    floppy_disk = self.gamestate.player.inventory.get_object_by_name("floppy disk")
+                    g_card = self.gamestate.player.inventory.get_object_by_name(GRAPHICS_CARD.lower())
+                    ram_chip = self.gamestate.player.inventory.get_object_by_name(RAM.lower())
+                    floppy_disk = self.gamestate.player.inventory.get_object_by_name(FLOPPY_DISK.lower())
 
                     if g_card is not None and \
                          ram_chip is not None and \
@@ -741,24 +741,24 @@ class GameClient:
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
                     else:
                         wprint(USE_COMPUTER_PARTS_MISSING)
-                elif obj_label == "hackersnacks":
+                elif obj_label == HACKERSNACKS.lower():
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
                     wprint(USE_SNACKS_SUCCESS)
-                elif obj_label == "skateboard":
+                elif obj_label == SKATEBOARD.lower():
                     self.gamestate.player.set_has_skate_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
                     wprint(USE_SKATEBOARD_SUCCESS)
-                elif obj_label == "spray paint":
+                elif obj_label == SPRAYPAINT.lower():
                     self.gamestate.player.set_has_spraypaint_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     wprint(USE_SPRAYPAINT_SUCCESS)
-                elif obj_label == "hacker manual":
+                elif obj_label == HACKER_MANUAL.lower():
                     self.gamestate.player.set_has_hack_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     wprint(USE_HACKERMANUAL_SUCCESS)
-                elif obj_label == "surge":
+                elif obj_label == SURGE.lower():
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
                     wprint(USE_SURGE_SUCCESS)
@@ -865,7 +865,7 @@ class GameClient:
             confirm = self.ui.user_prompt().lower()
             if confirm in YES_ALIASES:
                 message = LOOK_AT_TRASH_SEARCHED
-                ram_chip = self.gamestate.get_object_by_name("RAM Chip")
+                ram_chip = self.gamestate.get_object_by_name(RAM.lower())
                 self.gamestate.player.add_object_to_inventory(ram_chip)
                 self.gamestate.player.update_coolness(TRASH_CAN_SEARCH_COOLNESS_COST)
                 self.gamestate.is_trash_can_looted = True
