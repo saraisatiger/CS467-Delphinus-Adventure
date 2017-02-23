@@ -42,6 +42,9 @@ class Player:
     def get_inventory_objects(self):
         return self.inventory.objects
 
+    def get_owned_objects(self):
+        return self.owned.objects
+
     def get_cash(self):
         return self.cash
 
