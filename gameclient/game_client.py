@@ -465,7 +465,7 @@ class GameClient:
         return go_success
 
     def verb_hack(self, noun_name, noun_type):
-        # TODO: Finish implementing verb_hack
+        # TODO: Finish implementing verb_hack for other room features
         hack_success = False
 
         if self.gamestate.player.can_hack() is False:
