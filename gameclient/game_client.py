@@ -235,14 +235,12 @@ class GameClient:
 
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
-                save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
-                if quit_confirmed == True and save_game_prompt == False:
-                    status = GAMEOVER_QUIT
-                elif quit_confirmed == True and save_game_prompt == True:
-                    # Save game to file and exit
-                    status = GAMEOVER_SAVE
-                    # if quit_confirmed == True:
-                    #     status = SAVE_GAME
+                if quit_confirmed is True:
+                    save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
+                    if save_game_prompt is True:
+                        status = GAMEOVER_SAVE
+                    else:
+                        status = GAMEOVER_QUIT
             else:
                 wprint(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()

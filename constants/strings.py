@@ -85,11 +85,8 @@ SAVE_GAME_FILE_PROMPT = "Name a file to save this game (no extension): "
 SAVE_GAME_SUCCESS = "Saving game to filename: "
 SAVE_GAME_FAILED = "There was an error saving the game to filename: "
 SAVE_GAME_VALID_FILENAME_MESSAGE = "Something about the filename you provided was invalid."
-QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
-# QUIT_CONFIRM_PROMPT = "Quitting the game...\nDo you wish to save this game? (Y)es or (N)o"
+QUIT_CONFIRM_PROMPT = "Do you really wish to quit the game? (Y)es or (N)o"
 YES_ALIASES = {'yes', 'y'}
-
-
 
 
 # 'buy' strings
