@@ -39,7 +39,9 @@ class UserInterface:
 
 
     def print_introduction(self):
-        wprint(INTRO_STRING)
+        for paragraph in INTRO_SEQUENCE:
+            wprint(paragraph)
+            self.wait_for_enter()
 
     def print_main_menu(self):
         for line in MAIN_MENU_LINES:
@@ -68,8 +70,8 @@ class UserInterface:
 
     def print_splash_screen_new_game(self):
         self.clear_screen()
-        wprint(NEW_GAME_MESSAGE)  # Defined in constants\strings.py
-        self.wait_for_enter()
+        self.print_introduction()
+
 
     def print_splash_screen_load_game(self):
         self.clear_screen()
@@ -118,3 +120,8 @@ class UserInterface:
         wprint(INVENTORY_LIST_HEADER)
         print(inventory_description)
         wprint(INVENTORY_LIST_FOOTER)
+
+    def print_graffiti(self, spray_painted_message):
+        wprint(GRAFFITI_HEADER)
+        wprint(spray_painted_message)
+        wprint(GRAFFITI_FOOTER)
