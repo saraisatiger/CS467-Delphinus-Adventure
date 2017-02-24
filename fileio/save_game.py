@@ -283,7 +283,6 @@ class SaveGame:
         Returns a list of the filenames in the savegame folder
         :return: All files in the savedgame folder
         '''
-        # TODO: Implement this
         savedgames = []
         savedgames_dir = './gamedata/savedgames/*.json'
         savedgames_files_path =  glob.glob(savedgames_dir)
