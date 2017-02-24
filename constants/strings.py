@@ -179,6 +179,10 @@ SPRAYPAINT_FAIL_VIRTUAL_SPACE = "You cannot spraypaint on the internet, you know
 SPRAYPAINT_ROOM_SUCCESS = "You spraypaint the room with your message. You should take a [look]!"
 SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED = "This room is already painted."
 
+# 'skate' strings
+SKATE_SUCCESS = "You skate successfully."
+SKATE_FAILURE_NO_SKILL = "You need to practice with a [Skateboard] before you can skate around!"
+
 # 'steal' strings
 STEAL_FAIL_ALREADY_OWNED = "You already own that. You can just take it!"
 STEAL_FAIL_FREE_ITEM = "That doesn't cost anything. You should just take it - nobody will care!"
