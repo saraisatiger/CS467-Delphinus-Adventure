@@ -310,8 +310,9 @@ class GameClient:
         self.ui.wait_for_enter()
 
     def go_to_jail(self):
-        county_jail = self.gamestate.get_room_by_name("County Jail")
-        self.gamestate.set_current_room(county_jail)
+        jail_name = R7[0]
+        jail_room = self.gamestate.get_room_by_name(jail_name)
+        self.gamestate.set_current_room(jail_room)
         wprint(JAIL_GO_TO_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
         self.ui.wait_for_enter()
@@ -506,7 +507,7 @@ class GameClient:
             except:
                 logger.debug("hack_success is True but failed to call feature.set_is_hacked(True)")
 
-        print(message)
+        wprint(message)
         self.ui.wait_for_enter()
         return hack_success
 
