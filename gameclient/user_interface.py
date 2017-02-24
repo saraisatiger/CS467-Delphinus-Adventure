@@ -120,3 +120,13 @@ class UserInterface:
         wprint(INVENTORY_LIST_HEADER)
         print(inventory_description)
         wprint(INVENTORY_LIST_FOOTER)
+
+    def create_savedgames_dir(self):
+        # Windows reference only to testing locally
+        if self.op_system == "Windows":
+            os.system('if not exist ".\gamedata\savedgames" mkdir ".\gamedata\savedgames"')
+        # CITE: http://stackoverflow.com/questions/793858/how-to-mkdir-only-if-a-dir-does-not-already-exist
+        elif self.op_system == "Linux":
+            os.system('mkdir -p ./gamedata/savedgames')
+        # else:
+        #     pass

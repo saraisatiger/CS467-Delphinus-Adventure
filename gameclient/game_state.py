@@ -23,6 +23,7 @@ class GameState:
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
         self.initialize_gamestate()
+        self.game_file = ""
 
     def set_current_room(self, room):
         '''
@@ -71,7 +72,7 @@ class GameState:
         self.place_objects_in_rooms(self.objects)
 
     def initialize_load_game(self, filename):
-        # TODO: Need to set the property is_owned_by_player on objects in the game world in the save and load functions
+        self.game_file = filename.replace('.json', '')
 
         # Clear all of the variables by calling what is essentially the constructor
         self.initialize_gamestate()

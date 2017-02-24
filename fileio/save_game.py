@@ -71,8 +71,8 @@ class SaveGame:
                 self.player_inventory.append(inventory_object.get_name())
 
             self.owned = []
-            for owned_object in gamestate.player.get_owned_objects():
-                self.owned.append(owned_object.get_name())
+            for object_name in gamestate.player.get_owned_objects():
+                self.owned.append(object_name)
 
             # Player variables
             self.player_cash = gamestate.player.get_cash()

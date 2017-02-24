@@ -73,14 +73,16 @@ LOAD_OUT_OF_RANGE_MESSAGE = "That's not a valid menu option. Please choose an in
 
 SAVE_GAME_PROMPT = "Do you wish to save this game? (Y)es or (N)o?"
 SAVE_GAME_FILE_PROMPT = "Name a file to save this game (no extension): "
+SAVE_GAME_EXISTING = "This game was loaded from: "
+SAVE_GAME_EXISTING_PROMPT = "Do you wish to continue saving to this file? Your progress will be updated. (Y)es or (N)o"
 SAVE_GAME_SUCCESS = "Saving game to filename: "
+SAVE_UPDATE_GAME_SUCCESS = "Saving updated game to filename: "
 SAVE_GAME_FAILED = "There was an error saving the game to filename: "
 SAVE_GAME_AGAIN = "Try again:"
 SAVE_GAME_INVALID_EXISTS = "There is already a game saved to that file."
 SAVE_GAME_INVALID_CHARACTERS = "This filename contains invalid characters."
 SAVE_GAME_VALID_FILENAME_MESSAGE = "Something about the filename you provided was invalid."
 QUIT_CONFIRM_PROMPT = "Quitting the game will cause you to lose unsaved progress.\nDo you wish to continue? (Y)es or (N)o"
-# QUIT_CONFIRM_PROMPT = "Quitting the game...\nDo you wish to save this game? (Y)es or (N)o"
 YES_ALIASES = {'yes', 'y'}
 
 

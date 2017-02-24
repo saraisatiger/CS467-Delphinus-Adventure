@@ -22,7 +22,7 @@ class Player:
         self.coolness = 0
         self.speed = 0
         self.inventory = Inventory()
-        self.owned = Inventory()
+        self.owned = []
         self.has_hack_skill = False
         self.has_skate_skill = False
         self.has_spraypaint_skill = False
@@ -31,7 +31,7 @@ class Player:
         if object:
             copy_of_object = copy.copy(object)
             self.inventory.add_object(copy_of_object)
-            self.owned.add_object(copy_of_object)
+            self.owned.append(object.get_name())
 
     def remove_object_from_inventory(self, object):
         self.inventory.remove_object(object)
@@ -43,7 +43,7 @@ class Player:
         return self.inventory.objects
 
     def get_owned_objects(self):
-        return self.owned.objects
+        return self.owned
 
     def get_cash(self):
         return self.cash

@@ -234,13 +234,13 @@ class GameClient:
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
                 save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
-                if quit_confirmed == True and save_game_prompt == False:
+                if quit_confirmed == False:
+                    status = GAME_CONTINUE
+                elif quit_confirmed == True and save_game_prompt == False:
                     status = GAMEOVER_QUIT
                 elif quit_confirmed == True and save_game_prompt == True:
                     # Save game to file and exit
                     status = GAMEOVER_SAVE
-                    # if quit_confirmed == True:
-                    #     status = SAVE_GAME
             else:
                 wprint(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
@@ -296,18 +296,36 @@ class GameClient:
 
     def save_game_menu(self):
         save_game = SaveGame(self.gamestate)
+        game_file = self.gamestate.game_file
         file_name = ""
         valid_filename = False
 
-        while valid_filename is False or file_name == "":
-            wprint(SAVE_GAME_FILE_PROMPT)
-            file_name = self.ui.user_prompt()
-            valid_filename = save_game.is_existing_saved_game(file_name)
-            while valid_filename is False:
-                wprint(SAVE_GAME_INVALID_EXISTS)
-                wprint(SAVE_GAME_AGAIN)
+        if game_file == "":
+            while valid_filename is False or file_name == "":
+                wprint(SAVE_GAME_FILE_PROMPT)
                 file_name = self.ui.user_prompt()
                 valid_filename = save_game.is_existing_saved_game(file_name)
+                while valid_filename is False:
+                    wprint(SAVE_GAME_INVALID_EXISTS)
+                    wprint(SAVE_GAME_AGAIN)
+                    file_name = self.ui.user_prompt()
+                    valid_filename = save_game.is_existing_saved_game(file_name)
+        elif game_file:
+            wprint(SAVE_GAME_EXISTING + game_file + '.json')
+            wprint(SAVE_GAME_EXISTING_PROMPT)
+            confirm = self.ui.user_prompt()
+            if confirm in YES_ALIASES:
+                file_name = game_file
+                save_game.write_to_file(file_name)
+            else:
+                wprint(SAVE_GAME_FILE_PROMPT)
+                file_name = self.ui.user_prompt()
+                valid_filename = save_game.is_existing_saved_game(file_name)
+                while valid_filename is False:
+                    wprint(SAVE_GAME_INVALID_EXISTS)
+                    wprint(SAVE_GAME_AGAIN)
+                    file_name = self.ui.user_prompt()
+                    valid_filename = save_game.is_existing_saved_game(file_name)
 
         while save_game.write_to_file(file_name) is False:
             wprint(SAVE_GAME_INVALID_CHARACTERS)
@@ -683,8 +701,7 @@ class GameClient:
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
-                # if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
-                if room_object.get_cost() is 0 or room_object in self.gamestate.player.owned:
+                if room_object.get_cost() is 0 or room_object.get_name() in self.gamestate.player.owned:
                     self.gamestate.get_current_room().remove_object_from_room(room_object)
                     self.gamestate.player.add_object_to_inventory(room_object)
                     wprint(PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
@@ -807,10 +824,7 @@ class GameClient:
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
-                # if room_object.is_owned_by_player() is True:
-                #     wprint(STEAL_FAIL_ALREADY_OWNED)
-                # elif room_object.get_cost() is 0:
-                if room_object.get_cost() is 0:
+                if room_object.get_cost() is 0 or room_object.get_name() in self.gamestate.player.owned:
                     wprint(STEAL_FAIL_FREE_ITEM)
                 elif room_object.get_cost() > 0:
                     if (self.rand_event.attempt_steal() is True):
