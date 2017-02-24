@@ -1,5 +1,5 @@
 {
-  "name" : "Virus Room",
+  "name" : "Spaghetti Code",
   "long_description" : "A sticky sloppy mess of code swirls around your body immobilizing you in a small cramped space where you can barely see anything except a few black and white binary blinks and a couple of oozing corrupted files.",
   "short_description" : "A swirl of spaghetti code with binary blinks and some majorly harshed files.",
   "visited" : false,
@@ -18,10 +18,10 @@
   ],
   "room_connections" : [
     {
-      "label": "Evil Computer",
+      "label": "Data Tower",
       "cardinal_direction": "West",
-      "description": "",
-      "destination": "Evil Computer"
+      "description": "spooky looking tower of bits and bytes",
+      "destination": "Data Tower"
     }
   ]
 }

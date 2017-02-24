@@ -19,12 +19,12 @@ R5 = ['subway', 'metro', 'underground']
 R7 = ['jail', 'prison', 'slammer']
 R6 = ['pool on the roof', 'roof pool', 'pool', 'roof']
 R8 = ['hall', 'hallway']
-R9 = ['office']
+R9 = ['school office']
 R10 = ['computer', 'laptop']
 R11 = ['inside the metaverse', 'metaverse', 'internet']
 R12 = ['chat room', 'chat']
-R13 = ['evil computer']
-R14 = ['secret files', 'secret']
+R13 = ['data tower', 'data', 'tower']
+R14 = ['encrypted files', 'encrypted', 'encrypt', 'files']
 R15 = ['virus room', 'virus']
 #no room 16 as player will be sent automatically if they win
 
@@ -45,14 +45,14 @@ HACKERSNACKS = 'hackersnacks'
 HACKERSNACKS_ALIASES = ['hackersnacks', 'snacks', 'munchies']
 SURGE = 'surge'
 SURGE_ALIASES = ['surge', 'soda', 'drink', 'beverage'] 
-SPRAY_PAINT = 'can of SuperSprayPaint'
-SPRAY_PAINT_ALIASES = ['can of SuperSprayPaint', 'can']
+SPRAY_PAINT = 'cans of superspraypaint'
+SPRAY_PAINT_ALIASES = ['cans of superspraypaint', 'superspraypaint', 'cans', 'can']
 FLOPPY_DISK = 'floppy disk'
-FLOPPY_DISK_ALIASES = ['floppy disk', 'floppydisk', 'floppy', 'disk']
+FLOPPY_DISK_ALIASES = ['floppy disk', 'floppydisk', 'floppy']
 GRAPHICS_CARD = 'graphics card'
 GRAPHICS_CARD_ALIASES = ['graphics card', 'graphic card', 'graphicscard', 'graphiccard', 'card', 'graphics']
-NEW_COMPUTER = ['new computer']
-NEW_COMPUTER_ALIASES = ['new computer']
+NEW_COMPUTER = ['new laptop']
+NEW_COMPUTER_ALIASES = ['new laptop', 'laptop']
 RAM = 'ram chip'
 RAM_ALIASES = ['ram chip', 'random access memory', 'memory', 'chip', 'ram']
 
@@ -60,22 +60,22 @@ OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES,  SKATEBORD_ALIASES, HAC
 
 #features 
 #TODO: add aliases, simple 'look at' features and descriptions to ROOMS, then add logic here
-R1_F = [['"no skateboarding" sign', 'no skateboarding sign', 'sign'], ['guardrails', 'rails', 'rail'], ['traffic lights', 'lights']]
+R1_F = [['"no skateboarding" sign', 'no skateboarding sign', 'sign'], ['guardrails', 'rails', 'rail'], ['traffic lights', 'traffic', 'lights', 'light']]
 R2_F = [['phone booth', 'phone', 'booth'], ['trash can', 'trash'], ['turnstiles', 'turn stile', 'turn stiles', 'turnstile']]
 R3_F = [['ramp'], ['death to the patriarchy', 'game', 'death', 'patriarchy']]
 R4_F = [['counter'], ['shelves'], ['store clerk', 'clerk']]
-R5_F = [['atm'], ['security officer', 'security']]
-R6_F = [['your gear', 'gear'], ['unattended police computer', 'police computer'], ['police officer', 'police', 'cop'], ['unoccupied desk', 'desk'], ['metal door']]
+R5_F = [['atm'], ['crumpled cash', 'crumpled'], ['security officer', 'security']]
+R6_F = [['your gear', 'gear'], ['unattended police desktop', 'police desktop'], ['police officer', 'police', 'cop'], ['unoccupied desk', 'desk'], ['metal door']]
 R7_F = [['locker'], ['teacher', 'teach'], ['fire alarm', 'alarm']]
-R8_F = [['school-wide intercom mic', 'intercom mic', 'intercom', 'mic'], ['office computer'], ['acid burn'], ['clock'], ['poster']]
-R9_F = [['door'], ['ledge']]
+R8_F = [['school intercom mic', 'intercom mic', 'intercom', 'mic'], ['office desktop'], ['acid burn'], ['clock'], ['poster']]
+R9_F = [['control box', 'control', 'box'], ['door'], ['ledge']]
 R10_F = [['disk drive', 'drive'], ['panel'], ['terminal']]
 R11_F = [['bug'], ['firewall']]
-R12_F = [['emojis', 'emoticons'], ['creature', 'troll'], ['acid burn']]
+R12_F = [['emojis', 'emoji', 'emoticons'], ['creature', 'troll'], ['acid burn']]
 R13_F = [['input output port', 'input output port', 'in out port', 'input output', 'in out' 'port'], ['sentient cpu', 'cpu']]
 R14_F = [['cat videos from the internet', 'internet cat videos', 'cat videos', 'videos', 'vids'], ['nuclear launch codes', 'launch codes', 'codes']]
 R15_F = [['binary files', 'binary'], ['corrupted files', 'corrupted']]
-R16_F = [['acid burn'], ['diving board'], ['office windows']]
+R16_F = [['acid burn'], ['diving board', 'diving'], ['walls']]
 
 FEATURES_ALIASES_ARRAYS = [R1_F, R2_F, R3_F, R4_F, R5_F, R6_F, R7_F, R8_F, R9_F, R10_F, R11_F, R12_F, R13_F, R14_F, R15_F, R16_F]
 
@@ -108,6 +108,8 @@ LOOK_AT = 'look at'
 LOOK_AT_ALIASES = ['look at', 'examine']
 TAKE = 'take'
 TAKE_ALIASES = ['take', 'pick up', 'grab', 'acquire']
+TALK = 'talk'
+TALK_ALIASES = ['talk', 'speak', 'ask']
 INVENTORY = 'inventory'
 INVENTORY_ALIASES = ['inventory', 'backpack', 'bag']
 NEW_GAME = 'new game'
@@ -127,7 +129,7 @@ USE_ALIASES = ['use']
 
 
 VERB_ALIASES = [BUY_ALIASES, DROP_ALIASES, GO_ALIASES, HACK_ALIASES, HELP_ALIASES, LOAD_GAME_ALIASES, LOOK_AT_ALIASES, 
-LOOK_ALIASES, TAKE_ALIASES, INVENTORY_ALIASES, NEW_GAME_ALIASES, QUIT_ALIASES, SAVE_GAME_ALIASES, SPRAYPAINT_ALIASES, STEAL_ALIASES, USE_ALIASES]
+LOOK_ALIASES, TAKE_ALIASES, TALK_ALIASES, INVENTORY_ALIASES, NEW_GAME_ALIASES, QUIT_ALIASES, SAVE_GAME_ALIASES, SPRAYPAINT_ALIASES, STEAL_ALIASES, USE_ALIASES]
 
 
 NEGATIONS = ['not', 'don\'t', 'no']
