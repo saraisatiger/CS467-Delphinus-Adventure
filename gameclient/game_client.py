@@ -457,17 +457,19 @@ class GameClient:
     def verb_hack(self, noun_name, noun_type):
         # TODO: Finish implementing verb_hack for other room features
         hack_success = False
-        message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
         hacking_detected_by_police = False
+        message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
 
         if self.gamestate.player.can_hack() is False:
             message = HACK_FAIL_NOSKILL
-        else:
+        else: # Player can hack, try it
             if noun_type == NOUN_TYPE_OBJECT:
                 message = HACK_FAIL_INVALID_TARGET
                 hack_success = False
+
             elif noun_type == NOUN_TYPE_FEATURE:
                 cur_room = self.gamestate.get_current_room()
+
                 try:
                     feature = cur_room.get_feature_by_name(noun_name)
                     # logger.debug("feature retreived by name " + noun_name)
@@ -475,12 +477,12 @@ class GameClient:
                     # logger.debug("feature name.get_name() called: " + feature_name)
 
                     if feature.is_hackable() is True:
-                        # Determine if player will succeed in hacking one time, then evaluate if it even matters later
-                        hacking_detected_by_police = not self.rand_event.attempt_hack()
-
                         if feature.is_hacked() is True:
                             message = HACK_FAIL_ALREADY_HACKED
-                        else:
+                        else: # Not hacked yet, player will attempt the hack
+                            # Determine if player will succeed in hacking one time, then evaluate if it even matters later
+                            hacking_detected_by_police = not self.rand_event.attempt_hack()
+
                             if hacking_detected_by_police is True:
                                 message = HACK_FAIL_CAUGHT
                             elif hacking_detected_by_police is False:
@@ -500,10 +502,13 @@ class GameClient:
 
                                 else:
                                     message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
-                    else:
+                    else: # Feature is not a hackable feature
                         message = HACK_FAIL_INVALID_TARGET
+
                 except:
                     message = HACK_FAIL_FEATURE_NOT_PRESENT
+            else: # Player tried to hack something that's not an object or feature so it's nonsense
+                message = HACK_FAIL_NONSENSE
 
         if hack_success is True:
             try:
@@ -793,6 +798,7 @@ class GameClient:
         spraypaint_message = command_extra_first['name']
         # logger.debug("Message will be: '" + spraypaint_message + "'")
         spraypaint_success = False
+        spraypaint_caught
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name()
 
@@ -823,7 +829,9 @@ class GameClient:
 
     def verb_steal(self, noun_name, noun_type):
         steal_success = False
-        message = ''
+        steal_detected_by_police = False
+        message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
+
         if noun_type == NOUN_TYPE_FEATURE:
             message = STEAL_FAIL_FEATURE_INVALID
             steal_success = False
@@ -832,13 +840,15 @@ class GameClient:
 
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
-            if room_object is not None:
+            if room_object is not None: # Object is in this room
+                # Only steal objects that we have never owned or that are not free
                 if room_object.is_owned_by_player() is True:
                     message =  STEAL_FAIL_ALREADY_OWNED
                 elif room_object.get_cost() is 0:
                     message = STEAL_FAIL_FREE_ITEM
                 elif room_object.get_cost() > 0:
-                    if self.rand_event.attempt_steal() is True:
+                    steal_detected_by_police = not self.rand_event.attempt_steal()
+                    if steal_detected_by_police is False:
                         self.gamestate.get_current_room().remove_object_from_room(room_object)
                         self.gamestate.player.add_object_to_inventory(room_object)
                         message = STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX
@@ -847,12 +857,13 @@ class GameClient:
                     else:
                         message = STEAL_FAIL_PRISON
                         self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
-                        steal_success = False
-            else:
+            else: # room_object isn't present in this room
                 message = STEAL_FAIL_NOT_HERE
+        else: # Not an object or a noun
+            message = STEAL_FAIL_NOT_HERE
 
         wprint(message)
-        if steal_success is False:
+        if steal_detected_by_police is True:
             self.go_to_jail()
         self.ui.wait_for_enter()
         return steal_success

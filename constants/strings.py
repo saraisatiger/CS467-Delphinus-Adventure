@@ -123,6 +123,7 @@ HACK_FAIL_INVALID_TARGET = "There's no way to hack that. Try hacking something u
 HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
 HACK_FAIL_ALREADY_HACKED = "You've already hacked that."
 HACK_FAIL_CAUGHT = "You were caught hacking the system!"
+HACK_FAIL_NONSENSE = "What a bunch of nonsense. That's not something you can hack, at least, not here and now."
 HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww."
 HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should make things a lot faster for you."
 HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You should be able to pass through the area without paying now."
