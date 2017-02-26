@@ -311,7 +311,6 @@ class GameClient:
         self.gamestate.set_current_room(jail_room)
         wprint(JAIL_GO_TO_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
-        self.ui.wait_for_enter()
 
     def verb_buy(self, noun_name):
         '''
@@ -458,6 +457,8 @@ class GameClient:
     def verb_hack(self, noun_name, noun_type):
         # TODO: Finish implementing verb_hack for other room features
         hack_success = False
+        message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
+        hacking_detected_by_police = False
 
         if self.gamestate.player.can_hack() is False:
             message = HACK_FAIL_NOSKILL
@@ -472,26 +473,33 @@ class GameClient:
                     # logger.debug("feature retreived by name " + noun_name)
                     feature_name = feature.get_name().lower()
                     # logger.debug("feature name.get_name() called: " + feature_name)
+
                     if feature.is_hackable() is True:
+                        # Determine if player will succeed in hacking one time, then evaluate if it even matters later
+                        hacking_detected_by_police = not self.rand_event.attempt_hack()
+
                         if feature.is_hacked() is True:
                             message = HACK_FAIL_ALREADY_HACKED
-
-                        elif feature_name == "traffic lights":
-                            message = HACK_SUCCESS_TRAFFIC_LIGHTS
-                            self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
-                            hack_success = True
-
-                        elif feature_name == "atm":
-                            message = HACK_SUCCESS_ATM + " You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
-                            self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
-                            hack_success = True
-
-                        elif feature_name == "turnstiles":
-                            message = HACK_SUCCESS_TURNSTILE
-                            hack_success = True
-
                         else:
-                            message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
+                            if hacking_detected_by_police is True:
+                                message = HACK_FAIL_CAUGHT
+                            elif hacking_detected_by_police is False:
+                                if feature_name == "traffic lights":
+                                    message = HACK_SUCCESS_TRAFFIC_LIGHTS
+                                    self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
+                                    hack_success = True
+
+                                elif feature_name == "atm":
+                                    message = HACK_SUCCESS_ATM + " You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
+                                    self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
+                                    hack_success = True
+
+                                elif feature_name == "turnstiles":
+                                    message = HACK_SUCCESS_TURNSTILE
+                                    hack_success = True
+
+                                else:
+                                    message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
                     else:
                         message = HACK_FAIL_INVALID_TARGET
                 except:
@@ -504,6 +512,8 @@ class GameClient:
                 logger.debug("hack_success is True but failed to call feature.set_is_hacked(True)")
 
         wprint(message)
+        if hacking_detected_by_police is True:
+            self.go_to_jail()
         self.ui.wait_for_enter()
         return hack_success
 
@@ -813,9 +823,9 @@ class GameClient:
 
     def verb_steal(self, noun_name, noun_type):
         steal_success = False
-
+        message = ''
         if noun_type == NOUN_TYPE_FEATURE:
-            wprint("You cannot steal that.")
+            message = STEAL_FAIL_FEATURE_INVALID
             steal_success = False
 
         elif noun_type == NOUN_TYPE_OBJECT:
@@ -824,24 +834,26 @@ class GameClient:
 
             if room_object is not None:
                 if room_object.is_owned_by_player() is True:
-                    wprint(STEAL_FAIL_ALREADY_OWNED)
+                    message =  STEAL_FAIL_ALREADY_OWNED
                 elif room_object.get_cost() is 0:
-                    wprint(STEAL_FAIL_FREE_ITEM)
+                    message = STEAL_FAIL_FREE_ITEM
                 elif room_object.get_cost() > 0:
-                    if (self.rand_event.attempt_steal() is True):
+                    if self.rand_event.attempt_steal() is True:
                         self.gamestate.get_current_room().remove_object_from_room(room_object)
                         self.gamestate.player.add_object_to_inventory(room_object)
-                        wprint(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
+                        message = STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX
                         steal_success = True
                         self.gamestate.update_time_left(STEAL_COST)
                     else:
-                        wprint(STEAL_FAIL_PRISON)
+                        message = STEAL_FAIL_PRISON
                         self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
-                        self.go_to_jail()
-                        return steal_success
+                        steal_success = False
             else:
-                wprint(STEAL_FAIL_NOT_HERE)
+                message = STEAL_FAIL_NOT_HERE
 
+        wprint(message)
+        if steal_success is False:
+            self.go_to_jail()
         self.ui.wait_for_enter()
         return steal_success
 

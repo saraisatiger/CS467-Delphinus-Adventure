@@ -99,10 +99,12 @@ class GameState:
         # Hacked features
         hacked_feature_mapping = save_data.get_hacked_feature_mapping()
         for room_name in hacked_feature_mapping:
+            room_map = hacked_feature_mapping[room_name]
             for feature_name in hacked_feature_mapping[room_name]:
                 room = self.get_room_by_name(room_name)
                 feature = room.get_feature_by_name(feature_name)
-                feature.set_is_hacked(True)
+                is_hacked = room_map[feature_name]
+                feature.set_is_hacked(is_hacked)
 
         # Special booleans
         self.is_trash_can_looted = save_data.get_is_trash_can_looted()
