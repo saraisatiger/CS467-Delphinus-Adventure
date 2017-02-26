@@ -77,6 +77,18 @@ class Player:
     def can_spraypaint(self):
         return self.has_spraypaint_skill
 
+    def has_object_by_name(self, object_name):
+        '''
+        Used in a few different
+        :param object_name:
+        :return:
+        '''
+        player_inventory_objects = self.inventory.objects
+        for inventory_object in player_inventory_objects:
+            if inventory_object.get_name().lower() == object_name.lower():
+                return True
+        return False
+
 
 class Inventory:
     '''

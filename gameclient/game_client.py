@@ -176,6 +176,9 @@ class GameClient:
             if status in GAMEOVER_STATES:  # list as defined in constants\gameover_status_codes.py
                 return status
 
+            # Handling for 'use computer' hint for player
+            self.game_hint_check()
+
             # Print the current room's appropriate long_description
             self.verb_look(print_long_description)
             print_long_description = False # Reset this to false after printing
@@ -933,4 +936,11 @@ class GameClient:
         wprint(message)
         self.ui.wait_for_enter()
 
+    def game_hint_check(self):
+        new_laptop_name = 'new laptop'
+        player_has_new_pc = self.gamestate.player.has_object_by_name(new_laptop_name)
+        logger.debug("checking if player has object " + new_laptop_name + ". " + str(player_has_new_pc))
+
+        if player_has_new_pc is True:
+            wprint(HINT_NEW_PC)
 

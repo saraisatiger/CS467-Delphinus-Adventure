@@ -156,6 +156,9 @@ HELP_MESSAGE = [
 HELP_FEATURE_GENERIC = " is a feature of the room. 'Look at' it to learn more."
 HELP_OBJECT_GENERIC = " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'."
 
+# 'hints' strings (context-sensitive hints)
+HINT_NEW_PC = "You have a NEW Laptop! Maybe you should try to 'use computer'."
+
 # 'Inventory' strings
 INVENTORY_LIST_HEADER = STATUS_HEADER_BAR + "\nBackpack Contents\n" + STATUS_HEADER_BAR
 INVENTORY_LIST_FOOTER = STATUS_HEADER_BAR
