@@ -21,6 +21,7 @@ class RandomEventGenerator:
     def __init__(self):
         # Defined in constants/probabilities.py
         # 100 is 100% chance, 75 = 75 chance, etc.
+        self.spraypaint_success_chance = SPRAYPAINT_SUCCESS_CHANCE
         self.steal_success_chance = STEAL_SUCCESS_CHANCE
         self.hack_success_chance = HACK_SUCCESS_CHANCE
         random.seed()
@@ -40,3 +41,9 @@ class RandomEventGenerator:
     def get_random_cash_amount(self, min_amount, max_amount):
         amount = random.randint(min_amount, max_amount)
         return amount
+
+    def attempt_spraypaint(self):
+        num = random.randint(1,100)
+        if num <= self.spraypaint_success_chance:
+            return True
+        return False

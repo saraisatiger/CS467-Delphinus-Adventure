@@ -794,11 +794,15 @@ class GameClient:
         :param command_extras: This property stores the string that the user wants to print.
         :return:
         '''
+
+        # Read the string for the message out of the argument passed in
         command_extra_first = command_extras[0]
         spraypaint_message = command_extra_first['name']
         # logger.debug("Message will be: '" + spraypaint_message + "'")
+
         spraypaint_success = False
-        spraypaint_caught
+        spraypaint_detected_by_police = False
+
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name()
 
@@ -807,8 +811,12 @@ class GameClient:
                 # Check of room is already painted
                 is_cur_room_painted = self.gamestate.is_room_spray_painted_by_name(cur_room_name)
                 if is_cur_room_painted is False:
-                    interface_message = SPRAYPAINT_ROOM_SUCCESS
-                    spraypaint_success = True
+                    spraypaint_detected_by_police = not self.rand_event.attempt_spraypaint()
+                    if spraypaint_detected_by_police is False:
+                        interface_message = SPRAYPAINT_ROOM_SUCCESS
+                        spraypaint_success = True
+                    else:
+                        interface_message = SPRAYPAINT_FAIL_CAUGHT
                 else:
                     # Room is already painted, currently don't allow doing it again
                     interface_message = SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED
@@ -824,6 +832,8 @@ class GameClient:
             self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
 
         wprint(interface_message)
+        if spraypaint_detected_by_police is True:
+            self.go_to_jail()
         self.ui.wait_for_enter()
         return spraypaint_success
 
