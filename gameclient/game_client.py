@@ -94,7 +94,6 @@ class GameClient:
                 elif exit_code is GAMEOVER_LOSE:
                     wprint("Game over: Player lost")
                 elif exit_code is GAMEOVER_SAVE:
-                    print("ABOUT TO SAVE THIS GAME...")
                     self.save_game_menu()
                     wprint("Game over: Player saved game")
                 elif exit_code is GAMEOVER_LOAD:

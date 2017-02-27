@@ -83,7 +83,7 @@ class SaveGame:
             self.player_has_spraypaint_skill = gamestate.player.can_spraypaint()
 
             # Other variables stored in GameState
-            self.time_left = gamestate.get_time_left()
+            # self.time_left = gamestate.get_time_left()
 
 
     def write_to_file(self, filename):

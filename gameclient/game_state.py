@@ -124,14 +124,13 @@ class GameState:
             self.player.add_object_to_inventory(obj)
             # logger.debug("Adding object " + obj.get_name() + " to player's bag.")
 
-        # TODO
         # Objects owned by player
         player_owned = save_data.get_owned()
         for object_name in player_owned:
-            obj = self.get_object_by_name(object_name)
-            copy_of_object = copy.copy(object)
-            player_owned.add_object(copy_of_object)
-            logger.debug("Adding object " + obj.get_name() + " to player's 'owned' list.")
+            # obj = self.get_object_by_name(object_name)
+            # copy_of_object = copy.copy(object)
+            self.player.owned.append(object_name)
+            # logger.debug("Adding object " + object_name + " to player's 'owned' list.")
 
         # Player variables
         # logger.debug("self.player_cash = save_data.get_player_cash() = " + str(save_data.get_player_cash()))
@@ -313,4 +312,8 @@ class GameState:
         self.time_left += time_change
 
     def get_time_left(self):
+        # if self.game_file == "":
+        #     return self.time_left
+        # else:
+        #     self.time_left =
         return self.time_left
