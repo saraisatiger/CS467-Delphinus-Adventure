@@ -263,7 +263,7 @@ class LanguageParser:
 		if target != None:
 			R.set_extra(str(target), str(target_is))
 			
-		# logger.debug("Parser returning: \n" + str(R))
+		logger.debug("Parser returning: \n" + str(R))
 		
 
 		return R

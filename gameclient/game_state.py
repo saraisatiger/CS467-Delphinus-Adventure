@@ -56,6 +56,7 @@ class GameState:
         self.time_left = STARTING_TIME
         self.is_trash_can_looted = False
         self.spraypaint_data = {}
+        self.jailroom_data = {}
 
     def load_rooms_and_objects_from_file(self):
         # Initialize the rooms and objects to their defaults
@@ -72,6 +73,9 @@ class GameState:
 
         # Set the spraypainted status for each room to be blank
         self.initialize_spraypaint_data()
+
+        # Set the jailroom to default status
+        self.initialize_jailroom_data()
 
     def initialize_load_game(self, filename):
         # TODO: Need to set the property is_owned_by_player on objects in the game world in the save and load functions
@@ -136,9 +140,13 @@ class GameState:
         # Other variables stored in GameState
         self.time_left = save_data.get_time_left()
 
-        # TODO: Read SaveGame data once it's implemented isntead of the below re-initialization
+        # TODO: Read SaveGame spraypaint_data once it's implemented isntead of the below re-initialization
         # self.spraypaint_data = save_data.get_spraypaint_data()
         self.initialize_spraypaint_data()  # TODO: Delete this once we can get the data from save_data (SaveGame obj.)
+
+        # TODO: Read SaveGame jailroom_data once it's implemented isntead of the below re-initialization
+        # self.jailroom_data = save_data.get_jailroom_data()
+        self.initialize_jailroom_data() # TODO: Delete this once we can get the data from save_data (SaveGame obj.)
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\gameover_status_codes.py  ((SSH))
@@ -190,7 +198,13 @@ class GameState:
                          'spraypaint_message': None
                 }
                 self.spraypaint_data[room_name] = entry
-        # logger.debug(str(self.spraypaint_data)) # TODO: Comment this out later
+
+    def initialize_jailroom_data(self):
+        self.jailroom_data = {
+            'cell_unlocked' : False,
+            'computer_hacked' : False,
+            'guard_bribed' : False
+        }
 
     def is_room_spray_painted_by_name(self, room_name):
         '''

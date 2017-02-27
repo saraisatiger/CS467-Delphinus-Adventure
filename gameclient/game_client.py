@@ -475,40 +475,44 @@ class GameClient:
 
                 try:
                     feature = cur_room.get_feature_by_name(noun_name)
-                    # logger.debug("feature retreived by name " + noun_name)
                     feature_name = feature.get_name().lower()
-                    # logger.debug("feature name.get_name() called: " + feature_name)
 
                     if feature.is_hackable() is True:
                         if feature.is_hacked() is True:
                             message = HACK_FAIL_ALREADY_HACKED
+
                         else: # Not hacked yet, player will attempt the hack
-                            # Determine if player will succeed in hacking one time, then evaluate if it even matters later
-                            hacking_detected_by_police = not self.rand_event.attempt_hack()
-
-                            if hacking_detected_by_police is True:
-                                message = HACK_FAIL_CAUGHT
-                            elif hacking_detected_by_police is False:
-                                if feature_name == "traffic lights":
-                                    message = HACK_SUCCESS_TRAFFIC_LIGHTS
-                                    self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
-                                    hack_success = True
-
-                                elif feature_name == "atm":
-                                    message = HACK_SUCCESS_ATM + " You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
-                                    self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
-                                    hack_success = True
-
-                                elif feature_name == "turnstiles":
-                                    message = HACK_SUCCESS_TURNSTILE
-                                    hack_success = True
-
-                                elif feature_name == "unattended police desktop":
-                                    message = "You Hack the computer and get out of jail"
+                            # No point go to jail if already there; only randomize result if not in jail already
+                            if feature_name == "unattended police desktop":
+                                hacking_detected_by_police = False
+                                if self.gamestate.jailroom_data['cell_unlocked'] is True:
+                                    message = HACK_SUCCESS_JAIL_COMPUTER
                                     self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
-
                                 else:
-                                    message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
+                                    message = HACK_FAIL_IN_CELL
+                            else:
+                                hacking_detected_by_police = not self.rand_event.attempt_hack()
+
+                                if hacking_detected_by_police is True:
+                                    message = HACK_FAIL_CAUGHT
+                                elif hacking_detected_by_police is False:
+                                    if feature_name == "traffic lights":
+                                        message = HACK_SUCCESS_TRAFFIC_LIGHTS
+                                        self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
+                                        hack_success = True
+
+                                    elif feature_name == "atm":
+                                        message = HACK_SUCCESS_ATM + " You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
+                                        self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
+                                        hack_success = True
+
+                                    elif feature_name == "turnstiles":
+                                        message = HACK_SUCCESS_TURNSTILE
+                                        hack_success = True
+
+                                    else:
+                                        message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
+
                     else: # Feature is not a hackable feature
                         message = HACK_FAIL_INVALID_TARGET
 
@@ -677,9 +681,9 @@ class GameClient:
             # logger.debug("verb_take() noun_type == 'feature'")
             room_feature = self.gamestate.get_current_room().get_feature_by_name(noun_name)
             if room_feature is None:
-                wprint("You don't see a " + noun_name + " to try and take.")
+                message = ("You don't see a " + noun_name + " to try and take.")
             else:
-                wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
+                message = ("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
         elif noun_type == NOUN_TYPE_OBJECT:
             # logger.debug("verb_take() noun_type == 'object'")
@@ -689,17 +693,21 @@ class GameClient:
                 if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
                     self.gamestate.get_current_room().remove_object_from_room(room_object)
                     self.gamestate.player.add_object_to_inventory(room_object)
-                    wprint(PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
+                    message = (PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
                     take_success = True
                 elif room_object.get_cost() > 0:
-                    wprint(PICKUP_NOT_FREE)
+                    message = (PICKUP_NOT_FREE)
             # Otherwise failed:
             else:
-                wprint(PICKUP_FAILURE_PREFIX + self.verb_noun_name + PICKUP_FAILURE_SUFFIX)
+                message = (PICKUP_FAILURE_PREFIX + self.verb_noun_name + PICKUP_FAILURE_SUFFIX)
+
+        else:
+            message = (PICKUP_FAILURE_PREFIX + self.verb_noun_name + PICKUP_FAILURE_SUFFIX)
 
         if take_success:
             self.gamestate.update_time_left(TAKE_COST)
 
+        wprint(message)
         self.ui.wait_for_enter()
         return take_success
 
@@ -852,14 +860,21 @@ class GameClient:
         steal_success = False
         steal_detected_by_police = False
         message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
+        current_room = self.gamestate.get_current_room()
 
-        if noun_type == NOUN_TYPE_FEATURE:
+        jail_room_name = R7[0] # R7[0] is the jail room
+        if (noun_name.lower() == "key") and (current_room.get_name().lower() == jail_room_name):
+            logger.debug("Inside the first clause")
+            message = "You steal the key off the wall, where it is hanging just within your reach off of a hook. You then let yourself out."
+            self.gamestate.jailroom_data['cell_unlocked'] = True
+
+        elif noun_type == NOUN_TYPE_FEATURE:
             message = STEAL_FAIL_FEATURE_INVALID
             steal_success = False
 
         elif noun_type == NOUN_TYPE_OBJECT:
 
-            room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
+            room_object = current_room.get_object_by_name(noun_name)
 
             if room_object is not None: # Object is in this room
                 # Only steal objects that we have never owned or that are not free
@@ -870,7 +885,7 @@ class GameClient:
                 elif room_object.get_cost() > 0:
                     steal_detected_by_police = not self.rand_event.attempt_steal()
                     if steal_detected_by_police is False:
-                        self.gamestate.get_current_room().remove_object_from_room(room_object)
+                        current_room.remove_object_from_room(room_object)
                         self.gamestate.player.add_object_to_inventory(room_object)
                         message = STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX
                         steal_success = True

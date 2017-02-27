@@ -123,10 +123,18 @@ HACK_FAIL_INVALID_TARGET = "There's no way to hack that. Try hacking something u
 HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
 HACK_FAIL_ALREADY_HACKED = "You've already hacked that."
 HACK_FAIL_CAUGHT = "You were caught hacking the system!"
+HACK_FAIL_IN_CELL = "You need to get out of the cell before you can hack on that terminal."
 HACK_FAIL_NONSENSE = "What a bunch of nonsense. That's not something you can hack, at least, not here and now."
-HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww."
-HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should make things a lot faster for you."
-HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You should be able to pass through the area without paying now."
+HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your " \
+                   "account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww. "
+HACK_SUCCESS_JAIL_COMPUTER = "You Hack the computer, clearing your criminal record and unlocking the exit to the " \
+                             "building. The one rent-a-cop here doesn't seem to realize anything is amiss, " \
+                             "so you grab your gear on the way out. They'll probably change the locks on those cells " \
+                             "so you toss the key in a trash can on the way out. "
+HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should " \
+                              "make things a lot faster for you. "
+HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You " \
+                         "should be able to pass through the area without paying now. "
 
 # 'help' strings
 HELP_HEADER_TEXT = "HELP"
@@ -161,7 +169,8 @@ HINTS_HEADER_SINGULAR = "Hint:"
 HINTS_HEADER_PLURAL = "Hints:"
 HINT_BULLET_PREFIX = " * "
 HINT_NEW_PC = "You have a NEW Laptop! Maybe you should try to 'use computer'."
-HINT_ALL_PARTS = "You have a RAM Chip, a Graphics Card, and a Floppy Disk - everything you need to repair your computer. Maybe you should try to 'use computer'."
+HINT_ALL_PARTS = "You have a RAM Chip, a Graphics Card, and a Floppy Disk - everything you need to repair your " \
+                 "computer. Maybe you should try to 'use computer'. "
 
 # 'Inventory' strings
 INVENTORY_LIST_HEADER = STATUS_HEADER_BAR + "\nBackpack Contents\n" + STATUS_HEADER_BAR
@@ -179,8 +188,11 @@ NO_INTERESTING_FEATURES_MESSAGE = "You see nothing else worth checking out."
 LOOK_AT_NOT_SEEN = "You do not see that here."
 LOOK_AT_TRASH_CAN_ALREADY_LOOTED = "You already dug through the trash can. There's nothing else worth taking."
 LOOK_AT_TRASH_CAN_PROMPT = "Do you want to dig deeper in the trash? You might get messy. (Y)es or (N)o."
-LOOK_AT_TRASH_SEARCHED = "You dig deeper into the trash and stain your shirt with mustard from an old hot dog. How uncool! But wait, there's a barely-used RAM chip in the trash! You wipe it off with an anti-static cloth and tuck it into your bag."
-LOOK_AT_TRASH_NOT_SEARCHED = "You see a partially eaten hot dog and a partially digested chicken bone laying on the top, but you can't bring yourself to dig deeper."
+LOOK_AT_TRASH_SEARCHED = "You dig deeper into the trash and stain your shirt with mustard from an old hot dog. How " \
+                         "uncool! But wait, there's a barely-used RAM chip in the trash! You wipe it off with an " \
+                         "anti-static cloth and tuck it into your bag. "
+LOOK_AT_TRASH_NOT_SEARCHED = "You see a partially eaten hot dog and a partially digested chicken bone laying on the " \
+                             "top, but you can't bring yourself to dig deeper. "
 
 # 'spraypaint' strings
 SPRAYPAINT_FAIL_NO_SKILL = "You need to [use Spray Paint] before you can try to spraypaint the world."
@@ -215,11 +227,15 @@ USE_FAIL_NONSENSE = "There doesn't seem to be anything like that to use."
 USE_CASH_SUCCESS_PREFIX = "You count the bills and put them in your wallet. You are "
 USE_CASH_SUCCESS_SUFFIX = " dollars richer!"
 USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"
-USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide to Building Amazing Hacking Machines' to see what you need?"
-USE_HACKERMANUAL_SUCCESS = "You peruse the pages of the hacker manual and feel confident you can hack just about anything. Just don't get caught!"
+USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide " \
+                             "to Building Amazing Hacking Machines' to see what you need? "
+USE_HACKERMANUAL_SUCCESS = "You peruse the pages of the hacker manual and feel confident you can [Hack] just about " \
+                           "anything. Just don't get caught or you'll land yourself in jail!"
 USE_SNACKS_SUCCESS = "Crunchy yet satisfying. You feel faster, do you Grok it?"
-USE_SKATEBOARD_SUCCESS = "Stepping onto the Skateboard, you feel as though you can do anything faster. Maybe that's just the Surge you drank for breakfast surging through your veins, though?"
-USE_SPRAYPAINT_SUCCESS = "You spend a few moments shaking the Spray Paint and test it out. You can now spraypaint the town red!"
+USE_SKATEBOARD_SUCCESS = "Stepping onto the Skateboard, you feel as though you can do anything faster. Maybe that's " \
+                         "just the Surge you drank for breakfast surging through your veins, though? You can probably " \
+                         "[Skate] on this bad boy, too! "
+USE_SPRAYPAINT_SUCCESS = "You shake the cans up and test one out. You can now [Spraypaint] the town red!"
 USE_SURGE_SUCCESS = "You gulp down the Surge and let out a belch. You feel energized!"
 
 # Gameover cheating messages
