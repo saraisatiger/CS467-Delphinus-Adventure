@@ -44,9 +44,7 @@ class GameClient:
 
     def main_loop(self):
         '''
-        Comments outline the flow of project and intended functions for now
-        based on game engine workflow graph
-        :return: N/A
+        Main control loop for game
         '''
 
         # Outer loop makes game play until user decides to quit from the main menu
@@ -81,7 +79,7 @@ class GameClient:
                 # Actually playing the game will eventually terminate for one of the below reasons
                 # We handle each case separately because if a player forfeits and does not save,
                 # it can have different logic than if they quit and save, etc.
-                # The constants are defined in constants\gameover_status_codes.py
+                # The constants are defined in constants/gameover_status_codes.py
 
                 if self.command is NEW_GAME:
                     self.ui.print_splash_screen_new_game()
@@ -96,6 +94,7 @@ class GameClient:
                 elif exit_code is GAMEOVER_LOSE:
                     wprint("Game over: Player lost")
                 elif exit_code is GAMEOVER_SAVE:
+                    print("ABOUT TO SAVE THIS GAME...")
                     self.save_game_menu()
                     wprint("Game over: Player saved game")
                 elif exit_code is GAMEOVER_LOAD:
@@ -156,6 +155,7 @@ class GameClient:
         self.verb_targets = None
         self.verb_preposition = None
         self.command = INVALID_INPUT
+        self.extras = None
 
     def play_game(self):
         '''
@@ -209,10 +209,10 @@ class GameClient:
                 self.verb_steal(self.verb_noun_name, self.verb_noun_type)
             elif self.command is BUY:
                 self.verb_buy(self.verb_noun_name)
+            elif self.command is SKATE:
+                self.verb_skate()
             elif self.command is SPRAYPAINT:
-                # TODO: Finish implementing verb_spraypaint and remove the debug print
-                logger.debug("Spraypaint is not fully implemented yet.")
-                self.verb_spraypaint(self.verb_noun_name)
+                self.verb_spraypaint(self.extras)
             elif self.command is USE:
                 self.verb_use(self.verb_noun_name, self.verb_noun_type)
             elif self.command is HELP:
@@ -221,32 +221,24 @@ class GameClient:
                 load_confirmed = self.verb_quit(LOAD_CONFIRM_PROMPT)
                 if load_confirmed == True:
                     status = GAMEOVER_LOAD
-
             elif self.command is SAVE_GAME:
                 self.save_game_menu()
-
             elif self.command is CHEATCODE_WIN:
                 status = self.verb_cheat_win()
-
             elif self.command is CHEATCODE_LOSE:
                 status = self.verb_cheat_lose()
-
             elif self.command is QUIT:
                 quit_confirmed = self.verb_quit(QUIT_CONFIRM_PROMPT)
-                save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
-                if quit_confirmed == False:
-                    status = GAME_CONTINUE
-                elif quit_confirmed == True and save_game_prompt == False:
-                    status = GAMEOVER_QUIT
-                elif quit_confirmed == True and save_game_prompt == True:
-                    # Save game to file and exit
-                    status = GAMEOVER_SAVE
+                if quit_confirmed is True:
+                    save_game_prompt = self.verb_save(SAVE_GAME_PROMPT)
+                    if save_game_prompt is True:
+                        status = GAMEOVER_SAVE
+                    else:
+                        status = GAMEOVER_QUIT
             else:
                 wprint(COMMAND_NOT_UNDERSTOOD)
                 self.ui.wait_for_enter()
 
-            # This is called to ensure no lingering variables set in the GameClient by user or language parser returns
-            # self.reset_input_and_command()
         return status
 
     def load_game_menu(self):
@@ -343,8 +335,9 @@ class GameClient:
         self.ui.wait_for_enter()
 
     def go_to_jail(self):
-        county_jail = self.gamestate.get_room_by_name("County Jail")
-        self.gamestate.set_current_room(county_jail)
+        jail_name = R7[0]
+        jail_room = self.gamestate.get_room_by_name(jail_name)
+        self.gamestate.set_current_room(jail_room)
         wprint(JAIL_GO_TO_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
         self.ui.wait_for_enter()
@@ -410,8 +403,6 @@ class GameClient:
                 wprint(DROP_FAILURE_VIRTUALSPACE)
             elif inventory_object is not None:
                 self.gamestate.player.inventory.remove_object(inventory_object)
-                # DEBUG Print owned array
-                # print(self.gamestate.player.owned.get_inventory_string())
                 self.gamestate.get_current_room().add_object_to_room(inventory_object)
                 wprint(DROP_SUCCESS_PREFIX + self.verb_noun_name + DROP_SUCCESS_SUFFIX)
                 drop_success = True
@@ -494,26 +485,22 @@ class GameClient:
         return go_success
 
     def verb_hack(self, noun_name, noun_type):
-        # TODO: Finish implementing verb_hack
+        # TODO: Finish implementing verb_hack for other room features
         hack_success = False
 
         if self.gamestate.player.can_hack() is False:
             message = HACK_FAIL_NOSKILL
-
         else:
-            # TODO: Once noun_type is passed by language-parser, change this to use commneted out if statements
-            # if noun_type == NOUN_TYPE_OBJECT:
-            #     message = HACK_FAIL_INVALID_TARGET
-            #     hack_success = False
-
-            # if noun_type == NOUN_TYPE_FEATURE:
-            if True: # Swap this with preceeding line later on
+            if noun_type == NOUN_TYPE_OBJECT:
+                message = HACK_FAIL_INVALID_TARGET
+                hack_success = False
+            elif noun_type == NOUN_TYPE_FEATURE:
                 cur_room = self.gamestate.get_current_room()
                 try:
                     feature = cur_room.get_feature_by_name(noun_name)
-                    logger.debug("feature retreived by name " + noun_name)
+                    # logger.debug("feature retreived by name " + noun_name)
                     feature_name = feature.get_name().lower()
-                    logger.debug("feature name.get_name() called: " + feature_name)
+                    # logger.debug("feature name.get_name() called: " + feature_name)
                     if feature.is_hackable() is True:
                         if feature.is_hacked() is True:
                             message = HACK_FAIL_ALREADY_HACKED
@@ -538,8 +525,6 @@ class GameClient:
                         message = HACK_FAIL_INVALID_TARGET
                 except:
                     message = HACK_FAIL_FEATURE_NOT_PRESENT
-            else: # TODO: Delete t his else statement once parser works with type/object identification
-                message = "This should never print."
 
         if hack_success is True:
             try:
@@ -547,7 +532,7 @@ class GameClient:
             except:
                 logger.debug("hack_success is True but failed to call feature.set_is_hacked(True)")
 
-        print(message)
+        wprint(message)
         self.ui.wait_for_enter()
         return hack_success
 
@@ -599,13 +584,20 @@ class GameClient:
         '''
         self.ui.clear_screen()
 
-        if self.gamestate.get_current_room().is_visited() is False or print_long_description is True:
-            description = self.gamestate.get_current_room().get_long_description()
+        cur_room = self.gamestate.get_current_room()
+        if cur_room.is_visited() is False or print_long_description is True:
+            description = cur_room.get_long_description()
         else:
-            description = self.gamestate.get_current_room().get_short_description()
+            description = cur_room.get_short_description()
 
         header_info = self.gamestate.get_header_info()
         self.ui.print_status_header(header_info)
+
+        # Print any 'graffiti' (spray paint messages)
+        spray_painted_message = self.gamestate.get_room_spray_painted_message(cur_room.get_name())
+        if spray_painted_message is not None:
+            self.ui.print_graffiti(spray_painted_message)
+
         self.ui.print_room_description(description)
         self.gamestate.get_current_room().set_visited()
 
@@ -729,6 +721,7 @@ class GameClient:
 
             if used_object is not None:
                 obj_label = used_object.get_name().lower()
+                # logger.debug("Trying to compare " + obj_label + " to various things, including: " + SPRAYPAINT.lower())
 
                 if obj_label == CASH_CRISP.lower():
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
@@ -767,7 +760,7 @@ class GameClient:
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
                     wprint(USE_SKATEBOARD_SUCCESS)
-                elif obj_label == SPRAYPAINT.lower():
+                elif obj_label == SPRAY_PAINT.lower():
                     self.gamestate.player.set_has_spraypaint_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     wprint(USE_SPRAYPAINT_SUCCESS)
@@ -793,22 +786,57 @@ class GameClient:
         self.ui.wait_for_enter()
         return use_success
 
-    def verb_spraypaint(self, verb_object):
-        # TODO: Implement this fully. Check that object/feature is spraypaintable and handle logic if not/fails
-        # TODO: also chance of getting caught / going to jail or some other bad effect
+    def verb_skate(self):
+        '''
+        TODO: Finish implementing this function ((SSH))
+        :return:
+        '''
+        skate_success = False
 
-        spraypaint_success = True
+        if self.gamestate.player.can_skateboard() is True:
+            message = SKATE_SUCCESS
+        else:
+            message = SKATE_FAILURE_NO_SKILL
+
+        wprint(message)
+        self.ui.wait_for_enter()
+        return skate_success
+
+    def verb_spraypaint(self, command_extras):
+        '''
+        Player is attempting to spraypaint the current room with a message
+        :param command_extras: This property stores the string that the user wants to print.
+        :return:
+        '''
+        command_extra_first = command_extras[0]
+        spraypaint_message = command_extra_first['name']
+        # logger.debug("Message will be: '" + spraypaint_message + "'")
+        spraypaint_success = False
+        cur_room = self.gamestate.get_current_room()
+        cur_room_name = cur_room.get_name()
 
         if self.gamestate.player.can_spraypaint():
-            wprint("TODO: You spraypaint stuff and coolness should go up and description should update. ")
-            self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
+            if cur_room.is_virtual_space() is False:
+                # Check of room is already painted
+                is_cur_room_painted = self.gamestate.is_room_spray_painted_by_name(cur_room_name)
+                if is_cur_room_painted is False:
+                    interface_message = SPRAYPAINT_ROOM_SUCCESS
+                    spraypaint_success = True
+                else:
+                    # Room is already painted, currently don't allow doing it again
+                    interface_message = SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED
+            else:
+                interface_message = SPRAYPAINT_FAIL_VIRTUAL_SPACE
         else:
-            wprint("You need to [use Spray Paint] before you can try to spraypaint the world.")
-            spraypaint_success = False
+            interface_message = SPRAYPAINT_FAIL_NO_SKILL
 
-        if spraypaint_success:
+        if spraypaint_success is True:
+            self.gamestate.set_room_spray_painted_by_name(cur_room_name, True)
+            self.gamestate.set_room_spray_painted_message(cur_room_name, spraypaint_message)
             self.gamestate.update_time_left(SPRAYPAINT_COST)
+            self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
 
+        wprint(interface_message)
         self.ui.wait_for_enter()
         return spraypaint_success
 
@@ -845,6 +873,13 @@ class GameClient:
         return steal_success
 
     def send_command_to_parser(self):
+        '''
+        Sends the user input to the parser then stores all of the results into the gamestate's variables
+        TODO Stretch goal: Refactor this method and just store the entire result on gamestate each round
+        THis would require reading the appropriate information off of the self.results inside of every verb. For 0 gain,
+        that's a lot of work to do. Lowest tier of priority item.
+        :return:
+        '''
         results = self.lp.parse_command(self.user_input)
         try:
             self.command = results.get_verb()
@@ -872,6 +907,9 @@ class GameClient:
             self.parser_error_message = None
 
     def search_trash_can(self):
+        '''
+        If the player decides to search trash can, this is the special logic that handles it.
+        '''
         if self.gamestate.is_trash_can_looted is True:
             message = LOOK_AT_TRASH_CAN_ALREADY_LOOTED
         else:
@@ -888,3 +926,5 @@ class GameClient:
 
         wprint(message)
         self.ui.wait_for_enter()
+
+
