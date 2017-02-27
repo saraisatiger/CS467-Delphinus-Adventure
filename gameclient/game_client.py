@@ -488,6 +488,7 @@ class GameClient:
                                 if self.gamestate.jailroom_data['cell_unlocked'] is True:
                                     message = HACK_SUCCESS_JAIL_COMPUTER
                                     self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
+                                    self.gamestate.initialize_jailroom_data()
                                 else:
                                     message = HACK_FAIL_IN_CELL
                             else:
