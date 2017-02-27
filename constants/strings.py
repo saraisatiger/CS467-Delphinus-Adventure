@@ -157,7 +157,11 @@ HELP_FEATURE_GENERIC = " is a feature of the room. 'Look at' it to learn more."
 HELP_OBJECT_GENERIC = " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'."
 
 # 'hints' strings (context-sensitive hints)
+HINTS_HEADER_SINGULAR = "Hint:"
+HINTS_HEADER_PLURAL = "Hints:"
+HINT_BULLET_PREFIX = " * "
 HINT_NEW_PC = "You have a NEW Laptop! Maybe you should try to 'use computer'."
+HINT_ALL_PARTS = "You have a RAM Chip, a Graphics Card, and a Floppy Disk - everything you need to repair your computer. Maybe you should try to 'use computer'."
 
 # 'Inventory' strings
 INVENTORY_LIST_HEADER = STATUS_HEADER_BAR + "\nBackpack Contents\n" + STATUS_HEADER_BAR

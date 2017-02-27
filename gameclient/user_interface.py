@@ -125,3 +125,13 @@ class UserInterface:
         wprint(GRAFFITI_HEADER)
         wprint(spray_painted_message)
         wprint(GRAFFITI_FOOTER)
+
+    def print_hints(self, hints):
+        if len(hints) > 1:
+            wprint(HINTS_HEADER_PLURAL)
+        else:
+            wprint(HINTS_HEADER_SINGULAR)
+        for hint in hints:
+            wprint(HINT_BULLET_PREFIX + hint)
+
+        self.wait_for_enter()

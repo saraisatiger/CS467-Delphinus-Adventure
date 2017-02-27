@@ -503,6 +503,10 @@ class GameClient:
                                     message = HACK_SUCCESS_TURNSTILE
                                     hack_success = True
 
+                                elif feature_name == "unattended police desktop":
+                                    message = "You Hack the computer and get out of jail"
+                                    self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
+
                                 else:
                                     message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
                     else: # Feature is not a hackable feature
@@ -937,10 +941,28 @@ class GameClient:
         self.ui.wait_for_enter()
 
     def game_hint_check(self):
+        hints = []
+        player = self.gamestate.player
+        cur_room = self.gamestate.get_current_room()
+        if cur_room is None:
+            logger.debug("UH OH!")
+            in_computer_room = False
+        else:
+            in_computer_room = cur_room.get_name() == "Your Computer"
+
+        # Check for laptop; if in inventory, tell player what to do
         new_laptop_name = 'new laptop'
-        player_has_new_pc = self.gamestate.player.has_object_by_name(new_laptop_name)
-        logger.debug("checking if player has object " + new_laptop_name + ". " + str(player_has_new_pc))
+        player_has_new_pc = player.has_object_by_name(new_laptop_name)
+        # logger.debug("checking if player has object " + new_laptop_name + ". " + str(player_has_new_pc))
+        if player_has_new_pc is True and in_computer_room is False:
+            hints.append(HINT_NEW_PC)
 
-        if player_has_new_pc is True:
-            wprint(HINT_NEW_PC)
+        player_has_all_parts = player.has_object_by_name(RAM) and player.has_object_by_name(FLOPPY_DISK) and player.has_object_by_name(GRAPHICS_CARD)
+        if player_has_all_parts is True and in_computer_room is False:
+            hints.append(HINT_ALL_PARTS)
 
+        if len(hints) > 0:
+            self.ui.print_hints(hints)
+
+
+# End of File

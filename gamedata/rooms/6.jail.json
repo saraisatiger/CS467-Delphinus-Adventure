@@ -13,7 +13,8 @@
       {
         "name" : "Unattended Police Desktop",
         "description" : "Somebody forgot to log out... Don't they learn this stuff in the Academy?",
-        "hackable": false
+        "hackable": true,
+        "description_hacked": "Not only have you unlocked the doors, but you've also wiped your criminal record clean (again)... c00l!"
       },
 	  {
         "name" : "Police Officer",
