@@ -705,9 +705,10 @@ class GameClient:
 
     def verb_use(self, noun_name, noun_type):
         use_success = True
+        message = "This should never print. Check verb_use() logic"
 
         if noun_type == NOUN_TYPE_FEATURE:
-            wprint("You cannot use that.")
+            message = "You cannot use that."
             use_success = False
         elif noun_type == NOUN_TYPE_OBJECT:
             used_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
@@ -720,12 +721,12 @@ class GameClient:
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
                     self.gamestate.player.update_cash(cash_gained)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                    message = (USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label == CASH_WAD.lower():
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
                     self.gamestate.player.update_cash(cash_gained )
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                    message = (USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label in {GRAPHICS_CARD.lower(), RAM.lower(), FLOPPY_DISK.lower()}:
                     # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
                     # and then update some game-state variable so that player can do things they can do if they have a PC
@@ -743,39 +744,42 @@ class GameClient:
                         self.gamestate.player.remove_object_from_inventory(floppy_disk)
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
                     else:
-                        wprint(USE_COMPUTER_PARTS_MISSING)
+                        message = (USE_COMPUTER_PARTS_MISSING)
                 elif obj_label == HACKERSNACKS.lower():
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                    wprint(USE_SNACKS_SUCCESS)
+                    message = (USE_SNACKS_SUCCESS)
                 elif obj_label == SKATEBOARD.lower():
                     self.gamestate.player.set_has_skate_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
-                    wprint(USE_SKATEBOARD_SUCCESS)
+                    message = (USE_SKATEBOARD_SUCCESS)
                 elif obj_label == SPRAY_PAINT.lower():
                     self.gamestate.player.set_has_spraypaint_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_SPRAYPAINT_SUCCESS)
+                    message = (USE_SPRAYPAINT_SUCCESS)
                 elif obj_label == HACKER_MANUAL.lower():
                     self.gamestate.player.set_has_hack_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_HACKERMANUAL_SUCCESS)
+                    message = (USE_HACKERMANUAL_SUCCESS)
                 elif obj_label == SURGE.lower():
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                    wprint(USE_SURGE_SUCCESS)
+                    message = (USE_SURGE_SUCCESS)
                 else:
                     logger.debug("Not implemented: use " + used_object.get_name())
-                    wprint("You used something that the game doesn't know what to do with, please tell your local dev!")
+                    message = ("You used something that the game doesn't know what to do with, please tell your local dev!")
                     use_success = False
             else:
-                wprint(USE_FAIL)
+                wprint(USE_FAIL_UNUSABLE)
                 use_success = False
+        else:
+            message = USE_FAIL_NONSENSE
 
         if use_success:
             self.gamestate.update_time_left(USE_COST)
 
+        wprint(message)
         self.ui.wait_for_enter()
         return use_success
 
