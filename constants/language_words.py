@@ -46,7 +46,7 @@ HACKERSNACKS_ALIASES = ['hackersnacks', 'snacks', 'munchies']
 SURGE = 'surge'
 SURGE_ALIASES = ['surge', 'soda', 'drink', 'beverage'] 
 SPRAY_PAINT = 'cans of superspraypaint'
-SPRAY_PAINT_ALIASES = ['cans of superspraypaint', 'superspraypaint', 'cans', 'can']
+SPRAY_PAINT_ALIASES = ['cans of superspraypaint', 'superspraypaint', 'cans']
 FLOPPY_DISK = 'floppy disk'
 FLOPPY_DISK_ALIASES = ['floppy disk', 'floppydisk', 'floppy']
 GRAPHICS_CARD = 'graphics card'
@@ -55,8 +55,16 @@ NEW_COMPUTER = ['new laptop']
 NEW_COMPUTER_ALIASES = ['new laptop', 'laptop']
 RAM = 'ram chip'
 RAM_ALIASES = ['ram chip', 'random access memory', 'memory', 'chip', 'ram']
+KEY= 'key'
+KEY_ALIASES = ['key', 'jailkey', 'cellkey' ]
+FIREBALL = 'fireball'
+FIREBALL_ALIASES = ['fireball', 'fire', 'ball']
+BUG = 'bug carcass'
+BUG_ALIASES = ['bug carcass', 'carcass']
+CPUHEAD = 'sentient cpu head'
+CPUHEAD_ALIASES = ['sentient cpu head', 'head']
 
-OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES,  SKATEBORD_ALIASES, HACKERSNACKS_ALIASES, HACKER_MANUAL_ALIASES, SURGE_ALIASES, SPRAY_PAINT_ALIASES, FLOPPY_DISK_ALIASES, GRAPHICS_CARD_ALIASES, RAM_ALIASES]
+OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES,  SKATEBORD_ALIASES, HACKERSNACKS_ALIASES, HACKER_MANUAL_ALIASES, SURGE_ALIASES, SPRAY_PAINT_ALIASES, FLOPPY_DISK_ALIASES, GRAPHICS_CARD_ALIASES, NEW_COMPUTER_ALIASES, RAM_ALIASES, KEY_ALIASES, FIREBALL_ALIASES, BUG_ALIASES, CPUHEAD_ALIASES]
 
 #features 
 #TODO: add aliases, simple 'look at' features and descriptions to ROOMS, then add logic here
@@ -126,6 +134,7 @@ STEAL = 'steal'
 STEAL_ALIASES = ['steal']
 USE = 'use'
 USE_ALIASES = ['use']
+
 
 
 VERB_ALIASES = [BUY_ALIASES, DROP_ALIASES, GO_ALIASES, HACK_ALIASES, HELP_ALIASES, LOAD_GAME_ALIASES, LOOK_AT_ALIASES, 

@@ -24,6 +24,47 @@ INTRO_SEQUENCE = [
     "Such a bummer. So yeah, now you are like, a teen hacking legend with a crashed computer and serious intell. If only you could repair your sweet machine and figure out some way to bring that corrupt Evil Corps to justice! And like, it would be great to get a date- seriously, are you the only teen hacking legend who can never get a date? That cannot be right."
 ]
 
+#Text arrays for NPC features labled LOCATION_NAME_PERSONNAME_TEXT
+#Each NPC has 5 strings of texts they can say
+#Last string is a default that should be repeated for any text request after the initial 4
+
+PAWNSHOP_STORECLERK_TEXT = ['If you\'re just looking keep walking.', 
+'Bathroom is out of order and also for paying customers only.', 
+'If highly recommend the RAM. This means Really Awesome Mechanics. Goes well with graphics.', 
+'All products have a lifetime gaurantee- no returns.' 
+'I don\'t have all day to chit chat, give me cash or let me return to my nap.']
+
+OFFICE_ACIDBURN_TEXT = ['You must be the new kid, Crash Override. I haven\'t seen you around here before...', 
+'I heard hack. You should know, I\'m the best hacker in this little galaxy.',  
+'I\'ve been trying to take down EvilCorps for awhile, those corporate clones are the worst. Word is they\'ve been messing with you too- we should work together to stop them.', 
+'There is a pool up on the roof of this school, lots of hackers hang out there. You might find some evidence there.', 
+'Can\'t chat all day. Smell ya later.']
+
+CHAT_ACIDBURN_TEXT = ['Wow! you made it. Kinda didn\'t think you were that cool.', 
+'FYI- I was just mesing about that roof pool... but if you make it out alive. Cash me outside and  I\'ll show you a real one. How \'bout dat?',
+'The trick to hacking is, you got to feel it- not think it. Like, I bet I could beat up a firefall with my bearhands if I really tried!',  
+'If you wanna be an eleet hacker, you gotta !=  a loser, yo!', 
+ 'You need to get to that Data Tower, find those launch codes and some proof against EvilCorps then send it to the Feds. We can\'t be waisting all day on this.']
+
+CHAT_CREATURE_TEXT = ['Prepare for a powning!' 
+'You type SUPER slow!', 
+'Your political opinions are bogus!!', 
+'I wrote a haiku about your mother...', 
+'Put your hack where your mouth is, newb!']
+
+DATATOWER_SENTIENTCPU_TEXT = ['Silly meatmouth, I will soon take over your silly little reality', 
+'It will be just like the Matrix- and I will feast on your human juices!!! ',  
+'Soon I will use the launch codes to nuke the planet. Hahaha!', 
+'I challange you to a dance off! I mean duel!', 
+'Stop chatting and get hacking filthy mortal meat thing!!!']
+
+POOL_ACIDBURN_TEXT = ['Hey, so you made it out alive, cool.', 
+'That Sentient CPU creep tried to suck my into a computer too, weirdo. Of course, since I am a better hacker than you I was able to out smart that bot.',  
+'But enough about how great I am, that saving the planet thing you did was rad.', 
+'I think I might take you to prom', 
+'Less talking more smooching!']
+
+
 DEFAULT_ROOM = "Street"
 
 INVALID_MENU_COMMAND_MESSAGE = " is not a valid command at the main menu"
@@ -222,3 +263,5 @@ GAMEOVER_CHEAT_LOSE_MESSAGE = "Game too hard for you, script kiddie? L2Play, noo
 
 # 'exit' messages
 EXIT_MESSAGE = "Exiting the game, bye."
+
+
