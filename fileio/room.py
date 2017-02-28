@@ -95,8 +95,11 @@ class Room:
         '''
         connection_string = ""
         if self.room_connections:
-            for connection in self.room_connections:
-                connection_string = connection_string + textwrap.fill(connection.get_connection_description(), TEXT_WIDTH) + "\n"
+            if len(self.room_connections) > 0:
+                for connection in self.room_connections:
+                    connection_string = connection_string + textwrap.fill(connection.get_connection_description(), TEXT_WIDTH) + "\n"
+        else:
+            return CONNECTION_STRING_NOEXITS
         return connection_string
 
     def get_object_list_string(self):

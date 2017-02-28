@@ -69,6 +69,7 @@ OBJECTS_HEADER = "You look around for anything not strapped down and you see:"
 OBJECTS_LIST_PREFIX = " * "
 CONNECTION_LIST_PREFIX = "  * ["
 CONNECTION_LIST_SEGWAY= "] is "
+CONNECTION_STRING_NOEXITS = "..No easy way out of here."
 
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
