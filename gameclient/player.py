@@ -11,6 +11,7 @@
 #       Used to figure out how to make a shallow/deep copy of an object rather than just assigning a reference to an object
 
 from constants.strings import *
+from constants.language_words import RAM, GRAPHICS_CARD, FLOPPY_DISK, NEW_COMPUTER
 import copy
 
 class Player:
@@ -92,6 +93,17 @@ class Player:
             if inventory_object.get_name().lower() == object_name.lower():
                 return True
         return False
+
+    def has_computer_parts(self):
+        if self.has_object_by_name(NEW_COMPUTER) is True:
+            return True
+        elif    self.has_object_by_name(RAM) is True and \
+                self.has_object_by_name(GRAPHICS_CARD) is True and \
+                self.has_object_by_name(FLOPPY_DISK) is True:
+            return True
+        else:
+            return False
+
 
 
 class Inventory:

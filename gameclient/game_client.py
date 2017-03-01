@@ -744,7 +744,12 @@ class GameClient:
         use_success = True
         message = "This should never print. Check verb_use() logic"
 
-        if noun_type == NOUN_TYPE_FEATURE:
+        if noun_name == "computer":
+            if self.gamestate.player.has_computer_parts() is True:
+                message = "You have the parts needed to use your computer! Let's boot up!"
+                self.gamestate.set_current_room(self.gamestate.get_room_by_name("your computer"))
+                use_success = True
+        elif noun_type == NOUN_TYPE_FEATURE:
             message = "You cannot use that."
             use_success = False
         elif noun_type == NOUN_TYPE_OBJECT:
