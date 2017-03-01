@@ -94,7 +94,6 @@ class GameClient:
                 elif exit_code is GAMEOVER_LOSE:
                     wprint("Game over: Player lost")
                 elif exit_code is GAMEOVER_SAVE:
-                    print("ABOUT TO SAVE THIS GAME...")
                     self.save_game_menu()
                     wprint("Game over: Player saved game")
                 elif exit_code is GAMEOVER_LOAD:
@@ -291,21 +290,50 @@ class GameClient:
 
     def save_game_menu(self):
         save_game = SaveGame(self.gamestate)
+        game_file = self.gamestate.game_file
         file_name = ""
         valid_filename = False
 
-        while valid_filename is False or file_name == "":
-            wprint(SAVE_GAME_FILE_PROMPT)
-            file_name = self.ui.user_prompt() + '.json'
+        if game_file == "":
+            while valid_filename is False or file_name == "":
+                wprint(SAVE_GAME_FILE_PROMPT)
+                file_name = self.ui.user_prompt()
+                valid_filename = save_game.is_existing_saved_game(file_name)
+                while valid_filename is False:
+                    wprint(SAVE_GAME_INVALID_EXISTS)
+                    wprint(SAVE_GAME_AGAIN)
+                    file_name = self.ui.user_prompt()
+                    valid_filename = save_game.is_existing_saved_game(file_name)
+        elif game_file:
+            wprint(SAVE_GAME_EXISTING + game_file + '.json')
+            wprint(SAVE_GAME_EXISTING_PROMPT)
+            confirm = self.ui.user_prompt()
+            if confirm in YES_ALIASES:
+                file_name = game_file
+                save_game.write_to_file(file_name)
+            else:
+                wprint(SAVE_GAME_FILE_PROMPT)
+                file_name = self.ui.user_prompt()
+                valid_filename = save_game.is_existing_saved_game(file_name)
+                while valid_filename is False:
+                    wprint(SAVE_GAME_INVALID_EXISTS)
+                    wprint(SAVE_GAME_AGAIN)
+                    file_name = self.ui.user_prompt()
+                    valid_filename = save_game.is_existing_saved_game(file_name)
+
+        while save_game.write_to_file(file_name) is False:
+            wprint(SAVE_GAME_INVALID_CHARACTERS)
+            wprint(SAVE_GAME_FAILED + file_name + '.json')
+            wprint(SAVE_GAME_AGAIN)
+            file_name = self.ui.user_prompt()
             valid_filename = save_game.is_existing_saved_game(file_name)
-            if valid_filename is False:
-                wprint(SAVE_GAME_VALID_FILENAME_MESSAGE)
+            while valid_filename is False:
+                wprint(SAVE_GAME_INVALID_EXISTS)
+                wprint(SAVE_GAME_AGAIN)
+                file_name = self.ui.user_prompt()
+                valid_filename = save_game.is_existing_saved_game(file_name)
 
-        if save_game.write_to_file(file_name) is True:
-            wprint(SAVE_GAME_SUCCESS + file_name)
-        else:
-            wprint(SAVE_GAME_FAILED + file_name)
-
+        wprint(SAVE_GAME_SUCCESS + file_name + '.json')
         self.ui.wait_for_enter()
 
     def go_to_jail(self):
@@ -334,8 +362,8 @@ class GameClient:
                 wprint(BUY_NOT_IN_ROOM)
             elif object.get_cost() is 0:
                 wprint(BUY_FREE_ITEM)
-            elif object.is_owned_by_player() is True:
-                wprint(BUY_FREE_ITEM)
+            # elif object.is_owned_by_player() is True:
+            #     wprint(BUY_FREE_ITEM)
             elif object.get_cost() > player_cash:
                 wprint(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
             else:
@@ -691,7 +719,7 @@ class GameClient:
             room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
 
             if room_object is not None:
-                if room_object.get_cost() is 0 or room_object.is_owned_by_player() is True:
+                if room_object.get_cost() is 0 or room_object.get_name() in self.gamestate.player.owned:
                     self.gamestate.get_current_room().remove_object_from_room(room_object)
                     self.gamestate.player.add_object_to_inventory(room_object)
                     message = (PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
@@ -879,7 +907,8 @@ class GameClient:
 
             if room_object is not None: # Object is in this room
                 # Only steal objects that we have never owned or that are not free
-                if room_object.is_owned_by_player() is True:
+                # if room_object.is_owned_by_player() is True:  # This was the original logic, was changed to below method that doesn't allow for duplicate object verification (if you own one floppy disk, you own them ALL)
+                if room_object.get_name() in self.gamestate.player.owned:
                     message =  STEAL_FAIL_ALREADY_OWNED
                 elif room_object.get_cost() is 0:
                     message = STEAL_FAIL_FREE_ITEM

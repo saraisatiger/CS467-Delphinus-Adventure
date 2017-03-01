@@ -6,6 +6,7 @@
 # Description: GameState class that encapsulates all things that can be changed in the game world
 # Principal Author of this file per Project plan: Shawn Hillyer
 
+from constants.gameplay_settings import STARTING_TIME
 from constants.gameover_status_codes import *
 from fileio.room import *
 from fileio.object import *
@@ -22,6 +23,7 @@ class GameState:
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
         self.initialize_gamestate()
+        self.game_file = ""
 
     def set_current_room(self, room):
         '''
@@ -78,7 +80,7 @@ class GameState:
         self.initialize_jailroom_data()
 
     def initialize_load_game(self, filename):
-        # TODO: Need to set the property is_owned_by_player on objects in the game world in the save and load functions
+        self.game_file = filename.replace('.json', '')
 
         # Clear all of the variables by calling what is essentially the constructor
         self.initialize_gamestate()
@@ -127,6 +129,14 @@ class GameState:
             obj = self.get_object_by_name(object_name)
             self.player.add_object_to_inventory(obj)
             # logger.debug("Adding object " + obj.get_name() + " to player's bag.")
+
+        # Objects owned by player
+        player_owned = save_data.get_owned()
+        for object_name in player_owned:
+            # obj = self.get_object_by_name(object_name)
+            # copy_of_object = copy.copy(object)
+            self.player.owned.append(object_name)
+            # logger.debug("Adding object " + object_name + " to player's 'owned' list.")
 
         # Player variables
         # logger.debug("self.player_cash = save_data.get_player_cash() = " + str(save_data.get_player_cash()))
@@ -314,4 +324,8 @@ class GameState:
         self.time_left += time_change
 
     def get_time_left(self):
+        # if self.game_file == "":
+        #     return self.time_left
+        # else:
+        #     self.time_left =
         return self.time_left

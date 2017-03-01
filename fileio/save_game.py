@@ -12,8 +12,12 @@
 # CITE: http://stackoverflow.com/questions/7935972/writing-to-a-new-directory-in-python-without-changing-directory
 # CITE: http://stackoverflow.com/questions/2835559/parsing-values-from-a-json-file-using-python
 # CITE: http://stackoverflow.com/questions/30876497/open-a-file-from-user-input-in-python-2-7
+# CITE: http://stackoverflow.com/questions/1976007/what-characters-are-forbidden-in-windows-and-linux-directory-names
+# CITE:
 
-from constants.gameplay_settings import STARTING_TIME
+# from constants.gameplay_settings import STARTING_TIME
+from constants.strings import *
+from gameclient.wprint import *
 import json
 import glob
 import os
@@ -55,6 +59,7 @@ class SaveGame:
                 for room_feature in room.room_features:
                     if room_feature.is_hackable() is True:
                         self.features_hacked_mapping[room.get_name()] = { room_feature.get_name() : room_feature.is_hacked() }
+                        # hacked_features.append()
 
 
             # Special booleans
@@ -65,6 +70,10 @@ class SaveGame:
             for inventory_object in gamestate.player.get_inventory_objects():
                 self.player_inventory.append(inventory_object.get_name())
 
+            self.owned = []
+            for object_name in gamestate.player.get_owned_objects():
+                self.owned.append(object_name)
+
             # Player variables
             self.player_cash = gamestate.player.get_cash()
             self.player_coolness = gamestate.player.get_coolness()
@@ -74,7 +83,7 @@ class SaveGame:
             self.player_has_spraypaint_skill = gamestate.player.can_spraypaint()
 
             # Other variables stored in GameState
-            self.time_left = gamestate.get_time_left()
+            # self.time_left = gamestate.get_time_left()
 
 
     def write_to_file(self, filename):
@@ -86,7 +95,15 @@ class SaveGame:
             Once a SaveGame object is instantiated, you can call write_to_file() method to save the data.
         '''
         saved_dir = './gamedata/savedgames/'
-        filename = filename
+        # Set of invalid characters
+        invalid_chars = [' ', '\r', '\t', '\n', '/', '\\', '/0', '>', '<', ':', '|', '?', '*', '%']
+
+        # Contains invalid characters
+        for i in invalid_chars:
+            if i in filename:
+                return False
+
+        filename = filename + '.json'
 
         json_savegame = {
             'current_room' : self.current_room_name,
@@ -100,6 +117,7 @@ class SaveGame:
             # Objects in rooms and inventory
             'objects_in_rooms': self.object_room_mapping,
             'player_inventory': self.player_inventory,
+            'owned' : self.owned,
 
             # Player variables
             'player_cash': self.player_cash,
@@ -148,6 +166,7 @@ class SaveGame:
         # Objects in rooms and inventory
         self.object_room_mapping = self.save_data['objects_in_rooms']
         self.player_inventory = self.save_data['player_inventory']
+        self.owned = self.save_data['owned']
 
         # Player variables
         self.player_cash = self.save_data['player_cash']
@@ -226,6 +245,12 @@ class SaveGame:
         except:
             return None
 
+    def get_owned(self):
+        try:
+            return self.owned
+        except:
+            return None
+
     def get_prior_room(self):
         try:
             if self.prior_room == "":
@@ -269,6 +294,7 @@ class SaveGame:
         :param file_name:
         :return: True if filename is does not already exist, False if exists
         '''
+        file_name = file_name + '.json'
         savedgames = self.get_savegame_filenames()
 
         for savedgame in savedgames:

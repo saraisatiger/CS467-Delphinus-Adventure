@@ -38,6 +38,8 @@ def main():
         # TODO Not critical for assignment as we must run on LINUX but can still implement this
         pass
 
+    ui.create_savedgames_dir()
+
     GC = GameClient()
     GC.main_loop()
 

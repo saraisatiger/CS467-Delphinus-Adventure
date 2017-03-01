@@ -56,6 +56,10 @@ class LanguageParser:
 		if command == '':
 			error = INVALID_EMPTY
 			
+		#save a copy of original in case we need for spraypaint
+		sprayCommand = command;
+		
+		#otherwise capitalization doesn't matter
 		command = command.lower().lstrip()
 
 		verb = None
@@ -131,6 +135,7 @@ class LanguageParser:
 		if error == None and cheat == None and verb_is_special == False:
 			#TARGET must be a message string
 			if verb == SPRAYPAINT:
+				words = sprayCommand.split()
 				if verb_idx + 1 < len(words):
 					verb_is_special = True
 					words_sublist = words[verb_idx + 1:]
