@@ -749,6 +749,8 @@ class GameClient:
                 message = "You have the parts needed to use your computer! Let's boot up!"
                 self.gamestate.set_current_room(self.gamestate.get_room_by_name("your computer"))
                 use_success = True
+            else:
+                message = "You don't have everything you need to fix your computer. Your [Floppy Disk] is toast, your [Graphics Card] is burned up, and the [RAM Chip] is corrupted! Or, you could just go buy a [New Laptop]!"
         elif noun_type == NOUN_TYPE_FEATURE:
             message = "You cannot use that."
             use_success = False
