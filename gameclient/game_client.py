@@ -611,6 +611,8 @@ class GameClient:
         room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
+        room_object_art = self.gamestate.get_object_art(noun_name)
+
         looked_at_trash_can = False
 
         if room_feature is not None:
@@ -638,7 +640,9 @@ class GameClient:
 
         self.gamestate.update_time_left(LOOK_AT_COST)
         description = textwrap.fill(description, TEXT_WIDTH)
+        # image = textwrap.fill(image, TEXT_WIDTH)
         print(description) # Don't use wprint() or it will remove linebreaks
+        print(room_object_art)
         self.ui.wait_for_enter()
 
         if looked_at_trash_can:

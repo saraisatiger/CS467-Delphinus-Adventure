@@ -10,6 +10,7 @@ from constants.gameplay_settings import STARTING_TIME
 from constants.gameover_status_codes import *
 from fileio.room import *
 from fileio.object import *
+from fileio.art import *
 from gameclient.user_interface import *
 
 from debug.debug import *
@@ -22,6 +23,7 @@ class GameState:
     def __init__(self):
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
+        self.art = ArtBuilder()
         self.initialize_gamestate()
         self.game_file = ""
 
@@ -49,11 +51,18 @@ class GameState:
                 return room_object
         return None
 
+    def get_object_art(self, object_name):
+        for object in self.object_art:
+            if object.name.lower() == object_name.lower():
+                return object.image
+        return None
+
     def initialize_gamestate(self):
         self.current_room = None
         self.prior_room = None
         self.rooms = []
         self.objects = []
+        self.object_art = []
         self.player = Player()
         self.time_left = STARTING_TIME
         self.is_trash_can_looted = False
@@ -63,6 +72,7 @@ class GameState:
         # Initialize the rooms and objects to their defaults
         self.rooms = self.rb.load_room_data_from_file()
         self.objects = self.ob.load_object_data_from_file()  # Being done in the initialize_gamestate()
+        self.object_art = self.art.load_art_from_file()
 
     def initialize_new_game(self):
         self.initialize_gamestate()
@@ -127,8 +137,6 @@ class GameState:
         # Objects owned by player
         player_owned = save_data.get_owned()
         for object_name in player_owned:
-            # obj = self.get_object_by_name(object_name)
-            # copy_of_object = copy.copy(object)
             self.player.owned.append(object_name)
             # logger.debug("Adding object " + object_name + " to player's 'owned' list.")
 
@@ -312,8 +320,4 @@ class GameState:
         self.time_left += time_change
 
     def get_time_left(self):
-        # if self.game_file == "":
-        #     return self.time_left
-        # else:
-        #     self.time_left =
         return self.time_left

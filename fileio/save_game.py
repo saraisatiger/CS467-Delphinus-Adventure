@@ -83,7 +83,8 @@ class SaveGame:
             self.player_has_spraypaint_skill = gamestate.player.can_spraypaint()
 
             # Other variables stored in GameState
-            # self.time_left = gamestate.get_time_left()
+            # self.jailroom_data = gamestate.get_jailroom_data()
+            self.time_left = gamestate.get_time_left()
 
 
     def write_to_file(self, filename):
@@ -128,6 +129,7 @@ class SaveGame:
             'player_has_spraypaint_skill': self.player_has_spraypaint_skill,
 
             # Other variables stored in GameState
+            # 'jailroom_data': self.jailroom_data,
             'time_left': self.time_left
         }
 
@@ -177,6 +179,7 @@ class SaveGame:
         self.player_has_spraypaint_skill = self.save_data['player_has_spraypaint_skill']
 
         # Other variables stored in GameState
+        # self.jailroom_data = self.save_data['jailroom_data']
         self.time_left = self.save_data['time_left']
 
     def get_current_room(self):
@@ -259,6 +262,12 @@ class SaveGame:
                 return self.prior_room
         except:
             return None
+
+    # def get_jailroom_data(self):
+    #     try:
+    #         return self.jailroom_data
+    #     except:
+    #         return None
 
     def get_time_left(self):
         try:
