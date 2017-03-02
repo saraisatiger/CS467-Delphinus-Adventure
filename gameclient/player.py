@@ -95,14 +95,19 @@ class Player:
         return False
 
     def has_computer_parts(self):
+
         if self.has_object_by_name(NEW_COMPUTER) is True:
             return True
-        elif    self.has_object_by_name(RAM) is True and \
+        elif    self.has_ram() is True and \
                 self.has_object_by_name(GRAPHICS_CARD) is True and \
                 self.has_object_by_name(FLOPPY_DISK) is True:
             return True
         else:
             return False
+
+    def has_ram(self):
+        has_ram = self.has_object_by_name(RAM) or self.has_object_by_name("Ram 2.0 chip")
+        return has_ram
 
 
 

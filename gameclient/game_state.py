@@ -10,6 +10,7 @@ from constants.gameplay_settings import STARTING_TIME
 from constants.gameover_status_codes import *
 from fileio.room import *
 from fileio.object import *
+from fileio.art import *
 from gameclient.user_interface import *
 
 from debug.debug import *
@@ -22,6 +23,7 @@ class GameState:
     def __init__(self):
         self.ob = ObjectBuilder()
         self.rb = RoomBuilder()
+        self.art = ArtBuilder()
         self.initialize_gamestate()
         self.game_file = ""
 
@@ -49,11 +51,18 @@ class GameState:
                 return room_object
         return None
 
+    def get_object_art(self, object_name):
+        for object in self.object_art:
+            if object.name.lower() == object_name.lower():
+                return object.image
+        return None
+
     def initialize_gamestate(self):
         self.current_room = None
         self.prior_room = None
         self.rooms = []
         self.objects = []
+        self.object_art = []
         self.player = Player()
         self.time_left = STARTING_TIME
         self.is_trash_can_looted = False
@@ -64,6 +73,7 @@ class GameState:
         # Initialize the rooms and objects to their defaults
         self.rooms = self.rb.load_room_data_from_file()
         self.objects = self.ob.load_object_data_from_file()  # Being done in the initialize_gamestate()
+        self.object_art = self.art.load_art_from_file()
 
     def initialize_new_game(self):
         self.initialize_gamestate()
@@ -133,8 +143,6 @@ class GameState:
         # Objects owned by player
         player_owned = save_data.get_owned()
         for object_name in player_owned:
-            # obj = self.get_object_by_name(object_name)
-            # copy_of_object = copy.copy(object)
             self.player.owned.append(object_name)
             # logger.debug("Adding object " + object_name + " to player's 'owned' list.")
 
@@ -151,7 +159,7 @@ class GameState:
         self.time_left = save_data.get_time_left()
 
         # TODO: Read SaveGame spraypaint_data once it's implemented isntead of the below re-initialization
-        # self.spraypaint_data = save_data.get_spraypaint_data()
+        self.spraypaint_data = save_data.get_spraypaint_data()
         self.initialize_spraypaint_data()  # TODO: Delete this once we can get the data from save_data (SaveGame obj.)
 
         # TODO: Read SaveGame jailroom_data once it's implemented isntead of the below re-initialization
@@ -209,12 +217,18 @@ class GameState:
                 }
                 self.spraypaint_data[room_name] = entry
 
+    def get_spraypaint_data(self):
+        return self.spraypaint_data
+
     def initialize_jailroom_data(self):
         self.jailroom_data = {
             'cell_unlocked' : False,
             'computer_hacked' : False,
             'guard_bribed' : False
         }
+
+    def get_jailroom_data(self):
+        return self.railroom_data
 
     def is_room_spray_painted_by_name(self, room_name):
         '''
@@ -292,6 +306,8 @@ class GameState:
                         self.player.add_object_to_inventory(game_object)
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " in inventory")
+                if object_location == "trash can":
+                    pass # it's manually 'yanked' in the 'search_trash_can()' method
                 else:
                     try:
                         room = self.get_room_by_name(object_location)
@@ -324,8 +340,4 @@ class GameState:
         self.time_left += time_change
 
     def get_time_left(self):
-        # if self.game_file == "":
-        #     return self.time_left
-        # else:
-        #     self.time_left =
         return self.time_left
