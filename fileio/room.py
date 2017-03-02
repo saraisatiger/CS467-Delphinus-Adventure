@@ -95,8 +95,11 @@ class Room:
         '''
         connection_string = ""
         if self.room_connections:
-            for connection in self.room_connections:
-                connection_string = connection_string + textwrap.fill(connection.get_connection_description(), TEXT_WIDTH) + "\n"
+            if len(self.room_connections) > 0:
+                for connection in self.room_connections:
+                    connection_string = connection_string + textwrap.fill(connection.get_connection_description(), TEXT_WIDTH) + "\n"
+        else:
+            return CONNECTION_STRING_NOEXITS
         return connection_string
 
     def get_object_list_string(self):
@@ -140,7 +143,7 @@ class Room:
         for room_feature in self.room_features:
             # logger.debug("Checking if " + room_feature.get_name().lower() + " is " + feature.lower() + "...")
             if room_feature.get_name().lower() == feature_name.lower():
-                logger.debug("Match found!")
+                # logger.debug("Match found!")
                 return room_feature
             # else:
             #     logger.debug("Not a match!")

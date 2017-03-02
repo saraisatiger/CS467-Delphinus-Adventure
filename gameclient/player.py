@@ -11,6 +11,7 @@
 #       Used to figure out how to make a shallow/deep copy of an object rather than just assigning a reference to an object
 
 from constants.strings import *
+from constants.language_words import RAM, ACMERAM, GRAPHICS_CARD, FLOPPY_DISK, NEW_COMPUTER
 import copy
 
 class Player:
@@ -80,6 +81,34 @@ class Player:
 
     def can_spraypaint(self):
         return self.has_spraypaint_skill
+
+    def has_object_by_name(self, object_name):
+        '''
+        Used in a few different
+        :param object_name:
+        :return:
+        '''
+        player_inventory_objects = self.inventory.objects
+        for inventory_object in player_inventory_objects:
+            if inventory_object.get_name().lower() == object_name.lower():
+                return True
+        return False
+
+    def has_computer_parts(self):
+
+        if self.has_object_by_name(NEW_COMPUTER) is True:
+            return True
+        elif    self.has_ram() is True and \
+                self.has_object_by_name(GRAPHICS_CARD) is True and \
+                self.has_object_by_name(FLOPPY_DISK) is True:
+            return True
+        else:
+            return False
+
+    def has_ram(self):
+        has_ram = self.has_object_by_name(RAM) or self.has_object_by_name(ACMERAM)
+        return has_ram
+
 
 
 class Inventory:

@@ -51,10 +51,12 @@ FLOPPY_DISK = 'floppy disk'
 FLOPPY_DISK_ALIASES = ['floppy disk', 'floppydisk', 'floppy']
 GRAPHICS_CARD = 'graphics card'
 GRAPHICS_CARD_ALIASES = ['graphics card', 'graphic card', 'graphicscard', 'graphiccard', 'card', 'graphics']
-NEW_COMPUTER = ['new laptop']
+NEW_COMPUTER = 'new laptop'
 NEW_COMPUTER_ALIASES = ['new laptop', 'laptop']
 RAM = 'ram chip'
 RAM_ALIASES = ['ram chip', 'random access memory', 'memory', 'chip', 'ram']
+ACMERAM = 'acmeram'
+ACMERAM_ALIASES = ['acmeram', 'acme']
 KEY= 'key'
 KEY_ALIASES = ['key', 'jailkey', 'cellkey' ]
 FIREBALL = 'fireball'
@@ -64,7 +66,7 @@ BUG_ALIASES = ['bug carcass', 'carcass']
 CPUHEAD = 'sentient cpu head'
 CPUHEAD_ALIASES = ['sentient cpu head', 'head']
 
-OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES,  SKATEBORD_ALIASES, HACKERSNACKS_ALIASES, HACKER_MANUAL_ALIASES, SURGE_ALIASES, SPRAY_PAINT_ALIASES, FLOPPY_DISK_ALIASES, GRAPHICS_CARD_ALIASES, NEW_COMPUTER_ALIASES, RAM_ALIASES, KEY_ALIASES, FIREBALL_ALIASES, BUG_ALIASES, CPUHEAD_ALIASES]
+OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES, SKATEBORD_ALIASES, HACKERSNACKS_ALIASES, HACKER_MANUAL_ALIASES, SURGE_ALIASES, SPRAY_PAINT_ALIASES, FLOPPY_DISK_ALIASES, GRAPHICS_CARD_ALIASES, NEW_COMPUTER_ALIASES, RAM_ALIASES, ACMERAM_ALIASES, KEY_ALIASES, FIREBALL_ALIASES, BUG_ALIASES, CPUHEAD_ALIASES]
 
 #features 
 #TODO: add aliases, simple 'look at' features and descriptions to ROOMS, then add logic here

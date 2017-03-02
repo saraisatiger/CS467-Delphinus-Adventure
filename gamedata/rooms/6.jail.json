@@ -13,11 +13,12 @@
       {
         "name" : "Unattended Police Desktop",
         "description" : "Somebody forgot to log out... Don't they learn this stuff in the Academy?",
-        "hackable": false
+        "hackable": true,
+        "description_hacked": "Not only have you unlocked the doors, but you've also wiped your criminal record clean (again)... c00l!"
       },
 	  {
         "name" : "Police Officer",
-        "description" : "Probably works for tips.",
+        "description" : "Probably works for tips. He's leaning against the wall right next to... is that a [key] hanging on a hook right above his head?!",
         "hackable": false
       },
       {
@@ -27,34 +28,11 @@
       },
 	  {
         "name" : "Metal Door",
-        "description" : "Locked tight- but there must be keys somewhere.",
+        "description" : "Locked tight. Controlled by a computer, it looks like. Only way out.",
         "hackable": false
       }
   ],
   "room_connections" : [
-    {
-      "label": "",
-      "cardinal_direction": "North",
-      "description": "",
-      "destination": ""
-    },
-    {
-      "label": "",
-      "cardinal_direction": "South",
-      "description": "",
-      "destination": ""
-    },
-    {
-      "label": "",
-      "cardinal_direction": "East",
-      "description": "",
-      "destination": ""
-    },
-    {
-      "label": "",
-      "cardinal_direction": "West",
-      "description": "",
-      "destination": ""
-    }
+
   ]
 }

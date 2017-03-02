@@ -175,6 +175,9 @@ class GameClient:
             if status in GAMEOVER_STATES:  # list as defined in constants\gameover_status_codes.py
                 return status
 
+            # Handling for 'use computer' hint for player
+            self.game_hint_check()
+
             # Print the current room's appropriate long_description
             self.verb_look(print_long_description)
             print_long_description = False # Reset this to false after printing
@@ -339,7 +342,6 @@ class GameClient:
         self.gamestate.set_current_room(jail_room)
         wprint(JAIL_GO_TO_MESSAGE)
         self.gamestate.update_time_left(JAIL_COST)
-        self.ui.wait_for_enter()
 
     def verb_buy(self, noun_name):
         '''
@@ -486,44 +488,67 @@ class GameClient:
     def verb_hack(self, noun_name, noun_type):
         # TODO: Finish implementing verb_hack for other room features
         hack_success = False
+        hacking_detected_by_police = False
+        message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
 
         if self.gamestate.player.can_hack() is False:
             message = HACK_FAIL_NOSKILL
-        else:
+        else: # Player can hack, try it
             if noun_type == NOUN_TYPE_OBJECT:
                 message = HACK_FAIL_INVALID_TARGET
                 hack_success = False
+
             elif noun_type == NOUN_TYPE_FEATURE:
                 cur_room = self.gamestate.get_current_room()
+
                 try:
                     feature = cur_room.get_feature_by_name(noun_name)
-                    # logger.debug("feature retreived by name " + noun_name)
                     feature_name = feature.get_name().lower()
-                    # logger.debug("feature name.get_name() called: " + feature_name)
+
                     if feature.is_hackable() is True:
                         if feature.is_hacked() is True:
                             message = HACK_FAIL_ALREADY_HACKED
 
-                        elif feature_name == "traffic lights":
-                            message = HACK_SUCCESS_TRAFFIC_LIGHTS
-                            self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
-                            hack_success = True
+                        else: # Not hacked yet, player will attempt the hack
+                            # No point go to jail if already there; only randomize result if not in jail already
+                            if feature_name == "unattended police desktop":
+                                hacking_detected_by_police = False
+                                if self.gamestate.jailroom_data['cell_unlocked'] is True:
+                                    message = HACK_SUCCESS_JAIL_COMPUTER
+                                    self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
+                                    self.gamestate.initialize_jailroom_data()
+                                else:
+                                    message = HACK_FAIL_IN_CELL
+                            else:
+                                hacking_detected_by_police = not self.rand_event.attempt_hack()
 
-                        elif feature_name == "atm":
-                            message = HACK_SUCCESS_ATM + " You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
-                            self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
-                            hack_success = True
+                                if hacking_detected_by_police is True:
+                                    message = HACK_FAIL_CAUGHT
+                                elif hacking_detected_by_police is False:
+                                    if feature_name == "traffic lights":
+                                        message = HACK_SUCCESS_TRAFFIC_LIGHTS
+                                        self.gamestate.player.update_speed(HACK_LIGHT_SPEED_CHANGE)
+                                        hack_success = True
 
-                        elif feature_name == "turnstiles":
-                            message = HACK_SUCCESS_TURNSTILE
-                            hack_success = True
+                                    elif feature_name == "atm":
+                                        message = HACK_SUCCESS_ATM + " You get " + str(HACK_ATM_CASH_AMOUNT) + " bucks."
+                                        self.gamestate.player.update_cash(HACK_ATM_CASH_AMOUNT)
+                                        hack_success = True
 
-                        else:
-                            message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
-                    else:
+                                    elif feature_name == "turnstiles":
+                                        message = HACK_SUCCESS_TURNSTILE
+                                        hack_success = True
+
+                                    else:
+                                        message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
+
+                    else: # Feature is not a hackable feature
                         message = HACK_FAIL_INVALID_TARGET
+
                 except:
                     message = HACK_FAIL_FEATURE_NOT_PRESENT
+            else: # Player tried to hack something that's not an object or feature so it's nonsense
+                message = HACK_FAIL_NONSENSE
 
         if hack_success is True:
             try:
@@ -532,6 +557,8 @@ class GameClient:
                 logger.debug("hack_success is True but failed to call feature.set_is_hacked(True)")
 
         wprint(message)
+        if hacking_detected_by_police is True:
+            self.go_to_jail()
         self.ui.wait_for_enter()
         return hack_success
 
@@ -687,9 +714,9 @@ class GameClient:
             # logger.debug("verb_take() noun_type == 'feature'")
             room_feature = self.gamestate.get_current_room().get_feature_by_name(noun_name)
             if room_feature is None:
-                wprint("You don't see a " + noun_name + " to try and take.")
+                message = ("You don't see a " + noun_name + " to try and take.")
             else:
-                wprint("You cannot take the " + room_feature.get_name() + " - that's impractical.")
+                message = ("You cannot take the " + room_feature.get_name() + " - that's impractical.")
 
         elif noun_type == NOUN_TYPE_OBJECT:
             # logger.debug("verb_take() noun_type == 'object'")
@@ -699,43 +726,54 @@ class GameClient:
                 if room_object.get_cost() is 0 or room_object.get_name() in self.gamestate.player.owned:
                     self.gamestate.get_current_room().remove_object_from_room(room_object)
                     self.gamestate.player.add_object_to_inventory(room_object)
-                    wprint(PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
+                    message = (PICKUP_SUCCESS_PREFIX + self.verb_noun_name + PICKUP_SUCCESS_SUFFIX)
                     take_success = True
                 elif room_object.get_cost() > 0:
-                    wprint(PICKUP_NOT_FREE)
+                    message = (PICKUP_NOT_FREE)
             # Otherwise failed:
             else:
-                wprint(PICKUP_FAILURE_PREFIX + self.verb_noun_name + PICKUP_FAILURE_SUFFIX)
+                message = (PICKUP_FAILURE_PREFIX + self.verb_noun_name + PICKUP_FAILURE_SUFFIX)
+
+        else:
+            message = (PICKUP_FAILURE_PREFIX + self.verb_noun_name + PICKUP_FAILURE_SUFFIX)
 
         if take_success:
             self.gamestate.update_time_left(TAKE_COST)
 
+        wprint(message)
         self.ui.wait_for_enter()
         return take_success
 
     def verb_use(self, noun_name, noun_type):
         use_success = True
+        message = "This should never print. Check verb_use() logic"
 
-        if noun_type == NOUN_TYPE_FEATURE:
-            wprint("You cannot use that.")
+        if noun_name == "computer":
+            if self.gamestate.player.has_computer_parts() is True:
+                message = "You have the parts needed to use your computer! Let's boot up!"
+                self.gamestate.set_current_room(self.gamestate.get_room_by_name("your computer"))
+                use_success = True
+            else:
+                message = "You don't have everything you need to fix your computer. Your [Floppy Disk] is toast, your [Graphics Card] is burned up, and the [RAM Chip] is corrupted! Or, you could just go buy a [New Laptop]!"
+        elif noun_type == NOUN_TYPE_FEATURE:
+            message = "You cannot use that."
             use_success = False
         elif noun_type == NOUN_TYPE_OBJECT:
             used_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
             if used_object is not None:
                 obj_label = used_object.get_name().lower()
-                # logger.debug("Trying to compare " + obj_label + " to various things, including: " + SPRAYPAINT.lower())
 
                 if obj_label == CASH_CRISP.lower():
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_CRISP_MIN, CASH_CRISP_MAX)
                     self.gamestate.player.update_cash(cash_gained)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                    message = (USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label == CASH_WAD.lower():
                     cash_gained = self.rand_event.get_random_cash_amount(CASH_WAD_CASH_MIN, CASH_WAD_CASH_MAX)
                     self.gamestate.player.update_cash(cash_gained )
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
+                    message = (USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
                 elif obj_label in {GRAPHICS_CARD.lower(), RAM.lower(), FLOPPY_DISK.lower()}:
                     # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
                     # and then update some game-state variable so that player can do things they can do if they have a PC
@@ -753,39 +791,42 @@ class GameClient:
                         self.gamestate.player.remove_object_from_inventory(floppy_disk)
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
                     else:
-                        wprint(USE_COMPUTER_PARTS_MISSING)
+                        message = (USE_COMPUTER_PARTS_MISSING)
                 elif obj_label == HACKERSNACKS.lower():
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                    wprint(USE_SNACKS_SUCCESS)
+                    message = (USE_SNACKS_SUCCESS)
                 elif obj_label == SKATEBOARD.lower():
                     self.gamestate.player.set_has_skate_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SKATEBOARD_SPEED_INCREASE)
-                    wprint(USE_SKATEBOARD_SUCCESS)
+                    message = (USE_SKATEBOARD_SUCCESS)
                 elif obj_label == SPRAY_PAINT.lower():
                     self.gamestate.player.set_has_spraypaint_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_SPRAYPAINT_SUCCESS)
+                    message = (USE_SPRAYPAINT_SUCCESS)
                 elif obj_label == HACKER_MANUAL.lower():
                     self.gamestate.player.set_has_hack_skill(True)
                     self.gamestate.player.remove_object_from_inventory(used_object)
-                    wprint(USE_HACKERMANUAL_SUCCESS)
+                    message = (USE_HACKERMANUAL_SUCCESS)
                 elif obj_label == SURGE.lower():
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
-                    wprint(USE_SURGE_SUCCESS)
+                    message = (USE_SURGE_SUCCESS)
                 else:
                     logger.debug("Not implemented: use " + used_object.get_name())
-                    wprint("You used something that the game doesn't know what to do with, please tell your local dev!")
+                    message = ("You used something that the game doesn't know what to do with, please tell your local dev!")
                     use_success = False
             else:
-                wprint(USE_FAIL)
+                wprint(USE_FAIL_UNUSABLE)
                 use_success = False
+        else:
+            message = USE_FAIL_NONSENSE
 
         if use_success:
             self.gamestate.update_time_left(USE_COST)
 
+        wprint(message)
         self.ui.wait_for_enter()
         return use_success
 
@@ -811,10 +852,18 @@ class GameClient:
         :param command_extras: This property stores the string that the user wants to print.
         :return:
         '''
-        command_extra_first = command_extras[0]
-        spraypaint_message = command_extra_first['name']
+
+        # Read the string for the message out of the argument passed in
+        try:
+            command_extra_first = command_extras[0]
+            spraypaint_message = command_extra_first['name']
+        except:
+            wprint("Hmm, the language parser didn't send back the string, maybe you're confusing the software.")
         # logger.debug("Message will be: '" + spraypaint_message + "'")
+
         spraypaint_success = False
+        spraypaint_detected_by_police = False
+
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name()
 
@@ -823,8 +872,12 @@ class GameClient:
                 # Check of room is already painted
                 is_cur_room_painted = self.gamestate.is_room_spray_painted_by_name(cur_room_name)
                 if is_cur_room_painted is False:
-                    interface_message = SPRAYPAINT_ROOM_SUCCESS
-                    spraypaint_success = True
+                    spraypaint_detected_by_police = not self.rand_event.attempt_spraypaint()
+                    if spraypaint_detected_by_police is False:
+                        interface_message = SPRAYPAINT_ROOM_SUCCESS
+                        spraypaint_success = True
+                    else:
+                        interface_message = SPRAYPAINT_FAIL_CAUGHT
                 else:
                     # Room is already painted, currently don't allow doing it again
                     interface_message = SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED
@@ -840,38 +893,59 @@ class GameClient:
             self.gamestate.player.update_coolness(SPRAYPAINT_COOLNESS_INCREASE)
 
         wprint(interface_message)
+        if spraypaint_detected_by_police is True:
+            self.go_to_jail()
         self.ui.wait_for_enter()
         return spraypaint_success
 
     def verb_steal(self, noun_name, noun_type):
         steal_success = False
+        steal_detected_by_police = False
+        message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
+        current_room = self.gamestate.get_current_room()
 
-        if noun_type == NOUN_TYPE_FEATURE:
-            wprint("You cannot steal that.")
+        jail_room_name = R7[0] # R7[0] is the jail room
+        if (noun_name.lower() == "key") and (current_room.get_name().lower() == jail_room_name):
+            if self.gamestate.jailroom_data['cell_unlocked'] is False:
+                message = "You steal the key off the wall, where it is hanging just within your reach off of a hook. You then let yourself out."
+                self.gamestate.jailroom_data['cell_unlocked'] = True
+            else:
+                message = "You already used the key and let yourself out!"
+
+        elif noun_type == NOUN_TYPE_FEATURE:
+            message = STEAL_FAIL_FEATURE_INVALID
             steal_success = False
 
         elif noun_type == NOUN_TYPE_OBJECT:
 
-            room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
+            room_object = current_room.get_object_by_name(noun_name)
 
-            if room_object is not None:
-                if room_object.get_cost() is 0 or room_object.get_name() in self.gamestate.player.owned:
-                    wprint(STEAL_FAIL_FREE_ITEM)
+            if room_object is not None: # Object is in this room
+                # Only steal objects that we have never owned or that are not free
+                # if room_object.is_owned_by_player() is True:  # This was the original logic, was changed to below method that doesn't allow for duplicate object verification (if you own one floppy disk, you own them ALL)
+                if room_object.get_name() in self.gamestate.player.owned:
+                    message =  STEAL_FAIL_ALREADY_OWNED
+                elif room_object.get_cost() is 0:
+                    message = STEAL_FAIL_FREE_ITEM
                 elif room_object.get_cost() > 0:
-                    if (self.rand_event.attempt_steal() is True):
-                        self.gamestate.get_current_room().remove_object_from_room(room_object)
+                    steal_detected_by_police = not self.rand_event.attempt_steal()
+                    if steal_detected_by_police is False:
+                        current_room.remove_object_from_room(room_object)
                         self.gamestate.player.add_object_to_inventory(room_object)
-                        wprint(STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX)
+                        message = STEAL_SUCCESS_PREFIX + room_object.get_name() + STEAL_SUCCESS_SUFFIX
                         steal_success = True
                         self.gamestate.update_time_left(STEAL_COST)
                     else:
-                        wprint(STEAL_FAIL_PRISON)
+                        message = STEAL_FAIL_PRISON
                         self.gamestate.update_time_left(STEAL_COST) # Still took the time to try and steal it
-                        self.go_to_jail()
-                        return steal_success
-            else:
-                wprint(STEAL_FAIL_NOT_HERE)
+            else: # room_object isn't present in this room
+                message = STEAL_FAIL_NOT_HERE
+        else: # Not an object or a noun
+            message = STEAL_FAIL_NOT_HERE
 
+        wprint(message)
+        if steal_detected_by_police is True:
+            self.go_to_jail()
         self.ui.wait_for_enter()
         return steal_success
 
@@ -930,4 +1004,29 @@ class GameClient:
         wprint(message)
         self.ui.wait_for_enter()
 
+    def game_hint_check(self):
+        hints = []
+        player = self.gamestate.player
+        cur_room = self.gamestate.get_current_room()
+        if cur_room is None:
+            logger.debug("UH OH!")
+            in_computer_room = False
+        else:
+            in_computer_room = cur_room.get_name() == "Your Computer"
 
+        if in_computer_room is False:
+            # Check for laptop; if in inventory, tell player what to do
+            new_laptop_name = 'new laptop'
+            player_has_new_pc = player.has_object_by_name(new_laptop_name)
+            if player_has_new_pc is True:
+                hints.append(HINT_NEW_PC)
+            # If not, check if the have all the parts they need
+            else:
+                if self.gamestate.player.has_computer_parts() is True:
+                    hints.append(HINT_ALL_PARTS)
+
+        if len(hints) > 0:
+            self.ui.print_hints(hints)
+
+
+# End of File

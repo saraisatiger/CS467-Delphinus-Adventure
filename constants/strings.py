@@ -86,7 +86,7 @@ MAIN_MENU_LINES = [
 
 # General UI strings
 PROMPT_TEXT = ">> "
-PRESS_KEY_TO_CONTINUE_MSG = "\n" + " Press [Enter] to continue ".center(80, "-")
+PRESS_KEY_TO_CONTINUE_MSG = "\n" + " Press [Enter] to continue ".center(TEXT_WIDTH, "-")
 
 # Status header strings
 STATUS_HEADER_BAR = "=" * TEXT_WIDTH
@@ -110,6 +110,7 @@ OBJECTS_HEADER = "You look around for anything not strapped down and you see:"
 OBJECTS_LIST_PREFIX = " * "
 CONNECTION_LIST_PREFIX = "  * ["
 CONNECTION_LIST_SEGWAY= "] is "
+CONNECTION_STRING_NOEXITS = " ...No easy way out of here. Just the computer-controlled metal door leading back to the street."
 
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
@@ -169,9 +170,19 @@ HACK_FAIL_NOSKILL = "You just don't know how to do that yet"
 HACK_FAIL_INVALID_TARGET = "There's no way to hack that. Try hacking something useful!"
 HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
 HACK_FAIL_ALREADY_HACKED = "You've already hacked that."
-HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww."
-HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should make things a lot faster for you."
-HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You should be able to pass through the area without paying now."
+HACK_FAIL_CAUGHT = "You were caught hacking the system!"
+HACK_FAIL_IN_CELL = "You need to get out of the cell before you can hack on that terminal."
+HACK_FAIL_NONSENSE = "What a bunch of nonsense. That's not something you can hack, at least, not here and now."
+HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your " \
+                   "account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww. "
+HACK_SUCCESS_JAIL_COMPUTER = "You Hack the computer, clearing your criminal record and unlocking the exit to the " \
+                             "building. The one rent-a-cop here doesn't seem to realize anything is amiss, " \
+                             "so you grab your gear on the way out. They'll probably change the locks on those cells " \
+                             "so you toss the key in a trash can on the way out. "
+HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should " \
+                              "make things a lot faster for you. "
+HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You " \
+                         "should be able to pass through the area without paying now. "
 
 # 'help' strings
 HELP_HEADER_TEXT = "HELP"
@@ -180,26 +191,35 @@ HELP_HEADER = "=" * HELP_HEADER_TEXT_WIDTH + HELP_HEADER_TEXT + "=" * HELP_HEADE
 HELP_MESSAGE = [
     "Type in a command. Valid commands are:",
     "* newgame:  Starts a new game when at the main menu",
-    "* loadgame:  Load a saved game",
-    "* savegame:  Save a game in progress",
-    "* quit:  Exit back to main menu or the program if already there",
-    "* help:  Prints this help message. Some hints can be found using 'help <object or feature'",
-    "* look:  Prints the long-form description of a room again after a room has been visited",
-    "* look at <object or feature>:  Looks at an object or feature",
-    "* go <direction or description>:  Go to the direction or room you type. Must be directly accessible from your current location.",
-    "* take <object>:  Take an object in the current room.",
-    "* drop <object>:  Drop an object in the current location. You can't drop items when you're inside the network.",
-    "* buy <object>:  Some objects cost money and cannot be taken.",
-    "* steal <object>  Sometimes you don't have enough money to buy an object.",
-    "* inventory  Look at all of the items youv'e collected so far.",
-    "* hack <feature>  Try and hack a feature in the room. Not everything can be hacked, and you need to learn how to hack first.",
+    "* loadgame:             Load a saved game",
+    "* savegame:             Save a game in progress",
+    "* quit:                 Exit back to main menu or the program if already there",
+    "* help:                 Prints this help message. Some hints can be found using 'help <object or feature'",
+    "* look:                 Look around again for more details.",
+    "* look at <something>:  Looks at an object or feature",
+    "* go <direction>:       Go to the direction or area that you indicate.",
+    "* take <object>:        Take an object in the current room.",
+    "* drop <object>:        Drop an object in the current location. You can't drop items when you're inside the network.",
+    "* buy <object>:         Some objects cost money and cannot be taken.",
+    "* steal <object>:       Sometimes you don't have enough money to buy an object.",
+    "* inventory             Look at all of the items youv'e collected so far.",
+    "* hack <feature>        Try and hack a feature in the room. Not everything can be hacked, and you need to learn how to hack first.",
     "* spraypaint <feature>  If you have the necessary tools, you can paint the town red.",
-    "* use <object or feature>  Everything has a purpose. Well, not everything."
+    "* skate:                Skate around. Pretty cool!"
+    "* use <something>       Everything has a purpose! Well, not everything..."
 ]
 
 
 HELP_FEATURE_GENERIC = " is a feature of the room. 'Look at' it to learn more."
 HELP_OBJECT_GENERIC = " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'."
+
+# 'hints' strings (context-sensitive hints)
+HINTS_HEADER_SINGULAR = "Hint:"
+HINTS_HEADER_PLURAL = "Hints:"
+HINT_BULLET_PREFIX = " * "
+HINT_NEW_PC = "You have a NEW Laptop! Maybe you should try to 'use computer'."
+HINT_ALL_PARTS = "You have a RAM Chip, a Graphics Card, and a Floppy Disk - everything you need to repair your " \
+                 "computer. Maybe you should try to 'use computer'. "
 
 # 'Inventory' strings
 INVENTORY_LIST_HEADER = STATUS_HEADER_BAR + "\nBackpack Contents\n" + STATUS_HEADER_BAR
@@ -217,11 +237,15 @@ NO_INTERESTING_FEATURES_MESSAGE = "You see nothing else worth checking out."
 LOOK_AT_NOT_SEEN = "You do not see that here."
 LOOK_AT_TRASH_CAN_ALREADY_LOOTED = "You already dug through the trash can. There's nothing else worth taking."
 LOOK_AT_TRASH_CAN_PROMPT = "Do you want to dig deeper in the trash? You might get messy. (Y)es or (N)o."
-LOOK_AT_TRASH_SEARCHED = "You dig deeper into the trash and stain your shirt with mustard from an old hot dog. How uncool! But wait, there's a barely-used RAM chip in the trash! You wipe it off with an anti-static cloth and tuck it into your bag."
-LOOK_AT_TRASH_NOT_SEARCHED = "You see a partially eaten hot dog and a partially digested chicken bone laying on the top, but you can't bring yourself to dig deeper."
+LOOK_AT_TRASH_SEARCHED = "You dig deeper into the trash and stain your shirt with mustard from an old hot dog. How " \
+                         "uncool! But wait, there's a barely-used RAM chip in the trash! You wipe it off with an " \
+                         "anti-static cloth and tuck it into your bag. "
+LOOK_AT_TRASH_NOT_SEARCHED = "You see a partially eaten hot dog and a partially digested chicken bone laying on the " \
+                             "top, but you can't bring yourself to dig deeper. "
 
 # 'spraypaint' strings
-SPRAYPAINT_FAIL_NO_SKILL = "You need to [use Spray Paint] before you can try to spraypaint the world."
+SPRAYPAINT_FAIL_NO_SKILL = "You need to [use cans of SuperSprayPaint] before you can try to spraypaint. Need to make " \
+                           "sure that stuff works, ya dig it?. "
 SPRAYPAINT_FAIL_VIRTUAL_SPACE = "You cannot spraypaint on the internet, you know better than that!"
 SPRAYPAINT_ROOM_SUCCESS = "You spraypaint the room with your message. You should take a [look]!"
 SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED = "This room is already painted."
@@ -229,12 +253,14 @@ SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED = "This room is already painted."
 # 'skate' strings
 SKATE_SUCCESS = "You skate successfully."
 SKATE_FAILURE_NO_SKILL = "You need to practice with a [Skateboard] before you can skate around!"
+SPRAYPAINT_FAIL_CAUGHT = "You've been spotted by the Po-Po! Too late to run, they've seen your face."
 
 # 'steal' strings
 STEAL_FAIL_ALREADY_OWNED = "You already own that. You can just take it!"
 STEAL_FAIL_FREE_ITEM = "That doesn't cost anything. You should just take it - nobody will care!"
 STEAL_SUCCESS_PREFIX = "Your nimble hands are able to procure the "
 STEAL_SUCCESS_SUFFIX = " without being caught."
+STEAL_FAIL_FEATURE_INVALID = "You cannot steal that."
 STEAL_FAIL_PRISON = "You aren't able to steal that without being seen. You've been caught!"
 STEAL_FAIL_NOT_HERE = "Thou shalt not steal that which is not present!"
 
@@ -246,15 +272,20 @@ PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
 PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, just steal it!"
 
 # ' use' strings
-USE_FAIL = "You cannot use that unless it is in your bag!"
+USE_FAIL_UNUSABLE = "You cannot use that unless it is in your bag!"
+USE_FAIL_NONSENSE = "There doesn't seem to be anything like that to use."
 USE_CASH_SUCCESS_PREFIX = "You count the bills and put them in your wallet. You are "
 USE_CASH_SUCCESS_SUFFIX = " dollars richer!"
 USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"
-USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide to Building Amazing Hacking Machines' to see what you need?"
-USE_HACKERMANUAL_SUCCESS = "You peruse the pages of the hacker manual and feel confident you can hack just about anything. Just don't get caught!"
+USE_COMPUTER_PARTS_MISSING = "You are missing some parts to the computer. Maybe you should read 'The Hacker's Guide " \
+                             "to Building Amazing Hacking Machines' to see what you need? "
+USE_HACKERMANUAL_SUCCESS = "You peruse the pages of the hacker manual and feel confident you can [Hack] just about " \
+                           "anything. Just don't get caught or you'll land yourself in jail!"
 USE_SNACKS_SUCCESS = "Crunchy yet satisfying. You feel faster, do you Grok it?"
-USE_SKATEBOARD_SUCCESS = "Stepping onto the Skateboard, you feel as though you can do anything faster. Maybe that's just the Surge you drank for breakfast surging through your veins, though?"
-USE_SPRAYPAINT_SUCCESS = "You spend a few moments shaking the Spray Paint and test it out. You can now spraypaint the town red!"
+USE_SKATEBOARD_SUCCESS = "Stepping onto the Skateboard, you feel as though you can do anything faster. Maybe that's " \
+                         "just the Surge you drank for breakfast surging through your veins, though? You can probably " \
+                         "[Skate] on this bad boy, too! "
+USE_SPRAYPAINT_SUCCESS = "You shake the cans up and test one out. You can now [Spraypaint] the town red!"
 USE_SURGE_SUCCESS = "You gulp down the Surge and let out a belch. You feel energized!"
 
 # Gameover cheating messages

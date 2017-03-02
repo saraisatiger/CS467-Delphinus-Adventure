@@ -67,6 +67,7 @@ class GameState:
         self.time_left = STARTING_TIME
         self.is_trash_can_looted = False
         self.spraypaint_data = {}
+        self.jailroom_data = {}
 
     def load_rooms_and_objects_from_file(self):
         # Initialize the rooms and objects to their defaults
@@ -84,6 +85,9 @@ class GameState:
 
         # Set the spraypainted status for each room to be blank
         self.initialize_spraypaint_data()
+
+        # Set the jailroom to default status
+        self.initialize_jailroom_data()
 
     def initialize_load_game(self, filename):
         self.game_file = filename.replace('.json', '')
@@ -111,10 +115,12 @@ class GameState:
         # Hacked features
         hacked_feature_mapping = save_data.get_hacked_feature_mapping()
         for room_name in hacked_feature_mapping:
+            room_map = hacked_feature_mapping[room_name]
             for feature_name in hacked_feature_mapping[room_name]:
                 room = self.get_room_by_name(room_name)
                 feature = room.get_feature_by_name(feature_name)
-                feature.set_is_hacked(True)
+                is_hacked = room_map[feature_name]
+                feature.set_is_hacked(is_hacked)
 
         # Special booleans
         self.is_trash_can_looted = save_data.get_is_trash_can_looted()
@@ -151,10 +157,11 @@ class GameState:
 
         # Other variables stored in GameState
         self.time_left = save_data.get_time_left()
+        self.initialize_spraypaint_data() # Make sure dictionary clear
+        self.spraypaint_data = save_data.get_spraypaint_data()
+        self.initialize_jailroom_data() # Makes sure dictionary clear
+        self.jailroom_data = save_data.get_jailroom_data()
 
-        # TODO: Read SaveGame data once it's implemented isntead of the below re-initialization
-        # self.spraypaint_data = save_data.get_spraypaint_data()
-        self.initialize_spraypaint_data()  # TODO: Delete this once we can get the data from save_data (SaveGame obj.)
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\gameover_status_codes.py  ((SSH))
@@ -206,7 +213,19 @@ class GameState:
                          'spraypaint_message': None
                 }
                 self.spraypaint_data[room_name] = entry
-        # logger.debug(str(self.spraypaint_data)) # TODO: Comment this out later
+
+    def get_spraypaint_data(self):
+        return self.spraypaint_data
+
+    def initialize_jailroom_data(self):
+        self.jailroom_data = {
+            'cell_unlocked' : False,
+            'computer_hacked' : False,
+            'guard_bribed' : False
+        }
+
+    def get_jailroom_data(self):
+        return self.jailroom_data
 
     def is_room_spray_painted_by_name(self, room_name):
         '''
@@ -214,7 +233,7 @@ class GameState:
         :param room_name: String, the name of the room as found in its JSON file.
         :return: True if room is spraypainted, false otherwise
         '''
-        is_painted = None
+        is_painted = False
         try:
             entry = self.spraypaint_data[room_name]
             if entry is not None:
@@ -233,7 +252,6 @@ class GameState:
         try:
             entry = self.spraypaint_data[room_name]
             entry['is_spraypainted'] = painted
-            # logger.debug(str(entry))
         except:
             logger.debug("Tried to set_room_spray_painted_by_name( +" + room_name + "," + str(painted) +  " ) but failed with exception.")
 
@@ -278,20 +296,18 @@ class GameState:
         for game_object in game_objects:
             # Cash wad is "hidden" in the trash can so you won't see it in the room in the normal fashion.
             object_location = game_object.get_default_location_name().lower()
-            # logger.debug("object_location = " + object_location)
             try:
                 if object_location == "inventory":
-                    # logger.debug("Location is inventory, trying to add it...")
                     try:
-                        # logger.debug("Added to inventory...")
                         self.player.add_object_to_inventory(game_object)
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " in inventory")
+                if object_location == "trash can":
+                    pass # it's manually 'yanked' in the 'search_trash_can()' method
                 else:
                     try:
                         room = self.get_room_by_name(object_location)
                         room.add_object_to_room(game_object)
-                        # logger.debug("Success??")
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " because room_name " + object_location + " does not exist.")
             except:
