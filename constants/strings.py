@@ -86,7 +86,7 @@ MAIN_MENU_LINES = [
 
 # General UI strings
 PROMPT_TEXT = ">> "
-PRESS_KEY_TO_CONTINUE_MSG = "\n" + " Press [Enter] to continue ".center(80, "-")
+PRESS_KEY_TO_CONTINUE_MSG = "\n" + " Press [Enter] to continue ".center(TEXT_WIDTH, "-")
 
 # Status header strings
 STATUS_HEADER_BAR = "=" * TEXT_WIDTH
@@ -110,7 +110,7 @@ OBJECTS_HEADER = "You look around for anything not strapped down and you see:"
 OBJECTS_LIST_PREFIX = " * "
 CONNECTION_LIST_PREFIX = "  * ["
 CONNECTION_LIST_SEGWAY= "] is "
-CONNECTION_STRING_NOEXITS = "..No easy way out of here."
+CONNECTION_STRING_NOEXITS = " ...No easy way out of here. Just the computer-controlled metal door leading back to the street."
 
 # Various messages to user related to new/save/load/quit commands
 NEW_GAME_MESSAGE = "Starting a new game."
@@ -191,21 +191,22 @@ HELP_HEADER = "=" * HELP_HEADER_TEXT_WIDTH + HELP_HEADER_TEXT + "=" * HELP_HEADE
 HELP_MESSAGE = [
     "Type in a command. Valid commands are:",
     "* newgame:  Starts a new game when at the main menu",
-    "* loadgame:  Load a saved game",
-    "* savegame:  Save a game in progress",
-    "* quit:  Exit back to main menu or the program if already there",
-    "* help:  Prints this help message. Some hints can be found using 'help <object or feature'",
-    "* look:  Prints the long-form description of a room again after a room has been visited",
-    "* look at <object or feature>:  Looks at an object or feature",
-    "* go <direction or description>:  Go to the direction or room you type. Must be directly accessible from your current location.",
-    "* take <object>:  Take an object in the current room.",
-    "* drop <object>:  Drop an object in the current location. You can't drop items when you're inside the network.",
-    "* buy <object>:  Some objects cost money and cannot be taken.",
-    "* steal <object>  Sometimes you don't have enough money to buy an object.",
-    "* inventory  Look at all of the items youv'e collected so far.",
-    "* hack <feature>  Try and hack a feature in the room. Not everything can be hacked, and you need to learn how to hack first.",
+    "* loadgame:             Load a saved game",
+    "* savegame:             Save a game in progress",
+    "* quit:                 Exit back to main menu or the program if already there",
+    "* help:                 Prints this help message. Some hints can be found using 'help <object or feature'",
+    "* look:                 Look around again for more details.",
+    "* look at <something>:  Looks at an object or feature",
+    "* go <direction>:       Go to the direction or area that you indicate.",
+    "* take <object>:        Take an object in the current room.",
+    "* drop <object>:        Drop an object in the current location. You can't drop items when you're inside the network.",
+    "* buy <object>:         Some objects cost money and cannot be taken.",
+    "* steal <object>:       Sometimes you don't have enough money to buy an object.",
+    "* inventory             Look at all of the items youv'e collected so far.",
+    "* hack <feature>        Try and hack a feature in the room. Not everything can be hacked, and you need to learn how to hack first.",
     "* spraypaint <feature>  If you have the necessary tools, you can paint the town red.",
-    "* use <object or feature>  Everything has a purpose. Well, not everything."
+    "* skate:                Skate around. Pretty cool!"
+    "* use <something>       Everything has a purpose! Well, not everything..."
 ]
 
 
@@ -243,7 +244,8 @@ LOOK_AT_TRASH_NOT_SEARCHED = "You see a partially eaten hot dog and a partially 
                              "top, but you can't bring yourself to dig deeper. "
 
 # 'spraypaint' strings
-SPRAYPAINT_FAIL_NO_SKILL = "You need to [use Spray Paint] before you can try to spraypaint the world."
+SPRAYPAINT_FAIL_NO_SKILL = "You need to [use cans of SuperSprayPaint] before you can try to spraypaint. Need to make " \
+                           "sure that stuff works, ya dig it?. "
 SPRAYPAINT_FAIL_VIRTUAL_SPACE = "You cannot spraypaint on the internet, you know better than that!"
 SPRAYPAINT_ROOM_SUCCESS = "You spraypaint the room with your message. You should take a [look]!"
 SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED = "This room is already painted."

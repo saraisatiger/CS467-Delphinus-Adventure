@@ -854,8 +854,11 @@ class GameClient:
         '''
 
         # Read the string for the message out of the argument passed in
-        command_extra_first = command_extras[0]
-        spraypaint_message = command_extra_first['name']
+        try:
+            command_extra_first = command_extras[0]
+            spraypaint_message = command_extra_first['name']
+        except:
+            wprint("Hmm, the language parser didn't send back the string, maybe you're confusing the software.")
         # logger.debug("Message will be: '" + spraypaint_message + "'")
 
         spraypaint_success = False
@@ -903,9 +906,11 @@ class GameClient:
 
         jail_room_name = R7[0] # R7[0] is the jail room
         if (noun_name.lower() == "key") and (current_room.get_name().lower() == jail_room_name):
-            logger.debug("Inside the first clause")
-            message = "You steal the key off the wall, where it is hanging just within your reach off of a hook. You then let yourself out."
-            self.gamestate.jailroom_data['cell_unlocked'] = True
+            if self.gamestate.jailroom_data['cell_unlocked'] is False:
+                message = "You steal the key off the wall, where it is hanging just within your reach off of a hook. You then let yourself out."
+                self.gamestate.jailroom_data['cell_unlocked'] = True
+            else:
+                message = "You already used the key and let yourself out!"
 
         elif noun_type == NOUN_TYPE_FEATURE:
             message = STEAL_FAIL_FEATURE_INVALID
@@ -1009,16 +1014,16 @@ class GameClient:
         else:
             in_computer_room = cur_room.get_name() == "Your Computer"
 
-        # Check for laptop; if in inventory, tell player what to do
-        new_laptop_name = 'new laptop'
-        player_has_new_pc = player.has_object_by_name(new_laptop_name)
-        # logger.debug("checking if player has object " + new_laptop_name + ". " + str(player_has_new_pc))
-        if player_has_new_pc is True and in_computer_room is False:
-            hints.append(HINT_NEW_PC)
-
-        player_has_all_parts = player.has_object_by_name(RAM) and player.has_object_by_name(FLOPPY_DISK) and player.has_object_by_name(GRAPHICS_CARD)
-        if player_has_all_parts is True and in_computer_room is False:
-            hints.append(HINT_ALL_PARTS)
+        if in_computer_room is False:
+            # Check for laptop; if in inventory, tell player what to do
+            new_laptop_name = 'new laptop'
+            player_has_new_pc = player.has_object_by_name(new_laptop_name)
+            if player_has_new_pc is True:
+                hints.append(HINT_NEW_PC)
+            # If not, check if the have all the parts they need
+            else:
+                if self.gamestate.player.has_computer_parts() is True:
+                    hints.append(HINT_ALL_PARTS)
 
         if len(hints) > 0:
             self.ui.print_hints(hints)

@@ -157,14 +157,11 @@ class GameState:
 
         # Other variables stored in GameState
         self.time_left = save_data.get_time_left()
-
-        # TODO: Read SaveGame spraypaint_data once it's implemented isntead of the below re-initialization
+        self.initialize_spraypaint_data() # Make sure dictionary clear
         self.spraypaint_data = save_data.get_spraypaint_data()
-        self.initialize_spraypaint_data()  # TODO: Delete this once we can get the data from save_data (SaveGame obj.)
+        self.initialize_jailroom_data() # Makes sure dictionary clear
+        self.jailroom_data = save_data.get_jailroom_data()
 
-        # TODO: Read SaveGame jailroom_data once it's implemented isntead of the below re-initialization
-        # self.jailroom_data = save_data.get_jailroom_data()
-        self.initialize_jailroom_data() # TODO: Delete this once we can get the data from save_data (SaveGame obj.)
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\gameover_status_codes.py  ((SSH))
@@ -228,7 +225,7 @@ class GameState:
         }
 
     def get_jailroom_data(self):
-        return self.railroom_data
+        return self.jailroom_data
 
     def is_room_spray_painted_by_name(self, room_name):
         '''
@@ -236,7 +233,7 @@ class GameState:
         :param room_name: String, the name of the room as found in its JSON file.
         :return: True if room is spraypainted, false otherwise
         '''
-        is_painted = None
+        is_painted = False
         try:
             entry = self.spraypaint_data[room_name]
             if entry is not None:
@@ -255,7 +252,6 @@ class GameState:
         try:
             entry = self.spraypaint_data[room_name]
             entry['is_spraypainted'] = painted
-            # logger.debug(str(entry))
         except:
             logger.debug("Tried to set_room_spray_painted_by_name( +" + room_name + "," + str(painted) +  " ) but failed with exception.")
 

@@ -11,7 +11,7 @@
 #       Used to figure out how to make a shallow/deep copy of an object rather than just assigning a reference to an object
 
 from constants.strings import *
-from constants.language_words import RAM, GRAPHICS_CARD, FLOPPY_DISK, NEW_COMPUTER
+from constants.language_words import RAM, ACMERAM, GRAPHICS_CARD, FLOPPY_DISK, NEW_COMPUTER
 import copy
 
 class Player:
@@ -106,7 +106,7 @@ class Player:
             return False
 
     def has_ram(self):
-        has_ram = self.has_object_by_name(RAM) or self.has_object_by_name("Ram 2.0 chip")
+        has_ram = self.has_object_by_name(RAM) or self.has_object_by_name(ACMERAM)
         return has_ram
 
 
