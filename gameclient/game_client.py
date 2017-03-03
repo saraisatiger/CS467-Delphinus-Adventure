@@ -663,6 +663,7 @@ class GameClient:
         looked_at_trash_can = False
         looked_at_panel = False
         looked_at_bug = False
+        looked_at_firewall = False
 
         if room_feature is not None:
             try:
@@ -675,6 +676,8 @@ class GameClient:
                     looked_at_panel = True
                 elif room_feature_name == "bug":
                     looked_at_bug = True
+                elif room_feature_name == "firewall":
+                    looked_at_firewall = True
 
             except:
                 logger.debug("verb_look_at(): room_feature.get_description() exception")
@@ -708,7 +711,8 @@ class GameClient:
             self.install_pc_components()
         elif looked_at_bug is True:
             self.minigame_bug()
-
+        elif looked_at_firewall is True:
+            self.minigame_firewall()
 
     def verb_quit(self, message):
         '''
@@ -1161,8 +1165,8 @@ class GameClient:
         print("You grab the '==' operator and quickly change it to:\n")
         print("\tA: !=")
         print("\tB: +=")
-        print("\tC: IDK fight the freaking spider!")
-        wprint("Enter [a/b/c]:")
+        print("\tC: IDK fight the freaking spider!\n")
+        print("Enter [a/b/c]:")
 
         user_response = self.ui.user_prompt()
 
@@ -1195,5 +1199,79 @@ class GameClient:
                 self.gamestate.player.add_object_to_inventory(spider_carcass)
             except:
                 logger.debug("Unable to add 'spider carcass' to player inventory, maybe the object doesn't exist yet?")
+
+        self.ui.wait_for_enter()
+
+    def minigame_firewall(self):
+        firewall_defeated = self.gamestate.endgame_data['metaverse']['is_firewall_defeated']
+
+        if firewall_defeated is True:
+            wprint("The wall of flames seems to have a convenient hole straight through the center, probably just "
+                   "scared of another encounter with such an awesome hacker. Also you might have stole its baby ["
+                   "fireball]. Are you guys like, related now? Not really sure how these things work.")
+        else:
+            wprint("You see a mass of flames blocking your way from the Data Towers, the fire twists and turns "
+                   "spiraling up towards the sky. How are you ever gonna get around that thing?! Thinking hard you "
+                   "come up with three possible solutions:")
+            print("\tA: Attempt ot Skateboard through the inferno")
+            print("\tB: THrow a can of Surge at it - the ultimate thirst quencher!")
+            print("\tC: IDK fight the firewall!!!!!\n")
+            print("Enter [a/b/c]:")
+
+            user_response = self.ui.user_prompt()
+
+            while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+                wprint("What? Try that again...")
+                user_response = self.ui.user_prompt()
+
+            if user_response in ANSWER_A:
+                if self.gamestate.player.can_skateboard() is True:
+                    wprint("You  jump on your board and pick up speed as you make your way toward the inferno. You "
+                           "can almost feel your eyebrows singe as you pass right through the blistering heat. You "
+                           "reach out and grasp a cute little [fireball], stashing it in your backpack as you glide "
+                           "out")
+                    firewall_defeated = True
+                else:
+                    wprint("Do you even know how to skateboard? You certainly don’t own one and like, that is just "
+                           "lame. Even you realise that what you have attempted is so uncool. You should probably "
+                           "think more next time.")
+                    self.gamestate.player.update_coolness(FIREWALL_COOLNESS_COST)
+            elif user_response in ANSWER_B:
+                if self.gamestate.player.has_object_by_name(SURGE):
+                    wprint("You take a trusty can of surge from your backpack, crack open that tab, listen to the "
+                           "sweet fizz, and hurle the can straight into the wall of fire! It blows a sticky sugar "
+                           "syrup hole right through the middle and you quietly thank your surge for sacrificing "
+                           "itself for the greater good. That soda will not be forgotten! What’s this now? You notice "
+                           "an adorable little fireball flung from the flames. Why not take the little guy along you "
+                           "think, stashing him in your backpack.")
+                    firewall_defeated = True
+                    surge = self.gamestate.player.inventory.get_object_by_name(SURGE)
+                    self.gamestate.player.remove_object_from_inventory(surge)
+                    try:
+                        fireball = self.gamestate.get_object_by_name(FIREBALL)
+                        self.gamestate.player.add_object_to_inventory(fireball)
+                    except:
+                        logger.debug("Couldn't add fireball to inventory, maybe it doesn't exist yet in gamedata files")
+                else:
+                    wprint("Oh snap! You musta drank all your [Surge]. Better try something else next time.")
+                    firewall_defeated = False
+            elif user_response in ANSWER_C:
+                wprint("You rush at the firewall, a wiry teen with nothing to lose. Fists flailing you beat back the "
+                       "monstrous flame making a tunnel right to the Data Tower. Berserkering with rage, "
+                       "your brutality knows no mercy when you notice a real cute lil’ ball of fire cowering from "
+                       "your wraith as your scorched body pummels through the flames- this is gonna leave some pretty "
+                       "sick scars. What the heck you think, scooping the little [fireball] up and depositing him in "
+                       "your backpack. Isn’t his fault his relatives are super bogus.")
+                self.gamestate.player.update_coolness(FIREWALL_COOLNESS_COST)
+                firewall_defeated = True
+
+            if firewall_defeated is True:
+                self.gamestate.endgame_data['metaverse']['is_firewall_defeated'] = True
+
+                try:
+                    spider_carcass = self.gamestate.get_object_by_name("spider carcass")  # TODO: replace string literal with constant from language_words.py once implemented
+                    self.gamestate.player.add_object_to_inventory(spider_carcass)
+                except:
+                    logger.debug("Unable to add ....")
 
         self.ui.wait_for_enter()

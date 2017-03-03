@@ -238,7 +238,8 @@ class GameState:
                 'is_graphics_installed' : False
             },
             'metaverse' : {
-                'is_spider_defeated' : False
+                'is_spider_defeated' : False,
+                'is_firewall_defeated' : False
             }
         }
 
