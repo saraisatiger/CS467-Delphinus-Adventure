@@ -135,7 +135,9 @@ SAVE_GAME_INVALID_CHARACTERS = "This filename contains invalid characters."
 SAVE_GAME_VALID_FILENAME_MESSAGE = "Something about the filename you provided was invalid."
 QUIT_CONFIRM_PROMPT = "Do you really wish to quit the game? (Y)es or (N)o"
 YES_ALIASES = {'yes', 'y'}
-
+ANSWER_A = {'a', 'A'}
+ANSWER_B = {'b', 'B'}
+ANSWER_C = {'c', 'C'}
 
 # 'buy' strings
 BUY_NOT_IN_ROOM = "That doesn't seem to be something you can buy here."

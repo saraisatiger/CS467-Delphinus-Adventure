@@ -236,6 +236,9 @@ class GameState:
                 'is_floppy_installed' : False,
                 'is_ram_installed' : False,
                 'is_graphics_installed' : False
+            },
+            'metaverse' : {
+                'is_spider_defeated' : False
             }
         }
 
