@@ -419,15 +419,10 @@ class GameClient:
     def verb_go(self, destination, error_message):
         go_success = False
 
-        if error_message is not None:
-            wprint(error_message)
-            wprint("This is probably because typing a destination's label like 'pawn shop', is not yet implemented")
-            self.ui.wait_for_enter()
-            return go_success
-
         destination = destination.lower()
-        cur_room = self.gamestate.get_current_room()
         destination_room_name = None
+        cur_room = self.gamestate.get_current_room()
+        cur_room_name = cur_room.get_name().lower()
 
         if destination is None or destination.isspace():
            message = GO_FAILURE_DESTINATION_MISSING
@@ -441,8 +436,9 @@ class GameClient:
             for connection in cur_room.room_connections:
                 if connection.label.lower() == destination or connection.cardinal_direction.lower() == destination:
                     destination_room_name = connection.destination.lower()
+
                     # Handle sub-way logic:
-                    if cur_room.get_name().lower() == "subway":
+                    if cur_room_name == "subway":
                         # It's free to go back where you came from, so check that first
                         if destination_room_name.lower() == self.gamestate.get_prior_room().get_name().lower():
                             go_success = True
@@ -459,6 +455,17 @@ class GameClient:
                         else:
                             go_success = True
                             break
+
+                    elif cur_room_name == "your computer":
+                        if self.gamestate.endgame_data['computer_room']['is_operable'] is True:
+                            go_success = True
+                            break
+                        else:
+                            message = GO_FAILURE_COMPUTER_INOPERABLE
+                            go_success = False
+                            break
+
+                    # Any room without special-handling / restrictions on movement is authorized to move, handle here
                     else:
                         go_success = True
                         break
@@ -641,12 +648,15 @@ class GameClient:
         room_object_art = self.gamestate.get_object_art(noun_name)
 
         looked_at_trash_can = False
+        looked_at_panel = False
 
         if room_feature is not None:
             try:
                 description = room_feature.get_description()
                 if room_feature.get_name().lower() == "trash can":
                     looked_at_trash_can = True
+                if room_feature.get_name().lower() == "panel":
+                    looked_at_panel = True
             except:
                 logger.debug("verb_look_at(): room_feature.get_description() exception")
                 description = "Uh oh, something has gone wrong. Contact the developer!"
@@ -672,8 +682,10 @@ class GameClient:
         print(room_object_art)
         self.ui.wait_for_enter()
 
-        if looked_at_trash_can:
+        if looked_at_trash_can is True:
             self.search_trash_can()
+        if looked_at_panel is True:
+            self.install_pc_components()
 
     def verb_quit(self, message):
         '''
@@ -746,15 +758,28 @@ class GameClient:
 
     def verb_use(self, noun_name, noun_type):
         use_success = True
+        current_room_name = self.gamestate.get_current_room().get_name().lower()
+        noun_name = noun_name.lower()
         message = "This should never print. Check verb_use() logic"
 
+        # Special 'use' case, 'use computer'. It's not a literal object that can be used, just the verbiage we chose
         if noun_name == "computer":
             if self.gamestate.player.has_computer_parts() is True:
-                message = "You have the parts needed to use your computer! Let's boot up!"
                 self.gamestate.set_current_room(self.gamestate.get_room_by_name("your computer"))
                 use_success = True
+
+                # Conditionally remove the 'new laptop' object if that's the item they had and toggle on 'operable' var
+                if self.gamestate.player.has_object_by_name(NEW_COMPUTER) is True:
+                    new_pc_item = self.gamestate.player.inventory.get_object_by_name(NEW_COMPUTER)
+                    self.gamestate.player.remove_object_from_inventory(new_pc_item)
+                    self.gamestate.endgame_data['computer_room']['is_operable'] = True
+                    message = "You boot up the new computer and jack into the nearest RJ-45 port you can find. Time to Hack!"
+                else: # Player must have the rest of the parts they needed, instead
+                    message = "You have what you need to repair your computer! Time to install the components... A [Floppy Disk], a [Graphics Card], and a [RAM Chip] are spread out upon your portable anti-static mat!"
+
             else:
                 message = "You don't have everything you need to fix your computer. Your [Floppy Disk] is toast, your [Graphics Card] is burned up, and the [RAM Chip] is corrupted! Or, you could just go buy a [New Laptop]!"
+
         elif noun_type == NOUN_TYPE_FEATURE:
             message = "You cannot use that."
             use_success = False
@@ -774,24 +799,16 @@ class GameClient:
                     self.gamestate.player.update_cash(cash_gained )
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     message = (USE_CASH_SUCCESS_PREFIX + str(cash_gained) + USE_CASH_SUCCESS_SUFFIX)
-                elif obj_label in {GRAPHICS_CARD.lower(), RAM.lower(), FLOPPY_DISK.lower()}:
-                    # TODO: Build logic to confirm player has all components to build a PC, in correct location to build one
-                    # and then update some game-state variable so that player can do things they can do if they have a PC
-                    g_card = self.gamestate.player.inventory.get_object_by_name(GRAPHICS_CARD.lower())
-                    ram_chip = self.gamestate.player.inventory.get_object_by_name(RAM.lower())
-                    floppy_disk = self.gamestate.player.inventory.get_object_by_name(FLOPPY_DISK.lower())
-
-                    if g_card is not None and \
-                         ram_chip is not None and \
-                        floppy_disk is not None:
-                        wprint(USE_COMPUTER_PARTS_SUCCESS)
-                        self.ui.wait_for_enter()
-                        self.gamestate.player.remove_object_from_inventory(g_card)
-                        self.gamestate.player.remove_object_from_inventory(ram_chip)
-                        self.gamestate.player.remove_object_from_inventory(floppy_disk)
-                        self.gamestate.set_current_room(self.gamestate.get_room_by_name("Your Computer"))
+                elif obj_label in {ACMERAM.lower(), RAM.lower(), GRAPHICS_CARD.lower()}:
+                    if current_room_name == "your computer":
+                        message = "You should take a [look at the panel] on the back of [Your Computer] to install this."
                     else:
-                        message = (USE_COMPUTER_PARTS_MISSING)
+                        message = USE_FAIL_COMPONENT_INSTALL
+                elif obj_label == FLOPPY_DISK.lower():
+                    if current_room_name == "your computer":
+                        message = self.install_floppy_disk()
+                    else:
+                        message = USE_FAIL_COMPONENT_INSTALL
                 elif obj_label == HACKERSNACKS.lower():
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
@@ -1004,6 +1021,77 @@ class GameClient:
         wprint(message)
         self.ui.wait_for_enter()
 
+    def install_floppy_disk(self):
+        if self.gamestate.endgame_data['computer_room']['is_floppy_installed'] is True:
+            message = "You've already installed one of those."
+        else:
+            wprint("Would you like to insert your [Floppy Disk] into the disk drive [y/n]?")
+            user_input = self.ui.user_prompt()
+
+            if user_input in YES_ALIASES:
+                self.gamestate.endgame_data['computer_room']['is_floppy_installed'] = True
+                self.gamestate.player.update_speed(FLOPPY_DISK_SPEED_INCREASE)
+                floppy_disk = self.gamestate.player.inventory.get_object_by_name(FLOPPY_DISK)
+                self.gamestate.player.remove_object_from_inventory(floppy_disk)
+                message = "You insert the [Floppy Disk] and can see a performance increase already!"
+            else:
+                message = "You have second thoughts for some reason. Maybe later..."
+        self.update_is_operable()
+        return message
+
+    def install_pc_components(self):
+        ram_installed = self.gamestate.endgame_data['computer_room']['is_ram_installed']
+        graphics_installed = self.gamestate.endgame_data ['computer_room']['is_graphics_installed']
+
+        if ram_installed is False:
+            wprint("You see some wires, one tiny RAM card looking lonely next to an empty slot. Don't these things usually come in pairs?")
+            wprint("Would you like to put in your RAM chip [y/n]?")
+            user_input = self.ui.user_prompt()
+
+            if user_input in YES_ALIASES:
+                ram_chip = None
+                if self.gamestate.player.has_object_by_name(RAM) is True:
+                    ram_chip = self.gamestate.player.inventory.get_object_by_name(RAM)
+                elif self.gamestate.player.has_object_by_name(ACMERAM) is True:
+                    ram_chip = self.gamestate.player.inventory.get_object_by_name(ACMERAM)
+                else:
+                    wprint("Uh oh, this is bad. Where's that RAM chip??") # Don't expect this to ever print...
+                if ram_chip is not None:
+                    self.gamestate.player.remove_object_from_inventory(ram_chip)
+                    self.gamestate.endgame_data['computer_room']['is_ram_installed'] = True
+                    self.gamestate.player.update_speed(RAM_SPEED_INCREASE)
+        else:
+            wprint("The new RAM was installed easily and is clamped onto the MOBO securely.")
+
+        if graphics_installed is False:
+            wprint("There's a graphics card with a photo of pong on it - it's definitely toasted.")
+            wprint("Would you like to replace the graphics card [y/n]?")
+            user_input = self.ui.user_prompt()
+
+            if user_input in YES_ALIASES:
+                graphics_card = None
+                if self.gamestate.player.has_object_by_name(GRAPHICS_CARD) is True:
+                    graphics_card = self.gamestate.player.inventory.get_object_by_name(GRAPHICS_CARD)
+                else:
+                    wprint("Uh oh, this is bad. Where's that graphics card??")  # Don't expect this to ever print...
+                if graphics_card is not None:
+                    self.gamestate.player.remove_object_from_inventory(graphics_card)
+                    self.gamestate.endgame_data['computer_room']['is_graphics_installed'] = True
+                    self.gamestate.player.update_speed(GRAPHICS_SPEED_INCREASE)
+        else:
+            wprint("A new Graphics Card takes up the majority of the expansion bay. This one has Sw33t-3d-Gr4phX Technology")
+
+        self.update_is_operable()
+
+
+    def update_is_operable(self):
+        ram_installed = self.gamestate.endgame_data['computer_room']['is_ram_installed']
+        graphics_installed = self.gamestate.endgame_data['computer_room']['is_graphics_installed']
+        floppy_installed = self.gamestate.endgame_data['computer_room']['is_floppy_installed']
+
+        if ram_installed and graphics_installed and floppy_installed is True:
+            self.gamestate.endgame_data['computer_room']['is_operable'] = True
+
     def game_hint_check(self):
         hints = []
         player = self.gamestate.player
@@ -1029,4 +1117,4 @@ class GameClient:
             self.ui.print_hints(hints)
 
 
-# End of File
+
