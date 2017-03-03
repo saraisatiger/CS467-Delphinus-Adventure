@@ -1077,7 +1077,7 @@ class GameClient:
                 if graphics_card is not None:
                     self.gamestate.player.remove_object_from_inventory(graphics_card)
                     self.gamestate.endgame_data['computer_room']['is_graphics_installed'] = True
-                    self.gamestate.player.update_speed(GRAPHICS_SPEED_INCREASE)
+                    self.gamestate.player.update_coolness(GRAPHICS_COOLNESS_INCREASE)
         else:
             wprint("A new Graphics Card takes up the majority of the expansion bay. This one has Sw33t-3d-Gr4phX Technology")
 
