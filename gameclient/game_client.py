@@ -465,6 +465,19 @@ class GameClient:
                             go_success = False
                             break
 
+                    elif cur_room_name == "inside the metaverse":
+                        if destination_room_name == "data tower":
+                            has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
+                            has_bug_carcass = self.gamestate.player.has_object_by_name("bug carcass") # TODO: Replace string with constant from language_words.py once defined
+
+                            if has_fireball is False or has_bug_carcass is False:
+                                go_success = False
+                                wprint("You need the fireball and bug carcass to proceed") # TODO: Make better message to user?
+                                break
+                            else:
+                                go_success = True
+                                break
+
                     # Any room without special-handling / restrictions on movement is authorized to move, handle here
                     else:
                         go_success = True
@@ -649,14 +662,20 @@ class GameClient:
 
         looked_at_trash_can = False
         looked_at_panel = False
+        looked_at_bug = False
 
         if room_feature is not None:
             try:
                 description = room_feature.get_description()
-                if room_feature.get_name().lower() == "trash can":
+                room_feature_name = room_feature.get_name().lower()
+                # CHeck for special room feature logic
+                if room_feature_name == "trash can":
                     looked_at_trash_can = True
-                if room_feature.get_name().lower() == "panel":
+                elif room_feature_name == "panel":
                     looked_at_panel = True
+                elif room_feature_name == "bug":
+                    looked_at_bug = True
+
             except:
                 logger.debug("verb_look_at(): room_feature.get_description() exception")
                 description = "Uh oh, something has gone wrong. Contact the developer!"
@@ -682,10 +701,14 @@ class GameClient:
         print(room_object_art)
         self.ui.wait_for_enter()
 
+        # Handle special look at 'minigame' logic
         if looked_at_trash_can is True:
             self.search_trash_can()
-        if looked_at_panel is True:
+        elif looked_at_panel is True:
             self.install_pc_components()
+        elif looked_at_bug is True:
+            self.minigame_bug()
+
 
     def verb_quit(self, message):
         '''
@@ -1116,5 +1139,61 @@ class GameClient:
         if len(hints) > 0:
             self.ui.print_hints(hints)
 
+    def minigame_bug(self):
+        '''
+        Called when player looks at the 'bug' inside metaverse
+        :return:
+        '''
+        # TODO: Pull these out to the strings.py file as constants if desired
 
+        spider_defeated = self.gamestate.endgame_data['metaverse']['is_spider_defeated']
 
+        if spider_defeated is  True:
+            wprint("You've already squashed this bug.")
+            self.ui.wait_for_enter()
+            return
+
+        wprint("The bug notices your interest and scuttles towards you at a terrifying speed! Before you can run, "
+               "the bug begins to cocoon you in an infinite loop!! You see the following code flash before your eyes "
+               "as you begin to lose conciousness:")
+        print("If (you == best hacker ever):")
+        print("    You = spider food\n")
+        print("You grab the '==' operator and quickly change it to:\n")
+        print("\tA: !=")
+        print("\tB: +=")
+        print("\tC: IDK fight the freaking spider!")
+        wprint("Enter [a/b/c]:")
+
+        user_response = self.ui.user_prompt()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint("What? Try that again...")
+            user_response = self.ui.user_prompt()
+
+        if user_response in ANSWER_A:
+            wprint("The spider rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
+                   "and ends up a dead spiddy on the floor. [Spider carcass] is added to your inventory")
+            spider_defeated = True
+        elif user_response in ANSWER_B:
+            wprint("The spider quits its cocooning and throws a compiler error straight at your face, woah that is "
+                   "gonna leave a nasty scar- you must look like, Rambo cool right now! Luckily you are able to break "
+                   "free of the webbing, but you feel pretty dazed.")
+            self.gamestate.player.update_speed(BUG_SPEED_LOSS)
+            self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
+            spider_defeated = False
+        elif user_response in ANSWER_C:
+            wprint("You punch the spider in one of its many eyes, splooting out a bunch of green gunk and eye juices "
+                   "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly [spider "
+                   "carcass] in your inventory")
+            spider_defeated = True
+
+        if spider_defeated is True:
+            self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
+            self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
+            try:
+                spider_carcass = self.gamestate.get_object_by_name("spider carcass") # TODO: replace string literal with constant from language_words.py once implemented
+                self.gamestate.player.add_object_to_inventory(spider_carcass)
+            except:
+                logger.debug("Unable to add 'spider carcass' to player inventory, maybe the object doesn't exist yet?")
+
+        self.ui.wait_for_enter()
