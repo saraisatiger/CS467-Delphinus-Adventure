@@ -162,6 +162,8 @@ GO_FAILURE_DESTINATION_MISSING = "You need to say where you're trying to go!"
 GO_FAILURE_PREFIX = "You try to go to the "
 GO_FAILURE_SUFFIX = " but just can't find a way."
 GO_FAILURE_SUBWAY_CASH = "You don't have enough cash to ride the subway. Maybe there's a way to ride without paying?"
+GO_FAILURE_COMPUTER_INOPERABLE = "Your computer isn't operable! Try installing your [Floppy Disk], [Graphics Card], " \
+                                 "and [RAM Chip] or equivalent model before logging into the Metaverse. "
 GO_INVALID_PREFIX = "You can't go to the "
 GO_INVALID_SUFFIX = " because you're basically there already!"
 
@@ -274,6 +276,7 @@ PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, j
 # ' use' strings
 USE_FAIL_UNUSABLE = "You cannot use that unless it is in your bag!"
 USE_FAIL_NONSENSE = "There doesn't seem to be anything like that to use."
+USE_FAIL_COMPONENT_INSTALL = "You have to be at [Your Computer] to install this component. If you've got everything you need, you should [use computer] to get started!"
 USE_CASH_SUCCESS_PREFIX = "You count the bills and put them in your wallet. You are "
 USE_CASH_SUCCESS_SUFFIX = " dollars richer!"
 USE_COMPUTER_PARTS_SUCCESS = "You have used the computer parts successfully. Obviously we need to implement something here?!"

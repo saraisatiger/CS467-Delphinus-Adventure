@@ -68,6 +68,7 @@ class GameState:
         self.is_trash_can_looted = False
         self.spraypaint_data = {}
         self.jailroom_data = {}
+        self.endgame_data = {}
 
     def load_rooms_and_objects_from_file(self):
         # Initialize the rooms and objects to their defaults
@@ -83,11 +84,10 @@ class GameState:
         self.set_default_room_by_name(DEFAULT_ROOM)
         self.place_objects_in_rooms(self.objects)
 
-        # Set the spraypainted status for each room to be blank
+        # Init various data-sets
         self.initialize_spraypaint_data()
-
-        # Set the jailroom to default status
         self.initialize_jailroom_data()
+        self.initialize_endgame_data()
 
     def initialize_load_game(self, filename):
         self.game_file = filename.replace('.json', '')
@@ -161,7 +161,8 @@ class GameState:
         self.spraypaint_data = save_data.get_spraypaint_data()
         self.initialize_jailroom_data() # Makes sure dictionary clear
         self.jailroom_data = save_data.get_jailroom_data()
-
+        self.initialize_endgame_data()
+        # self.endgame_data = save_data.get_endgame_data() # TODO: Have Sara build this into SaveGame
 
     def game_status(self):
         # TODO: Implement this properly. Status codes in constants\gameover_status_codes.py  ((SSH))
@@ -224,8 +225,39 @@ class GameState:
             'guard_bribed' : False
         }
 
+    def initialize_endgame_data(self):
+        '''
+        Used to store JSON-parsable variables to be saved to track special data in the end-game logic
+        :return:
+        '''
+        self.endgame_data = {
+            'computer_room': {
+                'is_operable' : False,
+                'is_floppy_installed' : False,
+                'is_ram_installed' : False,
+                'is_graphics_installed' : False
+            }
+        }
+
     def get_jailroom_data(self):
         return self.jailroom_data
+
+    def get_endgame_data(self):
+        logger.debug(self.endgame_data)
+        return self.endgame_data
+
+    # def append_endgame_data(self, key, new_data):
+    #     '''
+            # TODO: Probably delete this, it's just a bad idea
+    #     Add data to the endgame_data variable. Used to store special variables that are accessed by game engine to handle
+    #     special logic, particularly in the endgame
+    #
+    #     :param key: The key to use for the data being added
+    #     :param dict_data: The dictionary being added to the overall dictionary
+    #     :return: None
+    #     '''
+    #     logger.debug("Appending data\nKEY:\n" + key + "\nDATA:\n" + new_data)
+    #     self.endgame_data[key] = new_data
 
     def is_room_spray_painted_by_name(self, room_name):
         '''
