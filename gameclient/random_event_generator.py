@@ -12,6 +12,8 @@
 
 import random
 from constants.probabilities import *
+from debug.debug import *
+logger = logging.getLogger(__name__)
 
 class RandomEventGenerator:
     '''
@@ -45,5 +47,12 @@ class RandomEventGenerator:
     def attempt_spraypaint(self):
         num = random.randint(1,100)
         if num <= self.spraypaint_success_chance:
+            return True
+        return False
+
+    def coin_flip(self):
+        num = random.randint(1,100)
+        logger.debug("coin flip value: " + str(num))
+        if num <= 50:
             return True
         return False

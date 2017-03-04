@@ -506,7 +506,6 @@ class GameClient:
         return go_success
 
     def verb_hack(self, noun_name, noun_type):
-        # TODO: Finish implementing verb_hack for other room features
         hack_success = False
         hacking_detected_by_police = False
         message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
@@ -530,15 +529,30 @@ class GameClient:
                             message = HACK_FAIL_ALREADY_HACKED
 
                         else: # Not hacked yet, player will attempt the hack
-                            # No point go to jail if already there; only randomize result if not in jail already
+                            # These logical branches we don't allow the player to go to jail (while in jail or in metaverse)
                             if feature_name == "unattended police desktop":
                                 hacking_detected_by_police = False
                                 if self.gamestate.jailroom_data['cell_unlocked'] is True:
                                     message = HACK_SUCCESS_JAIL_COMPUTER
                                     self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
                                     self.gamestate.initialize_jailroom_data()
+                                    hack_success = True
                                 else:
                                     message = HACK_FAIL_IN_CELL
+
+                            elif feature_name == "binary files":
+                                hack_success = self.hack_binary_files()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_BINARY_FILES
+                                else:
+                                    message = HACK_FAIL_BINARY_FILES
+
+                            elif feature_name == "corrupted files":
+                                hack_success = self.hack_corrupted_files()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_CORRUPTED_FILES
+                                else:
+                                    message = HACK_FAIL_CORRUPTED_FILES
                             else:
                                 hacking_detected_by_police = not self.rand_event.attempt_hack()
 
@@ -560,7 +574,9 @@ class GameClient:
                                         hack_success = True
 
                                     else:
-                                        message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
+                                        message = "You tried to hack something that is hackable and has not already " \
+                                                  "been hacked, but the programmers forgot to program an effect. " \
+                                                  "Email the authors! "
 
                     else: # Feature is not a hackable feature
                         message = HACK_FAIL_INVALID_TARGET
@@ -1073,7 +1089,7 @@ class GameClient:
         if ram_installed is False:
             wprint("You see some wires, one tiny RAM card looking lonely next to an empty slot. Don't these things usually come in pairs?")
             wprint("Would you like to put in your RAM chip [y/n]?")
-            user_input = self.ui.user_prompt()
+            user_input = self.ui.user_prompt().lower()
 
             if user_input in YES_ALIASES:
                 ram_chip = None
@@ -1168,11 +1184,11 @@ class GameClient:
         print("\tC: IDK fight the freaking spider!\n")
         print("Enter [a/b/c]:")
 
-        user_response = self.ui.user_prompt()
+        user_response = self.ui.user_prompt().lower()
 
         while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
             wprint("What? Try that again...")
-            user_response = self.ui.user_prompt()
+            user_response = self.ui.user_prompt().lower()
 
         if user_response in ANSWER_A:
             wprint("The spider rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
@@ -1222,7 +1238,7 @@ class GameClient:
 
             while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
                 wprint("What? Try that again...")
-                user_response = self.ui.user_prompt()
+                user_response = self.ui.user_prompt().lower()
 
             if user_response in ANSWER_A:
                 if self.gamestate.player.can_skateboard() is True:
@@ -1272,6 +1288,103 @@ class GameClient:
                     spider_carcass = self.gamestate.get_object_by_name("spider carcass")  # TODO: replace string literal with constant from language_words.py once implemented
                     self.gamestate.player.add_object_to_inventory(spider_carcass)
                 except:
-                    logger.debug("Unable to add ....")
+                    logger.debug("Unable to add spider carcass to inventory")
 
         self.ui.wait_for_enter()
+
+    def hack_binary_files(self):
+        '''
+        Logic specific to the user trying to hack the binary files
+        :return: True if the hack succeeds, false otherwise.
+        '''
+        hack_success = False
+
+        wprint("You look into the strings of 1s and 0s barely able to make out anything in this nasty mess of tangled "
+               "code- then you notice somethings! A number any hacker would immediately recognize: 101. This clearly "
+               "means:")
+        print("\tA: lol- as in lolzcats!")
+        print("\tB: 101- the class you are clearly missing")
+        print("\tC: Love You Lots, aww grandma!")
+        print("Enter [a/b/c]")
+
+        user_response = self.ui.user_prompt()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint("What? Try that again...")
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A:
+            wprint("You got it! Love those crazy catz. You grab the [binary code] giving it a quick read before "
+            "shoving it in your backpack. It say:  ‘Dear diary, this is Mr. Robot. How are you? I am fine. I have a "
+            "secret?! Wanna know??? Of course you do, you are my best friend. Well, as president of EvilCorp Bank I "
+            "decided to blow up the world! How ‘bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
+            "Sunday? Lol, yours truly, Mr. Robot")
+            try:
+                binary_files = self.gamestate.get_object_by_name("binary files")  # TODO: replace string literal with constant from language_words.py once implemented
+                self.gamestate.player.add_object_to_inventory(binary_files)
+            except:
+                logger.debug("Unable to add binary files")
+            hack_success = True
+        elif user_response in ANSWER_B:
+            wprint("Yeah no, how could you be thinking of school at a time when your brain needs to actually be working?! Majorly uncool.")
+            self.gamestate.player.update_coolness(BINARY_FILES_COOLNESS_COST)
+            hack_success = False
+        elif user_response in ANSWER_C:
+            # TODO: Find a way so that the player can't keep hacking and getting this answer to increase coolness forever
+            wprint("Grandma does love you- cause like you are the coolest, but this isn’t the right answer")
+            self.gamestate.player.update_coolness(BINARY_FILES_COOLNESS_INCREASE)
+            hack_success = False
+
+        self.ui.wait_for_enter()
+        return hack_success
+
+    def hack_corrupted_files(self):
+        '''
+                Logic specific to the user trying to hack the binary files
+                :return: True if the hack succeeds, false otherwise.
+                '''
+        hack_success = False
+
+        wprint("You turn your hacking expertise to the oozing pile of corrupted files, hacking here and there to try "
+               "and make some sense of the mess- finally a user prompt: ‘WaN7 7o play gaM3 t1NY huuuuMan?’ [y/n]")
+
+        user_response = self.ui.user_prompt().lower()
+
+        while user_response not in YES_ALIASES and user_response not in NO_ALIASES:
+            wprint("What? Try that again...")
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in YES_ALIASES:
+            wprint("Before your eyes flashes up like, a really big Wheel of Fortune type deal, you take a spin "
+                   "throwing turing it as fast as you can and you see it tik tik tik around and around… fingers "
+                   "crossed!")
+            player_wins_spin = self.rand_event.coin_flip()
+
+            if player_wins_spin is True:
+                wprint("The wheel starts to slow and almost lands on ‘LiFe7ime SuPPly o’ F1ShStickz’ but makes it one "
+                "more tik and lands on ‘1 Fr33 [Surge].’ Eh, that works for you")
+                try:
+                    surge = self.gamestate.get_object_by_name(SURGE)
+                    self.gamestate.player.add_object_to_inventory(surge)
+                except:
+                    logger.debug("Unable to add surge from hack_corrupted_files() method")
+
+            elif player_wins_spin is False:
+                wprint("The wheel gets off to a good start and then quickly loses speed, landing on ‘i StteAL ur "
+                       "MoNey’ - oh no, better check your cash fund")
+                old_cash = self.gamestate.player.get_cash()
+                cash_loss = int(-1 * old_cash * CORRUPTED_FILE_CASH_PERCENT_LOSS)
+                self.gamestate.player.update_cash(cash_loss)
+                logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
+
+            else:
+                logger.debug("player_wins_spin must have returned a non-T/F value, that's nuts") # This should never print!
+
+            hack_success = True
+
+        else:
+            wprint("You play it safe and make it back out of that putrid mess… wonder what that game might have been though…")
+            hack_success = False
+
+        self.ui.wait_for_enter()
+        return hack_success

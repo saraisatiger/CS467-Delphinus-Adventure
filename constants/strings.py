@@ -134,7 +134,8 @@ SAVE_GAME_INVALID_EXISTS = "There is already a game saved to that file."
 SAVE_GAME_INVALID_CHARACTERS = "This filename contains invalid characters."
 SAVE_GAME_VALID_FILENAME_MESSAGE = "Something about the filename you provided was invalid."
 QUIT_CONFIRM_PROMPT = "Do you really wish to quit the game? (Y)es or (N)o"
-YES_ALIASES = {'yes', 'y'}
+YES_ALIASES = {'yes', 'y', 'yep', 'yeah', 'yea'}
+NO_ALIASES = {'no', 'n', 'nope'}
 ANSWER_A = {'a', 'A'}
 ANSWER_B = {'b', 'B'}
 ANSWER_C = {'c', 'C'}
@@ -170,6 +171,8 @@ GO_INVALID_PREFIX = "You can't go to the "
 GO_INVALID_SUFFIX = " because you're basically there already!"
 
 # 'hack' strings
+HACK_FAIL_BINARY_FILES = "You might need to hack those bytes some more, something doesn't feel right."
+HACK_FAIL_CORRUPTED_FILES = "You weren't able to overcome the corrupted nature of the corrupted files that time..."
 HACK_FAIL_NOSKILL = "You just don't know how to do that yet"
 HACK_FAIL_INVALID_TARGET = "There's no way to hack that. Try hacking something useful!"
 HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
@@ -179,6 +182,8 @@ HACK_FAIL_IN_CELL = "You need to get out of the cell before you can hack on that
 HACK_FAIL_NONSENSE = "What a bunch of nonsense. That's not something you can hack, at least, not here and now."
 HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your " \
                    "account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww. "
+HACK_SUCCESS_BINARY_FILES = "You hacked the binary files!"
+HACK_SUCCESS_CORRUPTED_FILES = "The corrupted files are uncorrupted!"
 HACK_SUCCESS_JAIL_COMPUTER = "You Hack the computer, clearing your criminal record and unlocking the exit to the " \
                              "building. The one rent-a-cop here doesn't seem to realize anything is amiss, " \
                              "so you grab your gear on the way out. They'll probably change the locks on those cells " \
