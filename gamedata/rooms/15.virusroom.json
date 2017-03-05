@@ -8,12 +8,14 @@
       {
         "name" : "Binary Files",
         "description" : "\"01000101111001Mr.Robot1100010\" So THAT'S who's behind all this!",
-        "hackable": false
+        "hackable": true,
+        "description_hacked": "These binary files have been hacked into bits."
       },
       {
         "name" : "Corrupted Files",
         "description" : "Probably shouldn't open these...",
-        "hackable": false
+        "hackable": true,
+        "description_hacked" : "... yea, next time, you will probably want to use VirtualSandbox3.0. Those were almost as corrupt as EvilCorp Bank!"
       }
   ],
   "room_connections" : [

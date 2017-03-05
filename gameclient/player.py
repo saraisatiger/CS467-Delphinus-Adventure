@@ -50,10 +50,10 @@ class Player:
         return self.cash
 
     def update_cash(self, cash_change):
-        self.cash += cash_change
+        self.cash += int(cash_change)
 
     def update_speed(self, speed_change):
-        self.speed += speed_change
+        self.speed += int(speed_change)
 
     def get_coolness(self):
         return self.coolness
@@ -62,7 +62,7 @@ class Player:
         return self.speed
 
     def update_coolness(self, coolness_change):
-        self.coolness += coolness_change
+        self.coolness += int(coolness_change)
 
     def set_has_hack_skill(self, has_skill=True):
         self.has_hack_skill = has_skill

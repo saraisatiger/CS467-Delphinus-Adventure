@@ -506,7 +506,6 @@ class GameClient:
         return go_success
 
     def verb_hack(self, noun_name, noun_type):
-        # TODO: Finish implementing verb_hack for other room features
         hack_success = False
         hacking_detected_by_police = False
         message = "Somehow message didn't get assigned, yikes! Tell the developer what you were doing!"
@@ -530,15 +529,53 @@ class GameClient:
                             message = HACK_FAIL_ALREADY_HACKED
 
                         else: # Not hacked yet, player will attempt the hack
-                            # No point go to jail if already there; only randomize result if not in jail already
+                            # These logical branches we don't allow the player to go to jail (while in jail or in metaverse)
                             if feature_name == "unattended police desktop":
                                 hacking_detected_by_police = False
                                 if self.gamestate.jailroom_data['cell_unlocked'] is True:
                                     message = HACK_SUCCESS_JAIL_COMPUTER
                                     self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
                                     self.gamestate.initialize_jailroom_data()
+                                    hack_success = True
                                 else:
                                     message = HACK_FAIL_IN_CELL
+
+                            elif feature_name == "binary files":
+                                hack_success = self.hack_binary_files()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_BINARY_FILES
+                                else:
+                                    message = HACK_FAIL_BINARY_FILES
+
+                            elif feature_name == "corrupted files":
+                                hack_success = self.hack_corrupted_files()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_CORRUPTED_FILES
+                                else:
+                                    message = HACK_FAIL_CORRUPTED_FILES
+
+                            elif feature_name == "Cat Videos from the Internet".lower():
+                                hack_success = self.hack_cat_videos()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_CAT_VIDEOS
+                                else:
+                                    message = HACK_FAIL_CAT_VIDEOS
+
+                            elif feature_name == "Nuclear Launch Codes".lower():
+                                hack_success = self.hack_launch_codes()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_LAUNCH_CODES
+                                else:
+                                    message = HACK_FAIL_LAUNCH_CODES
+
+                            elif feature_name == "Sentient CPU".lower():
+                                hack_success = self.hack_sentient_cpu()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_SENTIENT_CPU
+                                else:
+                                    message = HACK_FAIL_SENTIENT_CPU
+
+                            # Every other hack has a chance of sending to jail
                             else:
                                 hacking_detected_by_police = not self.rand_event.attempt_hack()
 
@@ -560,7 +597,9 @@ class GameClient:
                                         hack_success = True
 
                                     else:
-                                        message = "You tried to hack something that is hackable and has not already been hacked, but the programmers forgot to program an effect. Email the authors!"
+                                        message = "You tried to hack something that is hackable and has not already " \
+                                                  "been hacked, but the programmers forgot to program an effect. " \
+                                                  "Email the authors! "
 
                     else: # Feature is not a hackable feature
                         message = HACK_FAIL_INVALID_TARGET
@@ -658,7 +697,7 @@ class GameClient:
         room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
-        room_object_art = self.gamestate.get_object_art(noun_name)
+
 
         looked_at_trash_can = False
         looked_at_panel = False
@@ -701,7 +740,13 @@ class GameClient:
         description = textwrap.fill(description, TEXT_WIDTH)
         # image = textwrap.fill(image, TEXT_WIDTH)
         print(description) # Don't use wprint() or it will remove linebreaks
-        print(room_object_art)
+        try:
+            room_object_art = self.gamestate.get_object_art(noun_name)
+            if room_object_art is not None:
+                print(room_object_art)
+        except:
+            logger.debug("Error with room object art method?")
+
         self.ui.wait_for_enter()
 
         # Handle special look at 'minigame' logic
@@ -857,12 +902,43 @@ class GameClient:
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
                     message = (USE_SURGE_SUCCESS)
+
+                # TODO: TEST LOGIC BETWEEN HERE AND TODO END COMMENT AFTER PARSER SUPPORTS
+                elif obj_label == FIREBALL.lower():
+                    # TODO: Once language parser passes back the preposition and target, we can pass it to below
+                    target_feature = ""
+                    if target_feature == "binary files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_binary_files)
+                    elif target_feature == "corrupted files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_corrupted_files)
+                    elif target_feature == "cat videos from the internet":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_cat_videos)
+                    elif target_feature == "nuclear launch codes":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_launch_codes)
+                    else:
+                        message = "You're not sure how to use a fireball on that."
+                elif obj_label == "bug carcass":
+                    pass
+                    # TODO: Once language parser passes back the preposition and target, we can pass it to below
+                    target_feature = ""
+                    if target_feature == "binary files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
+                    elif target_feature == "corrupted files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_corrupted_files)
+                    elif target_feature == "cat videos from the internet":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_cat_videos)
+                    elif target_feature == "nuclear launch codes":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_launch_codes)
+                    else:
+                        message = "You're not sure how to use a bug carcass in such a way."
+                # TODO: TEST METHODS BETWEEN HERE AND TODO START COMMENT AFTER PARSER SUPPORTS
+
                 else:
                     logger.debug("Not implemented: use " + used_object.get_name())
                     message = ("You used something that the game doesn't know what to do with, please tell your local dev!")
                     use_success = False
             else:
-                wprint(USE_FAIL_UNUSABLE)
+                message = USE_FAIL_UNUSABLE
                 use_success = False
         else:
             message = USE_FAIL_NONSENSE
@@ -1073,7 +1149,7 @@ class GameClient:
         if ram_installed is False:
             wprint("You see some wires, one tiny RAM card looking lonely next to an empty slot. Don't these things usually come in pairs?")
             wprint("Would you like to put in your RAM chip [y/n]?")
-            user_input = self.ui.user_prompt()
+            user_input = self.ui.user_prompt().lower()
 
             if user_input in YES_ALIASES:
                 ram_chip = None
@@ -1168,11 +1244,11 @@ class GameClient:
         print("\tC: IDK fight the freaking spider!\n")
         print("Enter [a/b/c]:")
 
-        user_response = self.ui.user_prompt()
+        user_response = self.ui.user_prompt().lower()
 
         while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
-            wprint("What? Try that again...")
-            user_response = self.ui.user_prompt()
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
 
         if user_response in ANSWER_A:
             wprint("The spider rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
@@ -1221,8 +1297,8 @@ class GameClient:
             user_response = self.ui.user_prompt()
 
             while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
-                wprint("What? Try that again...")
-                user_response = self.ui.user_prompt()
+                wprint(INVALID_PROMPT_RESPONSE)
+                user_response = self.ui.user_prompt().lower()
 
             if user_response in ANSWER_A:
                 if self.gamestate.player.can_skateboard() is True:
@@ -1272,6 +1348,259 @@ class GameClient:
                     spider_carcass = self.gamestate.get_object_by_name("spider carcass")  # TODO: replace string literal with constant from language_words.py once implemented
                     self.gamestate.player.add_object_to_inventory(spider_carcass)
                 except:
-                    logger.debug("Unable to add ....")
+                    logger.debug("Unable to add spider carcass to inventory")
 
         self.ui.wait_for_enter()
+
+    def hack_binary_files(self):
+        '''
+        Logic specific to the user trying to hack the binary files
+        :return: True if the hack succeeds, false otherwise.
+        '''
+        hack_success = False
+
+        wprint("You look into the strings of 1s and 0s barely able to make out anything in this nasty mess of tangled "
+               "code- then you notice somethings! A number any hacker would immediately recognize: 101. This clearly "
+               "means:")
+        print("\tA: lol- as in lolzcats!")
+        print("\tB: 101- the class you are clearly missing")
+        print("\tC: Love You Lots, aww grandma!")
+        print("Enter [a/b/c]")
+
+        user_response = self.ui.user_prompt()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A:
+            wprint("You got it! Love those crazy catz. You grab the [binary code] giving it a quick read before "
+            "shoving it in your backpack. It say:  ‘Dear diary, this is Mr. Robot. How are you? I am fine. I have a "
+            "secret?! Wanna know??? Of course you do, you are my best friend. Well, as president of EvilCorp Bank I "
+            "decided to blow up the world! How ‘bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
+            "Sunday? Lol, yours truly, Mr. Robot")
+            try:
+                binary_files = self.gamestate.get_object_by_name("binary files")  # TODO: replace string literal with constant from language_words.py once implemented
+                self.gamestate.player.add_object_to_inventory(binary_files)
+            except:
+                logger.debug("Unable to add binary files")
+            hack_success = True
+        elif user_response in ANSWER_B:
+            wprint("Yeah no, how could you be thinking of school at a time when your brain needs to actually be working?! Majorly uncool.")
+            self.gamestate.player.update_coolness(BINARY_FILES_COOLNESS_COST)
+            hack_success = False
+        elif user_response in ANSWER_C:
+            # TODO: Find a way so that the player can't keep hacking and getting this answer to increase coolness forever
+            wprint("Grandma does love you- cause like you are the coolest, but this isn’t the right answer")
+            self.gamestate.player.update_coolness(BINARY_FILES_COOLNESS_INCREASE)
+            hack_success = False
+
+        self.ui.wait_for_enter()
+        return hack_success
+
+    def hack_corrupted_files(self):
+        '''
+                Logic specific to the user trying to hack the binary files
+                :return: True if the hack succeeds, false otherwise.
+                '''
+        hack_success = False
+
+        wprint("You turn your hacking expertise to the oozing pile of corrupted files, hacking here and there to try "
+               "and make some sense of the mess- finally a user prompt: ‘WaN7 7o play gaM3 t1NY huuuuMan?’ [y/n]")
+
+        user_response = self.ui.user_prompt().lower()
+
+        while user_response not in YES_ALIASES and user_response not in NO_ALIASES:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in YES_ALIASES:
+            wprint("Before your eyes flashes up like, a really big Wheel of Fortune type deal, you take a spin "
+                   "throwing turing it as fast as you can and you see it tik tik tik around and around… fingers "
+                   "crossed!")
+            player_wins_spin = self.rand_event.coin_flip()
+
+            if player_wins_spin is True:
+                wprint("The wheel starts to slow and almost lands on ‘LiFe7ime SuPPly o’ F1ShStickz’ but makes it one "
+                "more tik and lands on ‘1 Fr33 [Surge].’ Eh, that works for you")
+                try:
+                    surge = self.gamestate.get_object_by_name(SURGE)
+                    self.gamestate.player.add_object_to_inventory(surge)
+                except:
+                    logger.debug("Unable to add surge from hack_corrupted_files() method")
+
+            elif player_wins_spin is False:
+                wprint("The wheel gets off to a good start and then quickly loses speed, landing on ‘i StteAL ur "
+                       "MoNey’ - oh no, better check your cash fund")
+                old_cash = self.gamestate.player.get_cash()
+                cash_loss = int(-1 * old_cash * CORRUPTED_FILE_CASH_PERCENT_LOSS)
+                self.gamestate.player.update_cash(cash_loss)
+                # logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
+
+            else:
+                logger.debug("player_wins_spin must have returned a non-T/F value, that's nuts") # This should never print!
+
+            hack_success = True
+
+        else: # Must have responded 'no'
+            wprint("You play it safe and make it back out of that putrid mess… wonder what that game might have been though…")
+            hack_success = False
+
+        self.ui.wait_for_enter()
+        return hack_success
+
+    def hack_cat_videos(self):
+        '''
+                Logic specific to the user trying to hack the binary files
+                :return: True if the hack succeeds, false otherwise.
+                '''
+        hack_success = True
+
+        wprint("Your eyes glaze over with adorableness… so much fluff. You had something important to do, "
+               "but you can’t quite remember what. Do you want to keep watching [y/n]") 
+
+        user_response = self.ui.user_prompt().lower()
+
+        while user_response not in YES_ALIASES and user_response not in NO_ALIASES:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in YES_ALIASES:
+            wprint("You stare into the video screen giggling intermittently. Time seems to stop and you drool a bit. "
+                   "Eventually you pass out on the floor for awhile. When you wake up you are pretty certain you’ve "
+                   "missed at least a week’s worth of classes.")
+            self.gamestate.player.update_speed(CAT_VIDEO_SPEED_COST)
+            hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
+
+        else:  # Must have responded 'no'
+            wprint("This is the hardest thing you’ve ever done. You scrunch up your face and turn your back on the "
+                   "plethora of precious moments. A single tear falls down your battle hardened cheek, but you know "
+                   "this was the right choice.")
+            hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
+
+        self.ui.wait_for_enter()
+        return hack_success
+
+    def hack_launch_codes(self):
+        '''
+        Logic specific to the user trying to hack the binary files
+        :return: True if the hack succeeds, false otherwise.
+        '''
+        hack_success = False
+
+        wprint("As you reach for the codes, your hand is zapped by some weird blue electricity barrier- ow! You see "
+               "some code flash up creating a wall between you and the codes, just as you expected there is going to "
+               "be some decrypting to do. The code reads:")
+        print("Cr# 0v3 rRid 3")
+        print("\tA: Easy peasy, that means ‘Crashtag Oven Thrashers’ they are like the best punk bank ever.")
+        print("\tB: Well doh, that’s ‘Creators Riddance 3’ almost the coolest video game.")
+        print("\tC: Woah, they must be trying to frame you- that spells ‘Crash Override’ your super cool hacker handle!!!")
+        print("Enter [a/b/c]")
+
+        user_response = self.ui.user_prompt()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A or user_response in ANSWER_B:
+            wprint("You enter the code with confidence. Just as you enter the last character a shockwave hits you "
+                   "like a nasty pop quiz. Guess that isn’t the right answer")
+            hack_success = False
+            self.gamestate.player.update_speed(HACK_LAUNCH_CODE_COST)
+        elif user_response in ANSWER_C:
+            wprint("You type in the code, and the blue electricity shield drops. You gingerly take the codes and put "
+                   "them in your backpack… you are gonna need these and proof that you're not the mastermind behind "
+                   "this heinous scheme if you wanna beat this punk CPU!")
+
+            try:
+                launch_codes = self.gamestate.get_object_by_name("launch codes") # TODO: Update to string-literal from language_words.py once implemented
+                self.gamestate.player.add_object_to_inventory(launch_codes)
+            except:
+                logger.debug("Unable to add launch codes from hack_launch_codes() method")
+
+            hack_success = True
+
+        self.ui.wait_for_enter()
+        return hack_success
+
+    def use_fireball_on_binary_files(self, fireball_object, binary_files_feature):
+        '''
+        Untested method. Should be called by game client with language parser tells us that this is the response,
+        but parser does noet yet support (3/4/17).
+
+        Probably will be called in verb_use() after checking if there is a target for the fireball item to be used on
+
+        :return:
+        '''
+        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+        self.gamestate.player.update_speed(FIREBALL_ON_BINARY_SPEED_COST)
+
+    def use_bug_carcass_on_binary_files(self, bug_carcass_object, binary_files_feature):
+        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+
+    def use_bug_carcass_on_cat_videos(self, bug_carcass_object, cat_videos_feature):
+        wprint("Eww… the cats seem to like the dead bug. They offer gratitude in the form of some tasty "
+               "[hackersnacks]- this makes sense as those tasty treats are rumored to just be repackaged kibble")
+        snacks = self.gamestate.get_object_by_name(HACKERSNACKS)
+        self.gamestate.player.add_object_to_inventory(snacks)
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+
+    def use_bug_carcass_on_corrupted_files(self, bug_carcass_object, corrupted_files_feature):
+        wprint("Eww… I think they are making friends")
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+
+    def use_bug_carcass_on_launch_codes(self, bug_carcass_object, corrupted_files_feature):
+        wprint("This does nothing... and is weird.")
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+
+    def use_fireball_on_corrupted_files(self, fireball_object, corrupted_files_feature):
+        wprint("The files splutter up in a mess of flames - they are so not getting a prom date.")
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+
+    def use_fireball_on_cat_videos(self, fireball_object, cat_videos_feature):
+        wprint("You monster! The internet is angry and you spend like half your cash stash trying to change your identity.")
+        old_cash = self.gamestate.player.get_cash()
+        cash_loss = int(-1 * old_cash * CAT_VIDEO_CASH_PERCENT_LOSS)
+        self.gamestate.player.update_cash(cash_loss)
+        # logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+
+    def use_fireball_on_launch_codes(self, fireball_object, launch_codes_feature):
+        wprint("Oh that doesn’t look good, these are gonna be pretty hard to hack...")
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+
+    def use_object_on_feature(self, object_name, feature_name, success_function):
+        '''
+        Attempts to use the object designed by object_name on the feature designated by feature_name
+        :param object_name:
+        :param feature_name:
+        :param success_function:
+        :return:
+        '''
+        success = False
+        target_feature = self.gamestate.get_current_room().get_feature_by_name(feature_name)
+        object_used = self.gamestate.player.inventory.get_object_by_name(object_name)
+
+        if object_used is None:
+            wprint("You don't have a " + object_name + " that you can use.")
+
+        elif target_feature is None:
+            wprint("You see no ["+ feature_name + "] here to target with the [" + object_used.get_name() + "].")
+
+        else:
+            success_function(target_feature, object_used)
+            success = True
+
+        self.ui.wait_for_enter()
+        return success
+
+
+    def hack_sentient_cpu(self):
+        '''
+        Work in progress
+        :return:
+        '''
+        pass
