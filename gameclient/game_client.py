@@ -898,18 +898,32 @@ class GameClient:
 
                 # TODO: TEST LOGIC BETWEEN HERE AND TODO END COMMENT AFTER PARSER SUPPORTS
                 elif obj_label == FIREBALL.lower():
-                    pass
                     # TODO: Once language parser passes back the preposition and target, we can pass it to below
                     target_feature = ""
                     if target_feature == "binary files":
                         self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_binary_files)
-
-                elif obj_label == "bug carcass".lower():
+                    elif target_feature == "corrupted files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_corrupted_files)
+                    elif target_feature == "cat videos from the internet":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_cat_videos)
+                    elif target_feature == "nuclear launch codes":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_launch_codes)
+                    else:
+                        message = "You're not sure how to use a fireball on that."
+                elif obj_label == "bug carcass":
                     pass
                     # TODO: Once language parser passes back the preposition and target, we can pass it to below
                     target_feature = ""
                     if target_feature == "binary files":
                         self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
+                    elif target_feature == "corrupted files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_corrupted_files)
+                    elif target_feature == "cat videos from the internet":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_cat_videos)
+                    elif target_feature == "nuclear launch codes":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_launch_codes)
+                    else:
+                        message = "You're not sure how to use a bug carcass in such a way."
                 # TODO: TEST METHODS BETWEEN HERE AND TODO START COMMENT AFTER PARSER SUPPORTS
 
                 else:
@@ -1414,7 +1428,7 @@ class GameClient:
                 old_cash = self.gamestate.player.get_cash()
                 cash_loss = int(-1 * old_cash * CORRUPTED_FILE_CASH_PERCENT_LOSS)
                 self.gamestate.player.update_cash(cash_loss)
-                logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
+                # logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
 
             else:
                 logger.debug("player_wins_spin must have returned a non-T/F value, that's nuts") # This should never print!
@@ -1520,6 +1534,37 @@ class GameClient:
         wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
         self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
 
+    def use_bug_carcass_on_cat_videos(self, bug_carcass_object, cat_videos_feature):
+        wprint("Eww… the cats seem to like the dead bug. They offer gratitude in the form of some tasty "
+               "[hackersnacks]- this makes sense as those tasty treats are rumored to just be repackaged kibble")
+        snacks = self.gamestate.get_object_by_name(HACKERSNACKS)
+        self.gamestate.player.add_object_to_inventory(snacks)
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+
+    def use_bug_carcass_on_corrupted_files(self, bug_carcass_object, corrupted_files_feature):
+        wprint("Eww… I think they are making friends")
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+
+    def use_bug_carcass_on_launch_codes(self, bug_carcass_object, corrupted_files_feature):
+        wprint("This does nothing... and is weird.")
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+
+    def use_fireball_on_corrupted_files(self, fireball_object, corrupted_files_feature):
+        wprint("The files splutter up in a mess of flames - they are so not getting a prom date.")
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+
+    def use_fireball_on_cat_videos(self, fireball_object, cat_videos_feature):
+        wprint("You monster! The internet is angry and you spend like half your cash stash trying to change your identity.")
+        old_cash = self.gamestate.player.get_cash()
+        cash_loss = int(-1 * old_cash * CAT_VIDEO_CASH_PERCENT_LOSS)
+        self.gamestate.player.update_cash(cash_loss)
+        # logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+
+    def use_fireball_on_launch_codes(self, fireball_object, launch_codes_feature):
+        wprint("Oh that doesn’t look good, these are gonna be pretty hard to hack...")
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+
     def use_object_on_feature(self, object_name, feature_name, success_function):
         '''
         Attempts to use the object designed by object_name on the feature designated by feature_name
@@ -1542,4 +1587,5 @@ class GameClient:
             success_function(target_feature, object_used)
             success = True
 
+        self.ui.wait_for_enter()
         return success
