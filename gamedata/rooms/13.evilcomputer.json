@@ -13,7 +13,8 @@
       {
         "name" : "Sentient CPU",
         "description" : "The creepiest graphics imaginable.",
-        "hackable": false
+        "hackable": true,
+        "description_hacked" : "Not so sentient now, is it?!"
       }
   ],
   "room_connections" : [

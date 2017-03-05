@@ -568,6 +568,13 @@ class GameClient:
                                 else:
                                     message = HACK_FAIL_LAUNCH_CODES
 
+                            elif feature_name == "Sentient CPU".lower():
+                                hack_success = self.hack_sentient_cpu()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_SENTIENT_CPU
+                                else:
+                                    message = HACK_FAIL_SENTIENT_CPU
+
                             # Every other hack has a chance of sending to jail
                             else:
                                 hacking_detected_by_police = not self.rand_event.attempt_hack()
@@ -931,7 +938,7 @@ class GameClient:
                     message = ("You used something that the game doesn't know what to do with, please tell your local dev!")
                     use_success = False
             else:
-                wprint(USE_FAIL_UNUSABLE)
+                message = USE_FAIL_UNUSABLE
                 use_success = False
         else:
             message = USE_FAIL_NONSENSE
@@ -1589,3 +1596,11 @@ class GameClient:
 
         self.ui.wait_for_enter()
         return success
+
+
+    def hack_sentient_cpu(self):
+        '''
+        Work in progress
+        :return:
+        '''
+        pass

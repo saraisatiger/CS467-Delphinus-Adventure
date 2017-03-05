@@ -176,6 +176,7 @@ HACK_FAIL_BINARY_FILES = "You might need to hack those bytes some more, somethin
 HACK_FAIL_CAT_VIDEOS = "Meow is not the time for failure! Best try hacking that again."
 HACK_FAIL_CORRUPTED_FILES = "You weren't able to overcome the corrupted nature of the corrupted files that time..."
 HACK_FAIL_LAUNCH_CODES = "It seems the fate of the world should not rest on your shoulders."
+HACK_FAIL_SENTIENT_CPU = "It was aware of itself first, and now it's aware that you failed to hack it. Pissed. Off. CPU."
 HACK_FAIL_NOSKILL = "You just don't know how to do that yet"
 HACK_FAIL_INVALID_TARGET = "There's no way to hack that. Try hacking something useful!"
 HACK_FAIL_FEATURE_NOT_PRESENT = "There isn't one of those here to hack."
@@ -193,6 +194,7 @@ HACK_SUCCESS_JAIL_COMPUTER = "You Hack the computer, clearing your criminal reco
                              "so you grab your gear on the way out. They'll probably change the locks on those cells " \
                              "so you toss the key in a trash can on the way out. "
 HACK_SUCCESS_LAUNCH_CODES = "The following takes place between 9:00am and 10:00am. Feeling like Jack Bauer today!!"
+HACK_SUCCESS_SENTIENT_CPU = "You hacked the CPU and it knows it... because, like, it's sentient!"
 HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the street whenever you want. That should " \
                               "make things a lot faster for you. "
 HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You " \
