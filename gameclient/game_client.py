@@ -553,6 +553,15 @@ class GameClient:
                                     message = HACK_SUCCESS_CORRUPTED_FILES
                                 else:
                                     message = HACK_FAIL_CORRUPTED_FILES
+
+                            elif feature_name == "Cat Videos from the Internet".lower():
+                                hack_success = self.hack_cat_videos()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_CAT_VIDEOS
+                                else:
+                                    message = HACK_FAIL_CAT_VIDEOS
+
+                            # Every other hack has a chance of sending to jail
                             else:
                                 hacking_detected_by_police = not self.rand_event.attempt_hack()
 
@@ -674,7 +683,7 @@ class GameClient:
         room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
-        room_object_art = self.gamestate.get_object_art(noun_name)
+
 
         looked_at_trash_can = False
         looked_at_panel = False
@@ -717,7 +726,13 @@ class GameClient:
         description = textwrap.fill(description, TEXT_WIDTH)
         # image = textwrap.fill(image, TEXT_WIDTH)
         print(description) # Don't use wprint() or it will remove linebreaks
-        print(room_object_art)
+        try:
+            room_object_art = self.gamestate.get_object_art(noun_name)
+            if room_object_art is not None:
+                print(room_object_art)
+        except:
+            logger.debug("Error with room object art method?")
+
         self.ui.wait_for_enter()
 
         # Handle special look at 'minigame' logic
@@ -1187,7 +1202,7 @@ class GameClient:
         user_response = self.ui.user_prompt().lower()
 
         while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
-            wprint("What? Try that again...")
+            wprint(INVALID_PROMPT_RESPONSE)
             user_response = self.ui.user_prompt().lower()
 
         if user_response in ANSWER_A:
@@ -1237,7 +1252,7 @@ class GameClient:
             user_response = self.ui.user_prompt()
 
             while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
-                wprint("What? Try that again...")
+                wprint(INVALID_PROMPT_RESPONSE)
                 user_response = self.ui.user_prompt().lower()
 
             if user_response in ANSWER_A:
@@ -1310,7 +1325,7 @@ class GameClient:
         user_response = self.ui.user_prompt()
 
         while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
-            wprint("What? Try that again...")
+            wprint(INVALID_PROMPT_RESPONSE)
             user_response = self.ui.user_prompt().lower()
 
         if user_response in ANSWER_A:
@@ -1351,7 +1366,7 @@ class GameClient:
         user_response = self.ui.user_prompt().lower()
 
         while user_response not in YES_ALIASES and user_response not in NO_ALIASES:
-            wprint("What? Try that again...")
+            wprint(INVALID_PROMPT_RESPONSE)
             user_response = self.ui.user_prompt().lower()
 
         if user_response in YES_ALIASES:
@@ -1382,9 +1397,41 @@ class GameClient:
 
             hack_success = True
 
-        else:
+        else: # Must have responded 'no'
             wprint("You play it safe and make it back out of that putrid mess… wonder what that game might have been though…")
             hack_success = False
+
+        self.ui.wait_for_enter()
+        return hack_success
+
+    def hack_cat_videos(self):
+        '''
+                Logic specific to the user trying to hack the binary files
+                :return: True if the hack succeeds, false otherwise.
+                '''
+        hack_success = True
+
+        wprint("Your eyes glaze over with adorableness… so much fluff. You had something important to do, "
+               "but you can’t quite remember what. Do you want to keep watching [y/n]") 
+
+        user_response = self.ui.user_prompt().lower()
+
+        while user_response not in YES_ALIASES and user_response not in NO_ALIASES:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in YES_ALIASES:
+            wprint("You stare into the video screen giggling intermittently. Time seems to stop and you drool a bit. "
+                   "Eventually you pass out on the floor for awhile. When you wake up you are pretty certain you’ve "
+                   "missed at least a week’s worth of classes.")
+            self.gamestate.player.update_speed(CAT_VIDEO_SPEED_COST)
+            hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
+
+        else:  # Must have responded 'no'
+            wprint("This is the hardest thing you’ve ever done. You scrunch up your face and turn your back on the "
+                   "plethora of precious moments. A single tear falls down your battle hardened cheek, but you know "
+                   "this was the right choice.")
+            hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
 
         self.ui.wait_for_enter()
         return hack_success
