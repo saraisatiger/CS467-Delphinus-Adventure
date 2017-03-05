@@ -55,7 +55,7 @@ class SaveGame:
                 self.object_room_mapping[room.get_name()] = room_objects
 
                 # Remember which room features have been hacked
-                hacked_features = []
+                # hacked_features = []
                 for room_feature in room.room_features:
                     if room_feature.is_hackable() is True:
                         self.features_hacked_mapping[room.get_name()] = { room_feature.get_name() : room_feature.is_hacked() }

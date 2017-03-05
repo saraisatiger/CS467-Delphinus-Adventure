@@ -19,6 +19,11 @@
         "name" : "Acid Burn",
         "description" : "So much hacking knowledge in one gorgeous place!",
         "hackable": false
+      },
+      {
+          "name" : "1337 Translator",
+          "description" : "Translate your n00b text into l337 text!",
+          "hackable": false
       }
   ],
   "room_connections" : [

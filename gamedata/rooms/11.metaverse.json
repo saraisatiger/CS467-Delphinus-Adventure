@@ -12,7 +12,7 @@
       },
       {
         "name" : "Firewall",
-        "description" : "A flamming structure blocking your path to the Data Tower.",
+        "description" : "A flaming structure blocking your path to the Data Tower.",
         "hackable": false
       }
   ],

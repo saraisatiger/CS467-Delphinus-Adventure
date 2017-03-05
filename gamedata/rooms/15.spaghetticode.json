@@ -7,7 +7,7 @@
   "room_features" : [
       {
         "name" : "Binary Files",
-        "description" : "\"01000101111001Mr.Robot1100010\" So THAT'S who's behind all this!",
+        "description" : "'01000101111001Mr.Robot1100010' So THAT'S who's behind all this!",
         "hackable": true,
         "description_hacked": "These binary files have been hacked into bits."
       },

@@ -10,6 +10,8 @@
 # CITE: http://stackoverflow.com/questions/4810537/how-to-clear-the-screen-in-python
 # CITE: http://stackoverflow.com/questions/110362/how-can-i-find-the-current-os-in-python
 # CITE: https://docs.python.org/3.3/library/random.html
+# CITE: http://www.robertecker.com/hp/research/leet-converter.php
+# CITE: http://stackoverflow.com/questions/10492869/how-to-perform-leet-with-python
 
 from constants.gameplay_settings import *
 from constants.language_words import *
@@ -362,8 +364,6 @@ class GameClient:
                 wprint(BUY_NOT_IN_ROOM)
             elif object.get_cost() is 0:
                 wprint(BUY_FREE_ITEM)
-            # elif object.is_owned_by_player() is True:
-            #     wprint(BUY_FREE_ITEM)
             elif object.get_cost() > player_cash:
                 wprint(BUY_INSUFFICIENT_CASH_PREFIX + str(object.get_cost()) + BUY_INSUFFICIENT_CASH_SUFFIX)
             else:
@@ -703,12 +703,13 @@ class GameClient:
         looked_at_panel = False
         looked_at_bug = False
         looked_at_firewall = False
+        looked_at_leet = False
 
         if room_feature is not None:
             try:
                 description = room_feature.get_description()
                 room_feature_name = room_feature.get_name().lower()
-                # CHeck for special room feature logic
+                # Check for special room feature logic
                 if room_feature_name == "trash can":
                     looked_at_trash_can = True
                 elif room_feature_name == "panel":
@@ -717,6 +718,8 @@ class GameClient:
                     looked_at_bug = True
                 elif room_feature_name == "firewall":
                     looked_at_firewall = True
+                elif room_feature_name == "1337 Translator":
+                    looked_at_leet = True
 
             except:
                 logger.debug("verb_look_at(): room_feature.get_description() exception")
@@ -758,6 +761,8 @@ class GameClient:
             self.minigame_bug()
         elif looked_at_firewall is True:
             self.minigame_firewall()
+        elif looked_at_leet is True:
+            self.leet_translator()
 
     def verb_quit(self, message):
         '''
@@ -1308,7 +1313,7 @@ class GameClient:
                            "out")
                     firewall_defeated = True
                 else:
-                    wprint("Do you even know how to skateboard? You certainly don’t own one and like, that is just "
+                    wprint("Do you even know how to skateboard? You certainly don't own one and like, that is just "
                            "lame. Even you realise that what you have attempted is so uncool. You should probably "
                            "think more next time.")
                     self.gamestate.player.update_coolness(FIREWALL_COOLNESS_COST)
@@ -1351,6 +1356,51 @@ class GameClient:
                     logger.debug("Unable to add spider carcass to inventory")
 
         self.ui.wait_for_enter()
+
+    def leet_translator(self):
+        leet_speak = (('a', '4'), ('b', '6'), ('c', '('), ('d', '[)'), ('e', '3'),
+                      ('f', ']]='), ('g', '&'), ('h', '#'), ('i', '!'), ('j', ',|'),
+                      ('k', ']{'), ('l', '7'), ('m', '(V)'), ('n', '(\)'), ('o', '()'),
+                      ('p', '[]D'), ('q', '(,)'), ('r', 'R'), ('s', '$'), ('t', "']'"),
+                      ('u', '(_)'), ('v', '\/'), ('w', "'//"), ('x', '%'), ('y', "'/"),
+                      ('z', '"/_'))
+        # wprint(LEET_ENTER_TRANSLATOR_PROMPT)
+        wprint("Enter 1337 Translator? (Y)es or (N)o?")
+        confirm = self.ui.user_prompt().lower()
+        if confirm in YES_ALIASES:
+            # wprint(LEET_TRANSLATE_PROMPT)
+            self.gamestate.player.update_coolness(20)
+            repeat = False
+            wprint("Entering 1337 Translator... (Enter 'quit' to exit)")
+            input = self.ui.user_prompt()
+            translation = input.lower()
+            if input.lower() != "quit":
+                for noob, leet in leet_speak:
+                    translation = translation.replace(noob, leet)
+                wprint("Here's your 1337 translation:")
+                wprint(translation)
+                wprint("Wanna go again? (Y)es or (N)o?")
+                confirm = self.ui.user_prompt().lower()
+                if confirm in YES_ALIASES:
+                    repeat = True
+                    while repeat:
+                        wprint("Entering 1337 Translator... (Enter 'quit' to exit)")
+                        input = self.ui.user_prompt()
+                        translation = input.lower()
+                        if input.lower() != "quit":
+                            for noob, leet in leet_speak:
+                                translation = translation.replace(noob, leet)
+                            wprint("Here's your 1337 translation:")
+                            wprint(translation)
+                            wprint("Wanna go again? (Y)es or (N)o?")
+                            confirm = self.ui.user_prompt().lower()
+                            if confirm not in YES_ALIASES:
+                                repeat = False
+                                wprint("()]{, 6'/&... (That's 'OK, bye' for you n00bs!)")
+            else:
+                wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
+        else:
+            wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
 
     def hack_binary_files(self):
         '''
@@ -1603,4 +1653,14 @@ class GameClient:
         Work in progress
         :return:
         '''
-        pass
+        launch_codes = self.gamestate.get_object_by_name("Launch Codes")
+        binary_files = self.gamestate.get_object_by_name("Binary Files")
+        if launch_codes in self.gamestate.player.inventory and binary_files in self.gamestate.player.inventory:
+            print("CPU: 1, Player: 0")
+            self.gamestate.player.update_speed(-10)
+            self.gamestate.player.update_coolness(-10)
+            return False
+        else:
+            print("CPU: 0, Player: 1")
+            self.gamestate.player.update_coolness(100)
+            return True
