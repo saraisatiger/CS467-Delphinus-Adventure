@@ -1519,7 +1519,6 @@ class GameClient:
     def use_bug_carcass_on_binary_files(self, bug_carcass_object, binary_files_feature):
         wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
         self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
-        self.gamestate.player.update_speed(FIREBALL_ON_BINARY_SPEED_COST)
 
     def use_object_on_feature(self, object_name, feature_name, success_function):
         '''
