@@ -561,6 +561,13 @@ class GameClient:
                                 else:
                                     message = HACK_FAIL_CAT_VIDEOS
 
+                            elif feature_name == "Nuclear Launch Codes".lower():
+                                hack_success = self.hack_launch_codes()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_LAUNCH_CODES
+                                else:
+                                    message = HACK_FAIL_LAUNCH_CODES
+
                             # Every other hack has a chance of sending to jail
                             else:
                                 hacking_detected_by_police = not self.rand_event.attempt_hack()
@@ -888,6 +895,23 @@ class GameClient:
                     self.gamestate.player.remove_object_from_inventory(used_object)
                     self.gamestate.player.update_speed(SNACK_SPEED_INCREASE)
                     message = (USE_SURGE_SUCCESS)
+
+                # TODO: TEST LOGIC BETWEEN HERE AND TODO END COMMENT AFTER PARSER SUPPORTS
+                elif obj_label == FIREBALL.lower():
+                    pass
+                    # TODO: Once language parser passes back the preposition and target, we can pass it to below
+                    target_feature = ""
+                    if target_feature == "binary files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_binary_files)
+
+                elif obj_label == "bug carcass".lower():
+                    pass
+                    # TODO: Once language parser passes back the preposition and target, we can pass it to below
+                    target_feature = ""
+                    if target_feature == "binary files":
+                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
+                # TODO: TEST METHODS BETWEEN HERE AND TODO START COMMENT AFTER PARSER SUPPORTS
+
                 else:
                     logger.debug("Not implemented: use " + used_object.get_name())
                     message = ("You used something that the game doesn't know what to do with, please tell your local dev!")
@@ -1435,3 +1459,88 @@ class GameClient:
 
         self.ui.wait_for_enter()
         return hack_success
+
+    def hack_launch_codes(self):
+        '''
+        Logic specific to the user trying to hack the binary files
+        :return: True if the hack succeeds, false otherwise.
+        '''
+        hack_success = False
+
+        wprint("As you reach for the codes, your hand is zapped by some weird blue electricity barrier- ow! You see "
+               "some code flash up creating a wall between you and the codes, just as you expected there is going to "
+               "be some decrypting to do. The code reads:")
+        print("Cr# 0v3 rRid 3")
+        print("\tA: Easy peasy, that means ‘Crashtag Oven Thrashers’ they are like the best punk bank ever.")
+        print("\tB: Well doh, that’s ‘Creators Riddance 3’ almost the coolest video game.")
+        print("\tC: Woah, they must be trying to frame you- that spells ‘Crash Override’ your super cool hacker handle!!!")
+        print("Enter [a/b/c]")
+
+        user_response = self.ui.user_prompt()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A or user_response in ANSWER_B:
+            wprint("You enter the code with confidence. Just as you enter the last character a shockwave hits you "
+                   "like a nasty pop quiz. Guess that isn’t the right answer")
+            hack_success = False
+            self.gamestate.player.update_speed(HACK_LAUNCH_CODE_COST)
+        elif user_response in ANSWER_C:
+            wprint("You type in the code, and the blue electricity shield drops. You gingerly take the codes and put "
+                   "them in your backpack… you are gonna need these and proof that you're not the mastermind behind "
+                   "this heinous scheme if you wanna beat this punk CPU!")
+
+            try:
+                launch_codes = self.gamestate.get_object_by_name("launch codes") # TODO: Update to string-literal from language_words.py once implemented
+                self.gamestate.player.add_object_to_inventory(launch_codes)
+            except:
+                logger.debug("Unable to add launch codes from hack_launch_codes() method")
+
+            hack_success = True
+
+        self.ui.wait_for_enter()
+        return hack_success
+
+    def use_fireball_on_binary_files(self, fireball_object, binary_files_feature):
+        '''
+        Untested method. Should be called by game client with language parser tells us that this is the response,
+        but parser does noet yet support (3/4/17).
+
+        Probably will be called in verb_use() after checking if there is a target for the fireball item to be used on
+
+        :return:
+        '''
+        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
+        self.gamestate.player.remove_object_from_inventory(fireball_object)
+        self.gamestate.player.update_speed(FIREBALL_ON_BINARY_SPEED_COST)
+
+    def use_bug_carcass_on_binary_files(self, bug_carcass_object, binary_files_feature):
+        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        self.gamestate.player.update_speed(FIREBALL_ON_BINARY_SPEED_COST)
+
+    def use_object_on_feature(self, object_name, feature_name, success_function):
+        '''
+        Attempts to use the object designed by object_name on the feature designated by feature_name
+        :param object_name:
+        :param feature_name:
+        :param success_function:
+        :return:
+        '''
+        success = False
+        target_feature = self.gamestate.get_current_room().get_feature_by_name(feature_name)
+        object_used = self.gamestate.player.inventory.get_object_by_name(object_name)
+
+        if object_used is None:
+            wprint("You don't have a " + object_name + " that you can use.")
+
+        elif target_feature is None:
+            wprint("You see no ["+ feature_name + "] here to target with the [" + object_used.get_name() + "].")
+
+        else:
+            success_function(target_feature, object_used)
+            success = True
+
+        return success
