@@ -24,7 +24,7 @@ R10 = ['computer']
 R11 = ['inside the metaverse', 'metaverse', 'internet']
 R12 = ['chat room', 'chat']
 R13 = ['data tower', 'data', 'tower']
-R14 = ['encrypted files', 'encrypted', 'encrypt', 'files']
+R14 = ['encrypted files', 'encrypted', 'encrypt']
 R15 = ['virus room', 'virus']
 #no room 16 as player will be sent automatically if they win
 
@@ -63,8 +63,8 @@ FIREBALL = 'fireball'
 FIREBALL_ALIASES = ['fireball', 'fire', 'ball']
 BUG = 'bug carcass'
 BUG_ALIASES = ['bug carcass', 'carcass']
-CPUHEAD = 'sentient cpu head'
-CPUHEAD_ALIASES = ['sentient cpu head', 'head']
+CPUHEAD = 'cpu head'
+CPUHEAD_ALIASES = ['cpu head', 'head']
 
 OBJECT_ALIASES = [CASH_CRISP_ALIASES , CASH_WAD_ALIASES, SKATEBORD_ALIASES, HACKERSNACKS_ALIASES, HACKER_MANUAL_ALIASES, SURGE_ALIASES, SPRAY_PAINT_ALIASES, FLOPPY_DISK_ALIASES, GRAPHICS_CARD_ALIASES, NEW_COMPUTER_ALIASES, RAM_ALIASES, ACMERAM_ALIASES, KEY_ALIASES, FIREBALL_ALIASES, BUG_ALIASES, CPUHEAD_ALIASES]
 
@@ -81,8 +81,8 @@ R8_F = [['school intercom mic', 'intercom mic', 'intercom', 'mic'], ['office des
 R9_F = [['control box', 'control', 'box'], ['door'], ['ledge']]
 R10_F = [['disk drive', 'drive'], ['panel'], ['terminal']]
 R11_F = [['bug'], ['firewall']]
-R12_F = [['emojis', 'emoji', 'emoticons'], ['creature', 'troll'], ['acid burn']]
-R13_F = [['input output port', 'input output port', 'in out port', 'input output', 'in out' 'port'], ['sentient cpu', 'cpu']]
+R12_F = [['emojis', 'emoji', 'emoticons'], ['creature', 'troll'], ['acid burn'], ['leet translator', 'leet', 'translator']]
+R13_F = [['input output port', 'input output port', 'in out port', 'input output', 'in out' 'port'], ['sentient cpu', 'sentient']]
 R14_F = [['cat videos from the internet', 'internet cat videos', 'cat videos', 'videos', 'vids'], ['nuclear launch codes', 'launch codes', 'codes']]
 R15_F = [['binary files', 'binary'], ['corrupted files', 'corrupted']]
 R16_F = [['acid burn'], ['diving board', 'diving'], ['walls']]
