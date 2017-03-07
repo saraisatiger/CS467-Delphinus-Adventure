@@ -13,10 +13,12 @@
       "Hacker Manual",
       "Skateboard",
       "Fireball",
-      "Bug Carcass"
+      "Bug Carcass",
+      "Launch Codes",
+      "Binary Files"
    ],
-   "current_room":"Inside the Metaverse",
-   "prior_room":"Your Computer",
+   "current_room":"Data Tower",
+   "prior_room":"Inside the Metaverse",
    "player_has_skate_skill":true,
    "is_trash_can_looted":false,
    "spraypaint_data":{
