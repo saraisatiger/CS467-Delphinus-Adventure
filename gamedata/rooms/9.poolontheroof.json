@@ -6,7 +6,7 @@
   "virtual_space" : false,
   "room_features" : [
       {
-        "name" : "Door",
+        "name" : "Heavy Door",
         "description" : "A large metal structure which is probably gonna make you late for class. Psyc! You would never go to class.",
         "hackable": false
       },

@@ -81,10 +81,13 @@ class LanguageParser:
 		for alias in CHEATCODE_LOSE_ALIASES:
 			if alias in command:
 				verb  = CHEAT_LOSE
+				cheat = True
 		
 		for alias in CHEATCODE_WIN_ALIASES:
 			if alias in command:
 				verb = CHEAT_WIN
+				cheat = True
+				
 
 		# Check for empty string
 		if command == '':

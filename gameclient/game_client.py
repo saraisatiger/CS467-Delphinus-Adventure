@@ -468,7 +468,7 @@ class GameClient:
                     elif cur_room_name == "inside the metaverse":
                         if destination_room_name == "data tower":
                             has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
-                            has_bug_carcass = self.gamestate.player.has_object_by_name("bug carcass") # TODO: Replace string with constant from language_words.py once defined
+                            has_bug_carcass = self.gamestate.player.has_object_by_name("carcass") # TODO: Replace string with constant from language_words.py once defined
 
                             if has_fireball is False or has_bug_carcass is False:
                                 go_success = False
@@ -864,11 +864,11 @@ class GameClient:
                 use_success = True
 
                 # Conditionally remove the 'new laptop' object if that's the item they had and toggle on 'operable' var
-                if self.gamestate.player.has_object_by_name(NEW_COMPUTER) is True:
-                    new_pc_item = self.gamestate.player.inventory.get_object_by_name(NEW_COMPUTER)
+                if self.gamestate.player.has_object_by_name(NEW_LAPTOP) is True:
+                    new_pc_item = self.gamestate.player.inventory.get_object_by_name(NEW_LAPTOP)
                     self.gamestate.player.remove_object_from_inventory(new_pc_item)
                     self.gamestate.endgame_data['computer_room']['is_operable'] = True
-                    message = "You boot up the new computer and jack into the nearest RJ-45 port you can find. Time to Hack!"
+                    message = "You boot up the new laptop and jack into the nearest RJ-45 port you can find. Time to Hack!"
                 else: # Player must have the rest of the parts they needed, instead
                     message = "You have what you need to repair your computer! Time to install the components... A [Floppy Disk], a [Graphics Card], and a [RAM Chip] are spread out upon your portable anti-static mat!"
 
@@ -940,7 +940,7 @@ class GameClient:
                         self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_launch_codes)
                     else:
                         message = "You're not sure how to use a fireball on that."
-                elif obj_label == "bug carcass":
+                elif obj_label == "carcass":
                     pass
                     # TODO: Once language parser passes back the preposition and target, we can pass it to below
                     target_feature = ""
@@ -1260,11 +1260,11 @@ class GameClient:
                "the bug begins to cocoon you in an infinite loop!! You see the following code flash before your eyes "
                "as you begin to lose conciousness:")
         print("If (you == best hacker ever):")
-        print("    You = spider food\n")
+        print("    You = bug food\n")
         print("You grab the '==' operator and quickly change it to:\n")
         print("\tA: !=")
         print("\tB: +=")
-        print("\tC: IDK fight the freaking spider?!\n")
+        print("\tC: IDK fight the freaking bug?!\n")
         print("Enter [a/b/c]:")
 
         user_response = self.ui.user_prompt().lower()
@@ -1274,30 +1274,30 @@ class GameClient:
             user_response = self.ui.user_prompt().lower()
 
         if user_response in ANSWER_A:
-            wprint("The spider rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
-                   "and ends up a dead spiddy on the floor. [Bug carcass] is added to your inventory")
+            wprint("The bug rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
+                   "and ends up a dead spiddy on the floor. [carcass] is added to your inventory")
             spider_defeated = True
         elif user_response in ANSWER_B:
-            wprint("The spider quits its cocooning and throws a compiler error straight at your face, woah that is "
+            wprint("The bug quits its cocooning and throws a compiler error straight at your face, woah that is "
                    "gonna leave a nasty scar- you must look like, Rambo cool right now! Luckily you are able to break "
                    "free of the webbing, but you feel pretty dazed.")
             self.gamestate.player.update_speed(BUG_SPEED_LOSS)
             self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
             spider_defeated = False
         elif user_response in ANSWER_C:
-            wprint("You punch the spider in one of its many eyes, splooting out a bunch of green gunk and eye juices "
-                   "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly [spider "
-                   "carcass] in your inventory")
+            wprint("You punch the bug in one of its many eyes, splooting out a bunch of green gunk and eye juices "
+                   "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly "
+                   "[carcass] in your inventory")
             spider_defeated = True
 
         if spider_defeated is True:
             self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
             self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
             try:
-                bug_carcass = self.gamestate.get_object_by_name(BUG) # TODO: replace string literal with constant from language_words.py once implemented
-                self.gamestate.player.add_object_to_inventory(bug_carcass)
+                carcass = self.gamestate.get_object_by_name("Carcass") # TODO: replace string literal with constant from language_words.py once implemented
+                self.gamestate.player.add_object_to_inventory(carcass)
             except:
-                logger.debug("Unable to add [bug carcass] to player inventory, maybe the object doesn't exist yet?")
+                logger.debug("Unable to add [carcass] to player inventory, maybe the object doesn't exist yet?")
 
         self.ui.wait_for_enter()
 
@@ -1437,16 +1437,16 @@ class GameClient:
             user_response = self.ui.user_prompt().lower()
 
         if user_response in ANSWER_A:
-            wprint("You got it! Love those crazy catz. You grab the [binary code] giving it a quick read before "
+            wprint("You got it! Love those crazy catz. You grab the [binary string] giving it a quick read before "
             "shoving it in your backpack. It say:  ‘Dear diary, this is Mr. Robot. How are you? I am fine. I have a "
             "secret?! Wanna know??? Of course you do, you are my best friend. Well, as president of EvilCorp Bank I "
             "decided to blow up the world! How 'bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
             "Sunday? Lol, yours truly, Mr. Robot")
             try:
-                binary_files = self.gamestate.get_object_by_name("binary files")  # TODO: replace string literal with constant from language_words.py once implemented
+                binary_files = self.gamestate.get_object_by_name("Binary String")  # TODO: replace string literal with constant from language_words.py once implemented
                 self.gamestate.player.add_object_to_inventory(binary_files)
             except:
-                logger.debug("Unable to add binary files")
+                logger.debug("Unable to add binary string")
             hack_success = True
         elif user_response in ANSWER_B:
             wprint("Yeah no, how could you be thinking of school at a time when your brain needs to actually be working?! Majorly uncool.")
@@ -1551,8 +1551,8 @@ class GameClient:
         '''
         hack_success = False
 
-        wprint("As you reach for the codes, your hand is zapped by some weird blue electricity barrier- ow! You see "
-               "some code flash up creating a wall between you and the codes, just as you expected there is going to "
+        wprint("As you reach for the code, your hand is zapped by some weird blue electricity barrier- ow! You see "
+               "some code flash up creating a wall between you and the code, just as you expected there is going to "
                "be some decrypting to do. The code reads:")
         print("Cr# 0v3 rRid 3")
         print("\tA: Easy peasy, that means ‘Crashtag Oven Thrashers’ they are like the best punk bank ever.")
@@ -1572,12 +1572,12 @@ class GameClient:
             hack_success = False
             self.gamestate.player.update_speed(HACK_LAUNCH_CODE_COST)
         elif user_response in ANSWER_C:
-            wprint("You type in the code, and the blue electricity shield drops. You gingerly take the codes and put "
+            wprint("You type in the code, and the blue electricity shield drops. You gingerly take the [code] and put "
                    "them in your backpack… you are gonna need these and proof that you're not the mastermind behind "
                    "this heinous scheme if you wanna beat this punk CPU!")
 
             try:
-                launch_codes = self.gamestate.get_object_by_name("launch codes") # TODO: Update to string-literal from language_words.py once implemented
+                launch_codes = self.gamestate.get_object_by_name("Code") # TODO: Update to string-literal from language_words.py once implemented
                 self.gamestate.player.add_object_to_inventory(launch_codes)
             except:
                 logger.debug("Unable to add launch codes from hack_launch_codes() method")
@@ -1667,8 +1667,8 @@ class GameClient:
         :return:
         '''
         inventory = self.gamestate.player.get_inventory_objects()
-        launch_codes = self.gamestate.get_object_by_name("Launch Codes")
-        binary_files = self.gamestate.get_object_by_name("Binary Files")
+        launch_codes = self.gamestate.get_object_by_name("Code")
+        binary_files = self.gamestate.get_object_by_name("Binary String")
         if launch_codes in inventory and binary_files in inventory:
             wprint("All you do is SLAY! You dodge the sparks as they go flying past your head.")
             self.gamestate.player.update_coolness(100)

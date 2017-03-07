@@ -1,6 +1,6 @@
 {
-  "name" : "Bug Carcass",
-  "long_description" : "A nice trophy for defeating that bug back in the Metaverse.",
+  "name" : "Carcass",
+  "long_description" : "A nice [carcass] trophy for defeating that bug back in the Metaverse.",
   "short_description" : "Might be nice to keep around...",
   "default_location" : "Inside the Metaverse",
   "details" : "hack binary files",
