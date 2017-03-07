@@ -697,8 +697,6 @@ class GameClient:
         room_object = self.gamestate.get_current_room().get_object_by_name(noun_name)
         player_object = self.gamestate.player.inventory.get_object_by_name(noun_name)
 
-
-
         looked_at_trash_can = False
         looked_at_panel = False
         looked_at_bug = False
@@ -720,6 +718,16 @@ class GameClient:
                     looked_at_firewall = True
                 elif room_feature_name == "1337 Translator":
                     looked_at_leet = True
+                # if room_feature_name == "trash can":
+                #     looked_at_trash_can = True
+                # if room_feature_name == "panel":
+                #     looked_at_panel = True
+                # if room_feature_name == "bug":
+                #     looked_at_bug = True
+                # if room_feature_name == "firewall":
+                #     looked_at_firewall = True
+                # if room_feature_name == "1337 Translator":
+                #     looked_at_leet = True
 
             except:
                 logger.debug("verb_look_at(): room_feature.get_description() exception")
@@ -763,6 +771,16 @@ class GameClient:
             self.minigame_firewall()
         elif looked_at_leet is True:
             self.leet_translator()
+        # if looked_at_trash_can is True:
+        #     self.search_trash_can()
+        # if looked_at_panel is True:
+        #     self.install_pc_components()
+        # if looked_at_bug is True:
+        #     self.minigame_bug()
+        # if looked_at_firewall is True:
+        #     self.minigame_firewall()
+        # if looked_at_leet is True:
+        #     self.leet_translator()
 
     def verb_quit(self, message):
         '''
@@ -1246,7 +1264,7 @@ class GameClient:
         print("You grab the '==' operator and quickly change it to:\n")
         print("\tA: !=")
         print("\tB: +=")
-        print("\tC: IDK fight the freaking spider!\n")
+        print("\tC: IDK fight the freaking spider?!\n")
         print("Enter [a/b/c]:")
 
         user_response = self.ui.user_prompt().lower()
@@ -1257,7 +1275,7 @@ class GameClient:
 
         if user_response in ANSWER_A:
             wprint("The spider rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
-                   "and ends up a dead spiddy on the floor. [Spider carcass] is added to your inventory")
+                   "and ends up a dead spiddy on the floor. [Bug carcass] is added to your inventory")
             spider_defeated = True
         elif user_response in ANSWER_B:
             wprint("The spider quits its cocooning and throws a compiler error straight at your face, woah that is "
@@ -1276,10 +1294,10 @@ class GameClient:
             self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
             self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
             try:
-                spider_carcass = self.gamestate.get_object_by_name("spider carcass") # TODO: replace string literal with constant from language_words.py once implemented
-                self.gamestate.player.add_object_to_inventory(spider_carcass)
+                bug_carcass = self.gamestate.get_object_by_name(BUG) # TODO: replace string literal with constant from language_words.py once implemented
+                self.gamestate.player.add_object_to_inventory(bug_carcass)
             except:
-                logger.debug("Unable to add 'spider carcass' to player inventory, maybe the object doesn't exist yet?")
+                logger.debug("Unable to add [bug carcass] to player inventory, maybe the object doesn't exist yet?")
 
         self.ui.wait_for_enter()
 
@@ -1322,17 +1340,12 @@ class GameClient:
                     wprint("You take a trusty can of surge from your backpack, crack open that tab, listen to the "
                            "sweet fizz, and hurle the can straight into the wall of fire! It blows a sticky sugar "
                            "syrup hole right through the middle and you quietly thank your surge for sacrificing "
-                           "itself for the greater good. That soda will not be forgotten! What’s this now? You notice "
+                           "itself for the greater good. That soda will not be forgotten! What's this now? You notice "
                            "an adorable little fireball flung from the flames. Why not take the little guy along you "
                            "think, stashing him in your backpack.")
                     firewall_defeated = True
                     surge = self.gamestate.player.inventory.get_object_by_name(SURGE)
                     self.gamestate.player.remove_object_from_inventory(surge)
-                    try:
-                        fireball = self.gamestate.get_object_by_name(FIREBALL)
-                        self.gamestate.player.add_object_to_inventory(fireball)
-                    except:
-                        logger.debug("Couldn't add fireball to inventory, maybe it doesn't exist yet in gamedata files")
                 else:
                     wprint("Oh snap! You musta drank all your [Surge]. Better try something else next time.")
                     firewall_defeated = False
@@ -1350,10 +1363,10 @@ class GameClient:
                 self.gamestate.endgame_data['metaverse']['is_firewall_defeated'] = True
 
                 try:
-                    spider_carcass = self.gamestate.get_object_by_name("spider carcass")  # TODO: replace string literal with constant from language_words.py once implemented
-                    self.gamestate.player.add_object_to_inventory(spider_carcass)
+                    fireball = self.gamestate.get_object_by_name(FIREBALL)  # TODO: replace string literal with constant from language_words.py once implemented
+                    self.gamestate.player.add_object_to_inventory(fireball)
                 except:
-                    logger.debug("Unable to add spider carcass to inventory")
+                    logger.debug("Unable to add [fireball] to inventory")
 
         self.ui.wait_for_enter()
 
@@ -1427,7 +1440,7 @@ class GameClient:
             wprint("You got it! Love those crazy catz. You grab the [binary code] giving it a quick read before "
             "shoving it in your backpack. It say:  ‘Dear diary, this is Mr. Robot. How are you? I am fine. I have a "
             "secret?! Wanna know??? Of course you do, you are my best friend. Well, as president of EvilCorp Bank I "
-            "decided to blow up the world! How ‘bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
+            "decided to blow up the world! How 'bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
             "Sunday? Lol, yours truly, Mr. Robot")
             try:
                 binary_files = self.gamestate.get_object_by_name("binary files")  # TODO: replace string literal with constant from language_words.py once implemented
@@ -1653,14 +1666,15 @@ class GameClient:
         Work in progress
         :return:
         '''
+        inventory = self.gamestate.player.get_inventory_objects()
         launch_codes = self.gamestate.get_object_by_name("Launch Codes")
         binary_files = self.gamestate.get_object_by_name("Binary Files")
-        if launch_codes in self.gamestate.player.inventory and binary_files in self.gamestate.player.inventory:
-            print("CPU: 1, Player: 0")
+        if launch_codes in inventory and binary_files in inventory:
+            wprint("All you do is SLAY! You dodge the sparks as they go flying past your head.")
+            self.gamestate.player.update_coolness(100)
+            return True
+        else:
+            wprint("Your best hacking efforts have failed you! If only there were some items you could use against this evil machine...")
             self.gamestate.player.update_speed(-10)
             self.gamestate.player.update_coolness(-10)
             return False
-        else:
-            print("CPU: 0, Player: 1")
-            self.gamestate.player.update_coolness(100)
-            return True
