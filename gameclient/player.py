@@ -37,9 +37,6 @@ class Player:
     def remove_object_from_inventory(self, object):
         self.inventory.remove_object(object)
 
-    def get_inventory_string(self):
-        return self.inventory.get_inventory_string()
-
     def get_inventory_objects(self):
         return self.inventory.objects
 
@@ -135,7 +132,7 @@ class Inventory:
     def remove_object(self, object):
         self.objects.remove(object)
 
-    def get_inventory_string(self):
+    def get_inventory_string(self, longest_obj_name):
         '''
         Get a comma-delineated list of the objects in the inventory
         :return:
@@ -146,8 +143,10 @@ class Inventory:
             count = 0
             inventory_string = ""
             for object in self.objects:
+                obj_name_len = len(object.get_name())
+                padding = longest_obj_name - obj_name_len
                 count += 1
-                inventory_string += "[" + object.get_name() + ']:\t' + object.get_short_description()
+                inventory_string += "[" + object.get_name() + ']...' + ("." * padding) + object.get_short_description()
                 if count is not inventory_size:
                     inventory_string += "\n"
             return inventory_string

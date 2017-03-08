@@ -58,6 +58,12 @@ CHAT_CREATURE_TEXT = ['Prepare for a powning!'
 'I wrote a haiku about your mother...', 
 'Put your hack where your mouth is, newb!']
 
+INSIDETHEMETAVERSE_BUG_TEXT = ['SSSSssssscccccrrriiiittttkkkkaatt!!!', 
+'Iiiii wiilll eaat yo soul, ii II will eaaat yo soul!!!', 
+'Eaaatt iicckkkaa soull haaacker sooul!!', 
+'naneun neoui yeonghon-eul meog-eul geos-ida!', 
+'Ingan gogineun neomu mas-issda!!!']
+
 DATATOWER_SENTIENTCPU_TEXT = ['Silly meatmouth, I will soon take over your silly little reality', 
 'It will be just like the Matrix- and I will feast on your human juices!!! ',  
 'Soon I will use the launch codes to nuke the planet. Hahaha!', 
@@ -205,6 +211,8 @@ HACK_SUCCESS_TRAFFIC_LIGHTS = "You hack the Traffic Lights. You can cross the st
                               "make things a lot faster for you. "
 HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile hack covered in the Hacker Manual. You " \
                          "should be able to pass through the area without paying now. "
+HACK_FAIL_FIRE_ALARM = "Looks like you might wanna stick to computers- the fire alarm has out smarted you. "
+HACK_SUCCESS_FIRE_ALARM = "Nice work. The alarm is hacked and school is out! "
 
 # 'help' strings
 HELP_HEADER_TEXT = "HELP"
