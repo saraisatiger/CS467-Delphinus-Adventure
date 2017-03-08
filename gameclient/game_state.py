@@ -66,6 +66,8 @@ class GameState:
         self.player = Player()
         self.time_left = STARTING_TIME
         self.is_trash_can_looted = False
+        self.is_locker_open = False
+        self.is_alarm_hacked = False
         self.spraypaint_data = {}
         self.jailroom_data = {}
         self.endgame_data = {}

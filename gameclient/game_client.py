@@ -217,8 +217,6 @@ class GameClient:
                 self.verb_skate()
             elif self.command is SPRAYPAINT:
                 self.verb_spraypaint(self.extras)
-            elif self.command is TALK:
-                self.verb_talk(self.verb_noun_name, self.verb_noun_type)
             elif self.command is USE:
                 self.verb_use(self.verb_noun_name, self.verb_noun_type)
             elif self.command is HELP:
@@ -467,17 +465,18 @@ class GameClient:
                             go_success = False
                             break
 
-                    elif cur_room_name == "inside the metaverse" and destination_room_name == "data tower":
-                        has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
-                        has_bug_carcass = self.gamestate.player.has_object_by_name("carcass") # TODO: Replace string with constant from language_words.py once defined
+                    elif cur_room_name == "inside the metaverse":
+                        if destination_room_name == "data tower":
+                            has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
+                            has_bug_carcass = self.gamestate.player.has_object_by_name("carcass") # TODO: Replace string with constant from language_words.py once defined
 
-                        if has_fireball is False or has_bug_carcass is False:
-                            go_success = False
-                            wprint("You need the fireball and bug carcass to proceed") # TODO: Make better message to user?
-                            break
-                        else:
-                            go_success = True
-                            break
+                            if has_fireball is False or has_bug_carcass is False:
+                                go_success = False
+                                wprint("You need the fireball and bug carcass to proceed") # TODO: Make better message to user?
+                                break
+                            else:
+                                go_success = True
+                                break
 
                     # Any room without special-handling / restrictions on movement is authorized to move, handle here
                     else:
@@ -547,6 +546,13 @@ class GameClient:
                                     message = HACK_SUCCESS_BINARY_FILES
                                 else:
                                     message = HACK_FAIL_BINARY_FILES
+
+                            elif feature_name == "fire alarm":
+                                hack_success = self.hack_fire_alarm()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_FIRE_ALARM
+                                else:
+                                    message = HACK_FAIL_FIRE_ALARM
 
                             elif feature_name == "corrupted files":
                                 hack_success = self.hack_corrupted_files()
@@ -657,7 +663,7 @@ class GameClient:
 
     def verb_inventory(self):
         self.gamestate.update_time_left(INVENTORY_COST)
-        inventory_description = self.gamestate.player.inventory.get_inventory_string(self.gamestate.get_longest_object_name())
+        inventory_description = self.gamestate.player.get_inventory_string()
         self.ui.print_inventory(inventory_description)
         self.ui.wait_for_enter()
 
@@ -700,6 +706,7 @@ class GameClient:
 
         looked_at_trash_can = False
         looked_at_panel = False
+        looked_at_locker = False
         looked_at_bug = False
         looked_at_firewall = False
         looked_at_leet = False
@@ -713,11 +720,13 @@ class GameClient:
                     looked_at_trash_can = True
                 elif room_feature_name == "panel":
                     looked_at_panel = True
+                elif room_feature_name == "locker":
+                    looked_at_locker = True
                 elif room_feature_name == "bug":
                     looked_at_bug = True
                 elif room_feature_name == "firewall":
                     looked_at_firewall = True
-                elif room_feature_name == "1337 Translator":
+                elif room_feature_name == "leet translator":
                     looked_at_leet = True
                 # if room_feature_name == "trash can":
                 #     looked_at_trash_can = True
@@ -766,13 +775,24 @@ class GameClient:
             self.search_trash_can()
         elif looked_at_panel is True:
             self.install_pc_components()
+        elif looked_at_locker is True:
+            self.minigame_locker()
         elif looked_at_bug is True:
             self.minigame_bug()
         elif looked_at_firewall is True:
             self.minigame_firewall()
         elif looked_at_leet is True:
             self.leet_translator()
-
+        # if looked_at_trash_can is True:
+        #     self.search_trash_can()
+        # if looked_at_panel is True:
+        #     self.install_pc_components()
+        # if looked_at_bug is True:
+        #     self.minigame_bug()
+        # if looked_at_firewall is True:
+        #     self.minigame_firewall()
+        # if looked_at_leet is True:
+        #     self.leet_translator()
 
     def verb_quit(self, message):
         '''
@@ -842,60 +862,6 @@ class GameClient:
         wprint(message)
         self.ui.wait_for_enter()
         return take_success
-
-    def verb_talk(self, noun_name, noun_type):
-        # TODO: Parser doesn't return anything except that 'verb' : 'talk', eest is blank no matter what I type. Intended? Assuming not as there are two conversations in chat room
-        # For now, we just talk to whoever is in the room for logic testing purposes
-        cur_room = self.gamestate.get_current_room()
-        cur_room_name = cur_room.get_name().lower()
-        logger.debug("cur_room_name: " + cur_room_name)
-        room_feature = cur_room.get_feature_by_name(noun_name)
-
-        response = ""
-        talk_success = False
-
-        logger.debug("Player used talk command.")
-
-        # TODO: Likely have to update this to check the current room to see if the target of the talk command is a feature in the room and use if/elif to update correct one
-
-        if room_feature is not None:
-            logger.debug("room_eature is not None")
-            feature_name = room_feature.get_name().lower()
-            logger.debug("feature_name: " + feature_name)
-
-            if feature_name == "Store Clerk".lower():
-                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'store_clerk')
-                talk_success = True
-            elif feature_name == "Acid Burn".lower():
-                logger.debug("Confirmed feature_name is Acid Burn...")
-                if cur_room_name == "School Office".lower():
-                    response = self.get_talk_response_from_array(OFFICE_ACIDBURN_TEXT, 'office_acid')
-                    talk_success = True
-                elif cur_room_name == "Chat Room".lower():
-                    response = self.get_talk_response_from_array(CHAT_ACIDBURN_TEXT, 'chat_acid')
-                    talk_success = True
-                elif cur_room_name == "Winners' Pool".lower():
-                    response = self.get_talk_response_from_array(POOL_ACIDBURN_TEXT, 'pool_acid')
-                    talk_success = True
-            elif feature_name == "Creature".lower():
-                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'chat_creature')
-                talk_success = True
-            elif feature_name == "Sentient CPU".lower():
-                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'sentient_cpu')
-                talk_success = True
-            elif feature_name == "Teacher".lower():
-                response = self.get_talk_response_from_array(HALL_TEACHER_TEXT, 'hall_teacher')
-                talk_success = True
-            else:
-                response = TALK_FAIL_NOT_HERE
-
-        if talk_success is True:
-            self.gamestate.update_time_left(TALK_COST)
-
-        wprint(response)
-        self.ui.wait_for_enter()
-        return talk_success
-
 
     def verb_use(self, noun_name, noun_type):
         use_success = True
@@ -1287,6 +1253,85 @@ class GameClient:
 
         if len(hints) > 0:
             self.ui.print_hints(hints)
+            
+        
+        
+    def minigame_locker(self):
+        '''
+        Called when player looks at the 'locker' inside hall
+        :return:
+        '''
+
+        if self.gamestate.is_locker_open is  True:
+            wprint("Looks like there has already been a security breach on the locker. Nothing here.")
+            self.ui.wait_for_enter()
+            return
+
+        wprint("You examine the metal contraption and notice a sturdy lock in place to thwart  thievery. "
+               "Enter your locker combo, yo: ")
+
+        print("\tA: 31 80 08 ")
+        print("\tB: 00 77 34 ")
+        print("\tC: 46 13 75\n")
+        print("Enter [a/b/c]:")
+
+        user_response = self.ui.user_prompt().lower()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A:
+            self.gamestate.is_locker_open = True
+            wprint("The numbers click into place and the door swings open. You see two yellow eyses staring back at you."
+                   "\'Meow\' say a large furry cat in a rather rude manner as it seems you have just woken him from a nap.\n"
+                   "What shall you do with this new feline friend?")
+            print("\tA: Scoop up that fur ball and give him a hug!")
+            print("\tB: Acknowledge this superior begin, lower your eyes and back away slowly...")
+            print("\tC: Give him some [hackersnacks]!\n")
+            print("Enter [a/b/c]:")
+            
+            user_response = self.ui.user_prompt().lower()
+
+            while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+                wprint(INVALID_PROMPT_RESPONSE)
+                user_response = self.ui.user_prompt().lower()
+            
+            if user_response in ANSWER_A:
+                wprint("The cat scratches you and hisses before vanishing down the hall. Eh, still worth just a touch of that fluff.")
+                self.gamestate.player.update_coolness(CAT_FAIL_COOLNESS_INCREASE)
+            elif user_response in ANSWER_B:
+                wprint("The cat half closes his eyes at you in disdain. The cat does not like you, and it makes you feel uncool.")
+                self.gamestate.player.update_coolness(CAT_FAIL_COOLNESS_COST)
+            elif user_response in ANSWER_C:
+                if self.gamestate.player.has_object_by_name(HACKERSNACKS):
+                    wprint("The kitten sniffs once, twice and then the purrs begin. You feed this lovely minature tiger treat after treat. "
+                            "You are now best friends and [cat] decides to take up a permanent your backpack.")
+                    hackersnacks = self.gamestate.player.inventory.get_object_by_name(HACKERSNACKS)
+                    self.gamestate.player.remove_object_from_inventory(hackersnacks)
+                    self.gamestate.player.update_coolness(CAT_SUCCESS_COOLNESS_INCREASE)
+                    try:
+                        cat = self.gamestate.get_object_by_name("Cat") 
+                        self.gamestate.player.add_object_to_inventory(cat)
+                    except:
+                        logger.debug("Unable to add [cat] to player inventory, maybe the object doesn't exist yet?")
+                else:
+                    wprint("The cat perks up as you reach for [hackersnacks]- but you don\'t seem to have any in your inventory. "
+                            "This is an outrage! The cat jumps for your face, teeth and claws in a frenzy. "
+                            "It eats your left ear and most of your nose.")
+                    self.gamestate.player.update_coolness(CAT_FOOD_FAIL_COOLNESS_COST)
+                self.ui.wait_for_enter()
+            self.ui.wait_for_enter()
+        elif user_response in ANSWER_B:
+            wprint("A paper plane whizzes by your head almost chopping your ear off! This thing must be trapped! "
+                    "Would be great if you could remember that code...")
+        elif user_response in ANSWER_C:
+            wprint("You jiggle and wiggle that lock, but the code isn't correct. A freshman walks past and laughs. "
+                    "The shame.")
+            self.gamestate.player.update_coolness(LOCKER_OPEN_FAIL_COOLNESS_COST)
+
+        self.ui.wait_for_enter()
+        
 
     def minigame_bug(self):
         '''
@@ -1302,50 +1347,51 @@ class GameClient:
             self.ui.wait_for_enter()
             return
 
-        wprint("The bug notices your interest and scuttles towards you at a terrifying speed! Before you can run, "
-               "the bug begins to cocoon you in an infinite loop!! You see the following code flash before your eyes "
-               "as you begin to lose conciousness:")
-        print("If (you == best hacker ever):")
-        print("    You = bug food\n")
-        print("You grab the '==' operator and quickly change it to:\n")
-        print("\tA: !=")
-        print("\tB: +=")
-        print("\tC: IDK fight the freaking bug?!\n")
-        print("Enter [a/b/c]:")
+        else:                
+            wprint("The bug notices your interest and scuttles towards you at a terrifying speed! Before you can run, "
+                   "the bug begins to cocoon you in an infinite loop!! You see the following code flash before your eyes "
+                   "as you begin to lose conciousness:")
+            print("If (you == best hacker ever):")
+            print("    You = bug food\n")
+            print("You grab the '==' operator and quickly change it to:\n")
+            print("\tA: !=")
+            print("\tB: +=")
+            print("\tC: IDK fight the freaking bug?!\n")
+            print("Enter [a/b/c]:")
 
-        user_response = self.ui.user_prompt().lower()
-
-        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
-            wprint(INVALID_PROMPT_RESPONSE)
             user_response = self.ui.user_prompt().lower()
 
-        if user_response in ANSWER_A:
-            wprint("The bug rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
-                   "and ends up a dead spiddy on the floor. [carcass] is added to your inventory")
-            spider_defeated = True
-        elif user_response in ANSWER_B:
-            wprint("The bug quits its cocooning and throws a compiler error straight at your face, woah that is "
-                   "gonna leave a nasty scar- you must look like, Rambo cool right now! Luckily you are able to break "
-                   "free of the webbing, but you feel pretty dazed.")
-            self.gamestate.player.update_speed(BUG_SPEED_LOSS)
-            self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
-            spider_defeated = False
-        elif user_response in ANSWER_C:
-            wprint("You punch the bug in one of its many eyes, splooting out a bunch of green gunk and eye juices "
-                   "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly "
-                   "[carcass] in your inventory")
-            spider_defeated = True
+            while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+                wprint(INVALID_PROMPT_RESPONSE)
+                user_response = self.ui.user_prompt().lower()
 
-        if spider_defeated is True:
-            self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
-            self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
-            try:
-                carcass = self.gamestate.get_object_by_name("Carcass") # TODO: replace string literal with constant from language_words.py once implemented
-                self.gamestate.player.add_object_to_inventory(carcass)
-            except:
-                logger.debug("Unable to add [carcass] to player inventory, maybe the object doesn't exist yet?")
+            if user_response in ANSWER_A:
+                wprint("The bug rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
+                       "and ends up a dead spiddy on the floor. [carcass] is added to your inventory")
+                spider_defeated = True
+            elif user_response in ANSWER_B:
+                wprint("The bug quits its cocooning and throws a compiler error straight at your face, woah that is "
+                       "gonna leave a nasty scar- you must look like, Rambo cool right now! Luckily you are able to break "
+                       "free of the webbing, but you feel pretty dazed.")
+                self.gamestate.player.update_speed(BUG_SPEED_LOSS)
+                self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
+                spider_defeated = False
+            elif user_response in ANSWER_C:
+                wprint("You punch the bug in one of its many eyes, splooting out a bunch of green gunk and eye juices "
+                       "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly "
+                       "[carcass] in your inventory")
+                spider_defeated = True
 
-        self.ui.wait_for_enter()
+            if spider_defeated is True:
+                self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
+                self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
+                try:
+                    carcass = self.gamestate.get_object_by_name("Carcass") # TODO: replace string literal with constant from language_words.py once implemented
+                    self.gamestate.player.add_object_to_inventory(carcass)
+                except:
+                    logger.debug("Unable to add [carcass] to player inventory, maybe the object doesn't exist yet?")
+
+            self.ui.wait_for_enter()
 
     def minigame_firewall(self):
         firewall_defeated = self.gamestate.endgame_data['metaverse']['is_firewall_defeated']
@@ -1461,6 +1507,46 @@ class GameClient:
         else:
             wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
 
+    def hack_fire_alarm(self):
+        '''
+        Logic specific to the user trying to hack the fire alarm
+        :return: True if the hack succeeds, false otherwise.
+        '''
+        hack_success = False
+
+        wprint("You crack open the fire alarm with little difficulty as the teacher has conveniently looked the other way. "
+                "Inside you find a rainbow of wires and spend sometime decided what to do. Just now- the bell rings. "
+                "better do something quick or you\'ll be in detention for life!")
+        print("\tA: Cut the green wire!")
+        print("\tB: No it must be the purple wire- cut that!!")
+        print("\tC: Ahhh! Just cut all the wires!!!!!")
+        print("Enter [a/b/c]")
+
+        user_response = self.ui.user_prompt()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A:
+            wprint("Your hand gets shocked- ow! Kids are comming out of every door and it looks like that teacher "
+                    "has decided to pretend to care and give you a stern talking to... this is gonna take some time...")
+            self.gamestate.player.update_coolness(FIREALARM_SPEED_DECREASE)
+            hack_success = False
+        elif user_response in ANSWER_B:
+            wprint("Purple is the right choice! Woohoo a shower of sprinkles rains down on your head and sirens start " 
+                    "to whirrrrr as students run out of classrooms nearly stampeding each other on their path to freedom "
+                    "or the mall. You relax a bit, skipping all your classes gives you a lot of time for important stuff.")
+            self.gamestate.player.update_speed(FIREALARM_SPEED_INCREASE)
+            hack_success = True
+        elif user_response in ANSWER_C:
+            wprint("Oh no you\'ve killed the rainbow...you need to sit for awhile and think about what you\'ve done.")
+            self.gamestate.player.update_speed(FIREALARM_SPEED_DECREASE)
+            hack_success = False
+
+        self.ui.wait_for_enter()
+        return hack_success
+            
     def hack_binary_files(self):
         '''
         Logic specific to the user trying to hack the binary files
@@ -1724,12 +1810,3 @@ class GameClient:
             self.gamestate.player.update_speed(-10)
             self.gamestate.player.update_coolness(-10)
             return False
-
-    def get_talk_response_from_array(self, conversation_list, index_lookup):
-        max_index = len(conversation_list) - 1
-        msg_index = self.gamestate.talk_indices[index_lookup]
-        if msg_index < max_index:
-            self.gamestate.talk_indices[index_lookup] += 1
-        response = conversation_list[msg_index]
-        return response
-
