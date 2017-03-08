@@ -94,7 +94,7 @@ R13_F = [['input output port', 'input output port', 'in out port', 'input output
 R14_F = [['cat videos from the internet', 'internet cat videos', 'cat videos', 'videos', 'vids'], ['nuclear launch codes', 'nuclear codes', 'codes']]
 R15_F = [['binary files', 'binary'], ['corrupted files', 'corrupted']]
 R16_F = [['diving board', 'diving'], ['walls']]
-R_MULTI = ['acid burn']
+R_MULTI = [['acid burn']]
 
 FEATURES_ALIASES_ARRAYS = [R1_F, R2_F, R3_F, R4_F, R5_F, R6_F, R7_F, R8_F, R9_F, R10_F, R11_F, R12_F, R13_F, R14_F, R15_F, R16_F, R_MULTI]
 
