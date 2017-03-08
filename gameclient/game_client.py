@@ -849,6 +849,7 @@ class GameClient:
         # For now, we just talk to whoever is in the room for logic testing purposes
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name().lower()
+        logger.debug("cur_room_name: " + cur_room_name)
         room_feature = cur_room.get_feature_by_name(noun_name)
 
         response = ""
@@ -858,23 +859,35 @@ class GameClient:
 
         # TODO: Likely have to update this to check the current room to see if the target of the talk command is a feature in the room and use if/elif to update correct one
 
-        if cur_room_name == "pawn shop":
-            pass
-
-
         if room_feature is not None:
+            logger.debug("room_eature is not None")
             feature_name = room_feature.get_name().lower()
+            logger.debug("feature_name: " + feature_name)
+
             if feature_name == "Store Clerk".lower():
-                response = self.get_response_from_array(PAWNSHOP_STORECLERK_TEXT)
-                max_index = len(PAWNSHOP_STORECLERK_TEXT) - 1 # Typically 5 in current build
-                msg_index = self.gamestate.talk_indices['store_clerk']
-                if msg_index < max_index:
-                    self.gamestate.talk_indices['store_clerk'] += 1
-                response = PAWNSHOP_STORECLERK_TEXT[msg_index]
+                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'store_clerk')
+                talk_success = True
+            elif feature_name == "Acid Burn".lower():
+                logger.debug("Confirmed feature_name is Acid Burn...")
+                if cur_room_name == "School Office".lower():
+                    response = self.get_talk_response_from_array(OFFICE_ACIDBURN_TEXT, 'office_acid')
+                    talk_success = True
+                elif cur_room_name == "Chat Room".lower():
+                    response = self.get_talk_response_from_array(CHAT_ACIDBURN_TEXT, 'chat_acid')
+                    talk_success = True
+                elif cur_room_name == "Winners' Pool".lower():
+                    response = self.get_talk_response_from_array(POOL_ACIDBURN_TEXT, 'pool_acid')
+                    talk_success = True
+            elif feature_name == "Creature".lower():
+                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'chat_creature')
+                talk_success = True
+            elif feature_name == "Sentient CPU".lower():
+                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'sentient_cpu')
+                talk_success = True
+            else:
+                response = TALK_FAIL_NOT_HERE
 
-
-
-        if talk_success:
+        if talk_success is True:
             self.gamestate.update_time_left(TALK_COST)
 
         wprint(response)
@@ -1709,3 +1722,12 @@ class GameClient:
             self.gamestate.player.update_speed(-10)
             self.gamestate.player.update_coolness(-10)
             return False
+
+    def get_talk_response_from_array(self, conversation_list, index_lookup):
+        max_index = len(conversation_list) - 1
+        msg_index = self.gamestate.talk_indices[index_lookup]
+        if msg_index < max_index:
+            self.gamestate.talk_indices[index_lookup] += 1
+        response = conversation_list[msg_index]
+        return response
+

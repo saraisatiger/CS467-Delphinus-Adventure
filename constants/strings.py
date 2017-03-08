@@ -287,6 +287,9 @@ PICKUP_FAILURE_PREFIX = "You grasp for the non-existent "
 PICKUP_FAILURE_SUFFIX = " and unsurprisingly fail!"
 PICKUP_NOT_FREE = "That's not free. Perhaps you have the cash to Buy it... or, just steal it!"
 
+# 'talk' strings
+TALK_FAIL_NOT_HERE = "You don't see anybody - or anything - worth talking to."
+
 # ' use' strings
 USE_FAIL_UNUSABLE = "You cannot use that unless it is in your bag!"
 USE_FAIL_NONSENSE = "There doesn't seem to be anything like that to use."

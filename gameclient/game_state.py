@@ -75,7 +75,7 @@ class GameState:
             'chat_acid' : 0,
             'chat_creature' : 0,
             'sentient_cpu' : 0,
-            'poo_acid' : 0
+            'pool_acid' : 0
         }
 
     def load_rooms_and_objects_from_file(self):
