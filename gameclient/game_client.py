@@ -657,7 +657,7 @@ class GameClient:
 
     def verb_inventory(self):
         self.gamestate.update_time_left(INVENTORY_COST)
-        inventory_description = self.gamestate.player.get_inventory_string()
+        inventory_description = self.gamestate.player.inventory.get_inventory_string(self.gamestate.get_longest_object_name())
         self.ui.print_inventory(inventory_description)
         self.ui.wait_for_enter()
 
