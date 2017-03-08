@@ -217,6 +217,8 @@ class GameClient:
                 self.verb_skate()
             elif self.command is SPRAYPAINT:
                 self.verb_spraypaint(self.extras)
+            elif self.command is TALK:
+                self.verb_talk(self.verb_noun_name, self.verb_noun_type)
             elif self.command is USE:
                 self.verb_use(self.verb_noun_name, self.verb_noun_type)
             elif self.command is HELP:
@@ -771,16 +773,7 @@ class GameClient:
             self.minigame_firewall()
         elif looked_at_leet is True:
             self.leet_translator()
-        # if looked_at_trash_can is True:
-        #     self.search_trash_can()
-        # if looked_at_panel is True:
-        #     self.install_pc_components()
-        # if looked_at_bug is True:
-        #     self.minigame_bug()
-        # if looked_at_firewall is True:
-        #     self.minigame_firewall()
-        # if looked_at_leet is True:
-        #     self.leet_translator()
+
 
     def verb_quit(self, message):
         '''
@@ -850,6 +843,44 @@ class GameClient:
         wprint(message)
         self.ui.wait_for_enter()
         return take_success
+
+    def verb_talk(self, noun_name, noun_type):
+        # TODO: Parser doesn't return anything except that 'verb' : 'talk', eest is blank no matter what I type. Intended? Assuming not as there are two conversations in chat room
+        # For now, we just talk to whoever is in the room for logic testing purposes
+        cur_room = self.gamestate.get_current_room()
+        cur_room_name = cur_room.get_name().lower()
+        room_feature = cur_room.get_feature_by_name(noun_name)
+
+        response = ""
+        talk_success = False
+
+        logger.debug("Player used talk command.")
+
+        # TODO: Likely have to update this to check the current room to see if the target of the talk command is a feature in the room and use if/elif to update correct one
+
+        if cur_room_name == "pawn shop":
+            pass
+
+
+        if room_feature is not None:
+            feature_name = room_feature.get_name().lower()
+            if feature_name == "Store Clerk".lower():
+                response = self.get_response_from_array(PAWNSHOP_STORECLERK_TEXT)
+                max_index = len(PAWNSHOP_STORECLERK_TEXT) - 1 # Typically 5 in current build
+                msg_index = self.gamestate.talk_indices['store_clerk']
+                if msg_index < max_index:
+                    self.gamestate.talk_indices['store_clerk'] += 1
+                response = PAWNSHOP_STORECLERK_TEXT[msg_index]
+
+
+
+        if talk_success:
+            self.gamestate.update_time_left(TALK_COST)
+
+        wprint(response)
+        self.ui.wait_for_enter()
+        return talk_success
+
 
     def verb_use(self, noun_name, noun_type):
         use_success = True
