@@ -24,6 +24,7 @@ LOOK_COST = 0
 SPRAYPAINT_COST = -30
 STEAL_COST = -40
 TAKE_COST = -10
+TALK_COST = -15
 USE_COST = -25
 
 # Speed boosts from various activites

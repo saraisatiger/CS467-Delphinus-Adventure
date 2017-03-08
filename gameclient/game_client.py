@@ -217,6 +217,8 @@ class GameClient:
                 self.verb_skate()
             elif self.command is SPRAYPAINT:
                 self.verb_spraypaint(self.extras)
+            elif self.command is TALK:
+                self.verb_talk(self.verb_noun_name, self.verb_noun_type)
             elif self.command is USE:
                 self.verb_use(self.verb_noun_name, self.verb_noun_type)
             elif self.command is HELP:
@@ -465,18 +467,17 @@ class GameClient:
                             go_success = False
                             break
 
-                    elif cur_room_name == "inside the metaverse":
-                        if destination_room_name == "data tower":
-                            has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
-                            has_bug_carcass = self.gamestate.player.has_object_by_name("carcass") # TODO: Replace string with constant from language_words.py once defined
+                    elif cur_room_name == "inside the metaverse" and destination_room_name == "data tower":
+                        has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
+                        has_bug_carcass = self.gamestate.player.has_object_by_name("carcass") # TODO: Replace string with constant from language_words.py once defined
 
-                            if has_fireball is False or has_bug_carcass is False:
-                                go_success = False
-                                wprint("You need the fireball and bug carcass to proceed") # TODO: Make better message to user?
-                                break
-                            else:
-                                go_success = True
-                                break
+                        if has_fireball is False or has_bug_carcass is False:
+                            go_success = False
+                            wprint("You need the fireball and bug carcass to proceed") # TODO: Make better message to user?
+                            break
+                        else:
+                            go_success = True
+                            break
 
                     # Any room without special-handling / restrictions on movement is authorized to move, handle here
                     else:
@@ -771,16 +772,7 @@ class GameClient:
             self.minigame_firewall()
         elif looked_at_leet is True:
             self.leet_translator()
-        # if looked_at_trash_can is True:
-        #     self.search_trash_can()
-        # if looked_at_panel is True:
-        #     self.install_pc_components()
-        # if looked_at_bug is True:
-        #     self.minigame_bug()
-        # if looked_at_firewall is True:
-        #     self.minigame_firewall()
-        # if looked_at_leet is True:
-        #     self.leet_translator()
+
 
     def verb_quit(self, message):
         '''
@@ -850,6 +842,60 @@ class GameClient:
         wprint(message)
         self.ui.wait_for_enter()
         return take_success
+
+    def verb_talk(self, noun_name, noun_type):
+        # TODO: Parser doesn't return anything except that 'verb' : 'talk', eest is blank no matter what I type. Intended? Assuming not as there are two conversations in chat room
+        # For now, we just talk to whoever is in the room for logic testing purposes
+        cur_room = self.gamestate.get_current_room()
+        cur_room_name = cur_room.get_name().lower()
+        logger.debug("cur_room_name: " + cur_room_name)
+        room_feature = cur_room.get_feature_by_name(noun_name)
+
+        response = ""
+        talk_success = False
+
+        logger.debug("Player used talk command.")
+
+        # TODO: Likely have to update this to check the current room to see if the target of the talk command is a feature in the room and use if/elif to update correct one
+
+        if room_feature is not None:
+            logger.debug("room_eature is not None")
+            feature_name = room_feature.get_name().lower()
+            logger.debug("feature_name: " + feature_name)
+
+            if feature_name == "Store Clerk".lower():
+                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'store_clerk')
+                talk_success = True
+            elif feature_name == "Acid Burn".lower():
+                logger.debug("Confirmed feature_name is Acid Burn...")
+                if cur_room_name == "School Office".lower():
+                    response = self.get_talk_response_from_array(OFFICE_ACIDBURN_TEXT, 'office_acid')
+                    talk_success = True
+                elif cur_room_name == "Chat Room".lower():
+                    response = self.get_talk_response_from_array(CHAT_ACIDBURN_TEXT, 'chat_acid')
+                    talk_success = True
+                elif cur_room_name == "Winners' Pool".lower():
+                    response = self.get_talk_response_from_array(POOL_ACIDBURN_TEXT, 'pool_acid')
+                    talk_success = True
+            elif feature_name == "Creature".lower():
+                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'chat_creature')
+                talk_success = True
+            elif feature_name == "Sentient CPU".lower():
+                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'sentient_cpu')
+                talk_success = True
+            elif feature_name == "Teacher".lower():
+                response = self.get_talk_response_from_array(HALL_TEACHER_TEXT, 'hall_teacher')
+                talk_success = True
+            else:
+                response = TALK_FAIL_NOT_HERE
+
+        if talk_success is True:
+            self.gamestate.update_time_left(TALK_COST)
+
+        wprint(response)
+        self.ui.wait_for_enter()
+        return talk_success
+
 
     def verb_use(self, noun_name, noun_type):
         use_success = True
@@ -1678,3 +1724,12 @@ class GameClient:
             self.gamestate.player.update_speed(-10)
             self.gamestate.player.update_coolness(-10)
             return False
+
+    def get_talk_response_from_array(self, conversation_list, index_lookup):
+        max_index = len(conversation_list) - 1
+        msg_index = self.gamestate.talk_indices[index_lookup]
+        if msg_index < max_index:
+            self.gamestate.talk_indices[index_lookup] += 1
+        response = conversation_list[msg_index]
+        return response
+
