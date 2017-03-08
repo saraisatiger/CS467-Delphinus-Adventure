@@ -34,6 +34,12 @@ PAWNSHOP_STORECLERK_TEXT = ['If you\'re just looking keep walking.',
 'All products have a lifetime gaurantee- no returns.' 
 'I don\'t have all day to chit chat, give me cash or let me return to my nap.']
 
+HALL_TEACHER_TEXT = ['Move along slow poke. I am on my smoke break.', 
+'You know, if you wanna hack that firealarm. I could look the other way- I am missing my sudoku.',  
+'Pool on the roof? That sounds crazy. Then again, this whole place is crazy and kids are always messing around up there, must be something worth while.', 
+'You know I used to like children- true story.', 
+'Your teen angst is getting to me, better get going kiddo.']
+
 OFFICE_ACIDBURN_TEXT = ['You must be the new kid, Crash Override. I haven\'t seen you around here before...', 
 'I heard hack. You should know, I\'m the best hacker in this little galaxy.',  
 'I\'ve been trying to take down EvilCorps for awhile, those corporate clones are the worst. Word is they\'ve been messing with you too- we should work together to stop them.', 
