@@ -467,18 +467,17 @@ class GameClient:
                             go_success = False
                             break
 
-                    elif cur_room_name == "inside the metaverse":
-                        if destination_room_name == "data tower":
-                            has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
-                            has_bug_carcass = self.gamestate.player.has_object_by_name("carcass") # TODO: Replace string with constant from language_words.py once defined
+                    elif cur_room_name == "inside the metaverse" and destination_room_name == "data tower":
+                        has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
+                        has_bug_carcass = self.gamestate.player.has_object_by_name("carcass") # TODO: Replace string with constant from language_words.py once defined
 
-                            if has_fireball is False or has_bug_carcass is False:
-                                go_success = False
-                                wprint("You need the fireball and bug carcass to proceed") # TODO: Make better message to user?
-                                break
-                            else:
-                                go_success = True
-                                break
+                        if has_fireball is False or has_bug_carcass is False:
+                            go_success = False
+                            wprint("You need the fireball and bug carcass to proceed") # TODO: Make better message to user?
+                            break
+                        else:
+                            go_success = True
+                            break
 
                     # Any room without special-handling / restrictions on movement is authorized to move, handle here
                     else:
@@ -883,6 +882,9 @@ class GameClient:
                 talk_success = True
             elif feature_name == "Sentient CPU".lower():
                 response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'sentient_cpu')
+                talk_success = True
+            elif feature_name == "Teacher".lower():
+                response = self.get_talk_response_from_array(HALL_TEACHER_TEXT, 'hall_teacher')
                 talk_success = True
             else:
                 response = TALK_FAIL_NOT_HERE
