@@ -1034,15 +1034,21 @@ class GameClient:
 
             # Special handling skate targets
             if noun_name is not None and preposition is not None:
-                is_valid_preposition = self.is_valid_skate_preposition(preposition)
+                # Check if the preposition is valid and find a reference, if any, to the "target" the player input
+                is_valid_preposition = self.is_valid_skate_preposition(noun_name, preposition)
                 room_feature = cur_room.get_feature_by_name(noun_name)
+
                 if room_feature is not None and is_valid_preposition is True:
                     if room_feature.get_name().lower() == "ledge":
                         message = "You skate on the ledge, wow"
                         logger.debug("Skated on the ledge succesfully")
                         skate_success = True
+
+                    # Target must not be a feature in the room, they fail
                     else:
                         message = SKATE_FAIL_INVALID_TARGET
+
+                # If they used a nonsense preposition like "skate into ledge" this will print
                 elif is_valid_preposition is False:
                     message = "You cannot quite figure out how to skate in such a way."
                 else:
@@ -1880,7 +1886,10 @@ class GameClient:
         response = conversation_list[msg_index]
         return response
 
-    def is_valid_skate_preposition(self, preposition):
-        if preposition.lower() in {'on', 'onto', 'over', 'around', 'off'}:
-            return True
-        return False
+    def is_valid_skate_preposition(self, target_name, preposition):
+        if target_name == "ledge":
+            if preposition.lower() in {'on', 'onto', 'over', 'around', 'off'}:
+                return True
+            return False
+        else:
+            return False
