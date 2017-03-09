@@ -12,6 +12,7 @@
 
 from constants.strings import *
 from constants.language_words import RAM, ACMERAM, GRAPHICS_CARD, FLOPPY_DISK, NEW_LAPTOP
+from gameclient.wprint import *
 import copy
 
 class Player:
@@ -48,18 +49,36 @@ class Player:
 
     def update_cash(self, cash_change):
         self.cash += int(cash_change)
+        if cash_change > 0:
+            change_direction = "increased"
+        else:
+            change_direction = "decreased"
+            cash_change = int(-1 * cash_change)
+        wprint("Your [Cash] " + change_direction + " by " + str(cash_change) +".")
 
     def update_speed(self, speed_change):
         self.speed += int(speed_change)
+        if speed_change > 0:
+            change_direction = "increased"
+        else:
+            change_direction = "decreased"
+            speed_change = int(-1 * speed_change)
+        wprint("Your [Speed] " + change_direction + " by " + str(speed_change) +".")
+
+    def update_coolness(self, coolness_change):
+        self.coolness += int(coolness_change)
+        if coolness_change > 0:
+            change_direction = "increased"
+        else:
+            change_direction = "decreased"
+            coolness_change = int(-1 * coolness_change)
+        wprint("Your [Coolness] " + change_direction + " by " + str(coolness_change) +".")
 
     def get_coolness(self):
         return self.coolness
 
     def get_speed(self):
         return self.speed
-
-    def update_coolness(self, coolness_change):
-        self.coolness += int(coolness_change)
 
     def set_has_hack_skill(self, has_skill=True):
         self.has_hack_skill = has_skill

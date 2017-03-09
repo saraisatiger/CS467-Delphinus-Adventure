@@ -188,8 +188,6 @@ class GameClient:
             self.user_input = self.ui.user_prompt()
             self.send_command_to_parser()
 
-
-            # TODO: Refactor verb_*() methods to check the parser_error_message before proceeding
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 # The verb_look() method is called at the top of each loop, so not explicitly called here
@@ -214,13 +212,13 @@ class GameClient:
             elif self.command is BUY:
                 self.verb_buy(self.verb_noun_name)
             elif self.command is SKATE:
-                self.verb_skate()
+                self.verb_skate(self.verb_noun_name, self.verb_noun_type, self.verb_preposition)
             elif self.command is SPRAYPAINT:
                 self.verb_spraypaint(self.extras)
             elif self.command is TALK:
                 self.verb_talk(self.verb_noun_name, self.verb_noun_type)
             elif self.command is USE:
-                self.verb_use(self.verb_noun_name, self.verb_noun_type)
+                self.verb_use(self.verb_noun_name, self.verb_noun_type, self.verb_preposition, self.extras)
             elif self.command is HELP:
                 self.verb_help(self.verb_noun_name, self.verb_noun_type)
             elif self.command is LOAD_GAME:
@@ -470,11 +468,11 @@ class GameClient:
 
                     elif cur_room_name == "inside the metaverse" and destination_room_name == "data tower":
                         has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
-                        has_bug_carcass = self.gamestate.player.has_object_by_name("carcass")  # TODO: Replace string with constant from language_words.py once defined
+                        has_bug_carcass = self.gamestate.player.has_object_by_name(CARCASS)
 
                         if has_fireball is False or has_bug_carcass is False:
                             go_success = False
-                            wprint("You need the fireball and bug carcass to proceed")  # TODO: Make better message to user?
+                            wprint("You need to have acquired the [fireball] and bug [carcass] to proceed! Better [look at] everything here before you leave.")
                             break
                         else:
                             go_success = True
@@ -860,15 +858,13 @@ class GameClient:
     def verb_talk(self, noun_name, noun_type):
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name().lower()
-        logger.debug("cur_room_name: " + cur_room_name)
         room_feature = cur_room.get_feature_by_name(noun_name)
 
         response = ""
         talk_success = False
 
-        logger.debug("Player used talk command.")
-        # TODO: Likely have to update this to check the current room to see if the target of the talk command is a feature in the room and use if/elif to update correct one
-
+        # logger.debug("Player used talk command.")
+        
         if room_feature is not None:
             logger.debug("room_feature is not None")
             feature_name = room_feature.get_name().lower()
@@ -911,11 +907,18 @@ class GameClient:
         self.ui.wait_for_enter()
         return talk_success
 
-    def verb_use(self, noun_name, noun_type):
+    def verb_use(self, noun_name, noun_type, preposition, extras):
         use_success = True
         current_room_name = self.gamestate.get_current_room().get_name().lower()
         noun_name = noun_name.lower()
         message = "This should never print. Check verb_use() logic"
+        try:
+            logger.debug(str(extras[0]['name']))
+            target_feature = extras[0]['name']
+            logger.debug("****target_feature = " + str(target_feature))
+        except:
+            target_feature = None
+            logger.debug("Setting target_feature to None??? WHY!")
 
         # Special 'use' case, 'use computer'. It's not a literal object that can be used, just the verbiage we chose
         if noun_name == "computer":
@@ -930,10 +933,14 @@ class GameClient:
                     self.gamestate.endgame_data['computer_room']['is_operable'] = True
                     message = "You boot up the new laptop and jack into the nearest RJ-45 port you can find. Time to Hack!"
                 else: # Player must have the rest of the parts they needed, instead
-                    message = "You have what you need to repair your computer! Time to install the components... A [Floppy Disk], a [Graphics Card], and a [RAM Chip] are spread out upon your portable anti-static mat!"
+                    message = "You have what you need to repair your computer! Time to install the components... A [" \
+                              "Floppy Disk], a [Graphics Card], and a [RAM Chip] are spread out upon your portable " \
+                              "anti-static mat! "
 
             else:
-                message = "You don't have everything you need to fix your computer. Your [Floppy Disk] is toast, your [Graphics Card] is burned up, and the [RAM Chip] is corrupted! Or, you could just go buy a [New Laptop]!"
+                message = "You don't have everything you need to fix your computer. Your [Floppy Disk] is toast, " \
+                          "your [Graphics Card] is burned up, and the [RAM Chip] is corrupted! Or, you could just go " \
+                          "buy a [New Laptop]! "
 
         elif noun_type == NOUN_TYPE_FEATURE:
             message = "You cannot use that."
@@ -988,33 +995,32 @@ class GameClient:
 
                 # TODO: TEST LOGIC BETWEEN HERE AND TODO END COMMENT AFTER PARSER SUPPORTS
                 elif obj_label == FIREBALL.lower():
-                    # TODO: Once language parser passes back the preposition and target, we can pass it to below
-                    target_feature = ""
-                    if target_feature == "binary files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_binary_files)
+                    if target_feature is None:
+                        message = "Use it on what?!"
+                    elif target_feature == "binary files":
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_binary_files)
                     elif target_feature == "corrupted files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_corrupted_files)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_corrupted_files)
                     elif target_feature == "cat videos from the internet":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_cat_videos)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_cat_videos)
                     elif target_feature == "nuclear launch codes":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_launch_codes)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_launch_codes)
                     else:
                         message = "You're not sure how to use a fireball on that."
                 elif obj_label == "carcass":
-                    pass
                     # TODO: Once language parser passes back the preposition and target, we can pass it to below
-                    target_feature = ""
-                    if target_feature == "binary files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
+                    if target_feature is None:
+                        message, use_success = "Use it on what?!"
+                    elif target_feature == "binary files":
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
                     elif target_feature == "corrupted files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_corrupted_files)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_corrupted_files)
                     elif target_feature == "cat videos from the internet":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_cat_videos)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_cat_videos)
                     elif target_feature == "nuclear launch codes":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_launch_codes)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_launch_codes)
                     else:
                         message = "You're not sure how to use a bug carcass in such a way."
-                # TODO: TEST METHODS BETWEEN HERE AND TODO START COMMENT AFTER PARSER SUPPORTS
 
                 else:
                     logger.debug("Not implemented: use " + used_object.get_name())
@@ -1033,17 +1039,57 @@ class GameClient:
         self.ui.wait_for_enter()
         return use_success
 
-    def verb_skate(self):
+    def verb_skate(self, noun_name, noun_type, preposition):
         '''
         TODO: Finish implementing this function ((SSH))
         :return:
         '''
         skate_success = False
 
+        if noun_name == '':
+            noun_name = None
+
         if self.gamestate.player.can_skateboard() is True:
-            message = SKATE_SUCCESS
-        else:
-            message = SKATE_FAILURE_NO_SKILL
+            cur_room = self.gamestate.get_current_room()
+
+            # Special handling skate targets
+            if noun_name is not None and preposition is not None:
+                # Check if the preposition is valid and find a reference, if any, to the "target" the player input
+                is_valid_preposition = self.is_valid_preposition_for_target(noun_name, preposition)
+                room_feature = cur_room.get_feature_by_name(noun_name)
+
+                if room_feature is not None and is_valid_preposition is True:
+                    if room_feature.get_name().lower() == "ledge":
+                        land_safely = self.rand_event.coin_flip()
+                        if land_safely is True:
+                            message = SKATE_SUCCESS_LEDGE_SAFELANDING
+                            self.gamestate.player.update_coolness(SKATE_LEDGE_COOLNESS_INCREASE)
+                        else:
+                            message = SKATE_SUCCESS_LEDGE_FALL
+                            self.gamestate.player.update_speed(SKATE_LEDGE_SPEED_LOSS)
+                        self.gamestate.set_current_room(self.gamestate.get_room_by_name("Street"))
+                        skate_success = True
+
+
+                    # Target must not be a feature in the room, they fail
+                    else:
+                        message = SKATE_FAIL_INVALID_TARGET
+
+                # If they used a nonsense preposition like "skate into ledge" this will print
+                elif is_valid_preposition is False:
+                    message = "You cannot quite figure out how to skate in such a way."
+                else:
+                    message = SKATE_FAIL_INVALID_TARGET
+
+            # Generic skate command
+            else:
+                message = SKATE_SUCCESS
+                skate_success = True
+        else: # player does note have skatek skill
+            message = SKATE_FAIL_NO_SKILL
+
+        if skate_success is True:
+            self.gamestate.update_time_left(SKATE_COST)
 
         wprint(message)
         self.ui.wait_for_enter()
@@ -1420,12 +1466,11 @@ class GameClient:
         Called when player looks at the 'bug' inside metaverse
         :return:
         '''
-        # TODO: Pull these out to the strings.py file as constants if desired
 
-        spider_defeated = self.gamestate.endgame_data['metaverse']['is_spider_defeated']
+        bug_defeated = self.gamestate.endgame_data['metaverse']['is_spider_defeated']
 
-        if spider_defeated is  True:
-            wprint("You've already squashed this bug.")
+        if bug_defeated is True:
+            wprint(MINIGAME_BUG_DONE)
             self.ui.wait_for_enter()
             return
 
@@ -1450,25 +1495,25 @@ class GameClient:
             if user_response in ANSWER_A:
                 wprint("The bug rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
                        "and ends up a dead spiddy on the floor. [carcass] is added to your inventory")
-                spider_defeated = True
+                bug_defeated = True
             elif user_response in ANSWER_B:
                 wprint("The bug quits its cocooning and throws a compiler error straight at your face, woah that is "
                        "gonna leave a nasty scar- you must look like, Rambo cool right now! Luckily you are able to break "
                        "free of the webbing, but you feel pretty dazed.")
                 self.gamestate.player.update_speed(BUG_SPEED_LOSS)
                 self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
-                spider_defeated = False
+                bug_defeated = False
             elif user_response in ANSWER_C:
                 wprint("You punch the bug in one of its many eyes, splooting out a bunch of green gunk and eye juices "
                        "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly "
                        "[carcass] in your inventory")
-                spider_defeated = True
+                bug_defeated = True
 
-            if spider_defeated is True:
+            if bug_defeated is True:
                 self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
                 self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
                 try:
-                    carcass = self.gamestate.get_object_by_name("Carcass") # TODO: replace string literal with constant from language_words.py once implemented
+                    carcass = self.gamestate.get_object_by_name(CARCASS)
                     self.gamestate.player.add_object_to_inventory(carcass)
                 except:
                     logger.debug("Unable to add [carcass] to player inventory, maybe the object doesn't exist yet?")
@@ -1537,7 +1582,7 @@ class GameClient:
                 self.gamestate.endgame_data['metaverse']['is_firewall_defeated'] = True
 
                 try:
-                    fireball = self.gamestate.get_object_by_name(FIREBALL)  # TODO: replace string literal with constant from language_words.py once implemented
+                    fireball = self.gamestate.get_object_by_name(FIREBALL)
                     self.gamestate.player.add_object_to_inventory(fireball)
                 except:
                     logger.debug("Unable to add [fireball] to inventory")
@@ -1630,7 +1675,7 @@ class GameClient:
             elif user_response in ANSWER_C:
                 if self.gamestate.player.has_object_by_name(SURGE):
                     wprint("You poor the neon green liquid energy over the lock. It bubbles and fizzes eating "
-                            "through the structure like acid. Saddly, most of the lock is still intact and you "
+                            "through the structure like acid. Sadly, most of the lock is still intact and you "
                             "are really questioning your dietary choices.")
                     surge = self.gamestate.player.inventory.get_object_by_name(SURGE)
                     self.gamestate.player.remove_object_from_inventory(surge)
@@ -1655,7 +1700,7 @@ class GameClient:
                         user_response = self.ui.user_prompt().lower()
 
                     if user_response in ANSWER_A:
-                        wprint("The pigeon recieves your greetings in a most formal manner, nodding its head three times. "
+                        wprint("The pigeon receives your greetings in a most formal manner, nodding its head three times. "
                                 "The bird then assists you with your predicament, peeking open the door lock with its beak. "
                                 "It then flies away as it is a very busy bird. ")
                         hack_success = True
@@ -1767,7 +1812,7 @@ class GameClient:
             "decided to blow up the world! How 'bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
             "Sunday? Lol, yours truly, Mr. Robot")
             try:
-                binary_files = self.gamestate.get_object_by_name("Binary String")  # TODO: replace string literal with constant from language_words.py once implemented
+                binary_files = self.gamestate.get_object_by_name(BINARY_STRING)
                 self.gamestate.player.add_object_to_inventory(binary_files)
             except:
                 logger.debug("Unable to add binary string")
@@ -1901,7 +1946,7 @@ class GameClient:
                    "this heinous scheme if you wanna beat this punk CPU!")
 
             try:
-                launch_codes = self.gamestate.get_object_by_name("Code") # TODO: Update to string-literal from language_words.py once implemented
+                launch_codes = self.gamestate.get_object_by_name(CODE)
                 self.gamestate.player.add_object_to_inventory(launch_codes)
             except:
                 logger.debug("Unable to add launch codes from hack_launch_codes() method")
@@ -1910,6 +1955,29 @@ class GameClient:
 
         self.ui.wait_for_enter()
         return hack_success
+
+    def use_bug_carcass_on_binary_files(self, bug_carcass_object, binary_files_feature):
+        message = "Why did that seem like a good idea? Those are gonna be really hard to hack now."
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
+
+    def use_bug_carcass_on_cat_videos(self, bug_carcass_object, cat_videos_feature):
+        message = ("Eww… the cats seem to like the dead bug. They offer gratitude in the form of some tasty "
+               "[hackersnacks]- this makes sense as those tasty treats are rumored to just be repackaged kibble")
+        snacks = self.gamestate.get_object_by_name(HACKERSNACKS)
+        self.gamestate.player.add_object_to_inventory(snacks)
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
+
+    def use_bug_carcass_on_corrupted_files(self, bug_carcass_object, corrupted_files_feature):
+        message = "Eww… I think they are making friends"
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
+
+    def use_bug_carcass_on_launch_codes(self, bug_carcass_object, corrupted_files_feature):
+        message = "This does nothing... and is weird."
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
 
     def use_fireball_on_binary_files(self, fireball_object, binary_files_feature):
         '''
@@ -1920,44 +1988,29 @@ class GameClient:
 
         :return:
         '''
-        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
+        message = "Why did that seem like a good idea? Those are gonna be really hard to hack now."
         self.gamestate.player.remove_object_from_inventory(fireball_object)
         self.gamestate.player.update_speed(FIREBALL_ON_BINARY_SPEED_COST)
-
-    def use_bug_carcass_on_binary_files(self, bug_carcass_object, binary_files_feature):
-        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
-
-    def use_bug_carcass_on_cat_videos(self, bug_carcass_object, cat_videos_feature):
-        wprint("Eww… the cats seem to like the dead bug. They offer gratitude in the form of some tasty "
-               "[hackersnacks]- this makes sense as those tasty treats are rumored to just be repackaged kibble")
-        snacks = self.gamestate.get_object_by_name(HACKERSNACKS)
-        self.gamestate.player.add_object_to_inventory(snacks)
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
-
-    def use_bug_carcass_on_corrupted_files(self, bug_carcass_object, corrupted_files_feature):
-        wprint("Eww… I think they are making friends")
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
-
-    def use_bug_carcass_on_launch_codes(self, bug_carcass_object, corrupted_files_feature):
-        wprint("This does nothing... and is weird.")
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
 
     def use_fireball_on_corrupted_files(self, fireball_object, corrupted_files_feature):
-        wprint("The files splutter up in a mess of flames - they are so not getting a prom date.")
+        message = "The files splutter up in a mess of flames - they are so not getting a prom date."
         self.gamestate.player.remove_object_from_inventory(fireball_object)
+        return message
 
     def use_fireball_on_cat_videos(self, fireball_object, cat_videos_feature):
-        wprint("You monster! The internet is angry and you spend like half your cash stash trying to change your identity.")
+        # TODO: Work with Niza -- the alia
+        message = "You monster! The internet is angry and you spend like half your cash stash trying to change your identity."
         old_cash = self.gamestate.player.get_cash()
         cash_loss = int(-1 * old_cash * CAT_VIDEO_CASH_PERCENT_LOSS)
         self.gamestate.player.update_cash(cash_loss)
-        # logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
         self.gamestate.player.remove_object_from_inventory(fireball_object)
+        return message
 
     def use_fireball_on_launch_codes(self, fireball_object, launch_codes_feature):
-        wprint("Oh that doesn’t look good, these are gonna be pretty hard to hack...")
+        message = "Oh that doesn’t look good, these are gonna be pretty hard to hack..."
         self.gamestate.player.remove_object_from_inventory(fireball_object)
+        return message
 
     def use_object_on_feature(self, object_name, feature_name, success_function):
         '''
@@ -1972,17 +2025,16 @@ class GameClient:
         object_used = self.gamestate.player.inventory.get_object_by_name(object_name)
 
         if object_used is None:
-            wprint("You don't have a " + object_name + " that you can use.")
+            message = "You don't have a " + object_name + " that you can use."
 
         elif target_feature is None:
-            wprint("You see no ["+ feature_name + "] here to target with the [" + object_used.get_name() + "].")
+            message = "You see no ["+ feature_name + "] here to target with the [" + object_used.get_name() + "]."
 
         else:
-            success_function(target_feature, object_used)
+            message = success_function(object_used, target_feature)
             success = True
 
-        self.ui.wait_for_enter()
-        return success
+        return message, success
 
 
     def hack_sentient_cpu(self):
@@ -1990,13 +2042,10 @@ class GameClient:
         Work in progress
         :return:
         '''
-        inventory = []
-        code = self.gamestate.get_object_by_name("Code")
-        binary_string = self.gamestate.get_object_by_name("Binary String")
-        for inv_obj in self.gamestate.player.get_inventory_objects():
-            print(inv_obj.name)
-            inventory.append(inv_obj.name)
-        if code.name in inventory and binary_string.name in inventory:
+
+        player_has_code = self.gamestate.player.has_object_by_name(CODE)
+        player_has_binary_string = self.gamestate.player.has_object_by_name(BINARY_STRING)
+        if player_has_code is True and player_has_binary_string is True:
             wprint("All you do is SLAY! You dodge the sparks as they go flying past your head.")
             self.gamestate.player.update_coolness(100)
             return True
@@ -2013,3 +2062,11 @@ class GameClient:
             self.gamestate.talk_indices[index_lookup] += 1
         response = conversation_list[msg_index]
         return response
+
+    def is_valid_preposition_for_target(self, target_name, preposition):
+        if target_name == "ledge":
+            if preposition.lower() in {'on', 'onto', 'over', 'around', 'off'}:
+                return True
+            return False
+        else:
+            return False

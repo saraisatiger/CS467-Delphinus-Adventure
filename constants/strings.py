@@ -291,7 +291,13 @@ SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED = "This room is already painted."
 
 # 'skate' strings
 SKATE_SUCCESS = "You skate successfully."
-SKATE_FAILURE_NO_SKILL = "You need to practice with a [Skateboard] before you can skate around!"
+SKATE_SUCCESS_LEDGE_SAFELANDING = "You do a kick-flip and 360 off the roof, grinding along a fire escape rail and end " \
+                                  "up back on the Street. VERY cool, yo. Very cool. "
+SKATE_SUCCESS_LEDGE_FALL = "You try to do a kick-flip off the roof but somewhere between doing a 360 and a 180 you " \
+                           "lose your focus and fall onto the Street below. Sprained ankle and a loose wheel... " \
+                           "that'll slow you down. "
+SKATE_FAIL_NO_SKILL = "You need to practice with a [Skateboard] before you can skate around!"
+SKATE_FAIL_INVALID_TARGET = "You cannot skate on that."
 SPRAYPAINT_FAIL_CAUGHT = "You've been spotted by the Po-Po! Too late to run, they've seen your face."
 
 # 'steal' strings
@@ -338,4 +344,5 @@ GAMEOVER_CHEAT_LOSE_MESSAGE = "Game too hard for you, script kiddie? L2Play, noo
 # 'exit' messages
 EXIT_MESSAGE = "Exiting the game, bye."
 
-
+# Other strings
+MINIGAME_BUG_DONE = "You've already squashed this bug."
