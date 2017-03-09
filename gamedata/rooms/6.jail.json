@@ -16,7 +16,7 @@
         "hackable": true,
         "description_hacked": "Not only have you unlocked the doors, but you've also wiped your criminal record clean (again)... c00l!"
       },
-	  {
+      {
         "name" : "Police Officer",
         "description" : "Probably works for tips. He's leaning against the wall right next to... is that a [key] hanging on a hook right above his head?!",
         "hackable": false
@@ -26,7 +26,7 @@
         "description" : "The new home of all your sweet gear... not. gonna. cry.",
         "hackable": false
       },
-	  {
+      {
         "name" : "Metal Door",
         "description" : "Locked tight. Controlled by a computer, it looks like. Only way out.",
         "hackable": false

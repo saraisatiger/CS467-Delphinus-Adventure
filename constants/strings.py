@@ -73,9 +73,14 @@ DATATOWER_SENTIENTCPU_TEXT = ['Silly meatmouth, I will soon take over your silly
 POOL_ACIDBURN_TEXT = ['Hey, so you made it out alive, cool.', 
 'That Sentient CPU creep tried to suck my into a computer too, weirdo. Of course, since I am a better hacker than you I was able to out smart that bot.',  
 'But enough about how great I am, that saving the planet thing you did was rad.', 
-'I think I might take you to prom', 
+'I think I might take you to prom...', 
 'Less talking more smooching!']
 
+CAT_TEXT = ['Meow.', 
+'Meow?',  
+'Rarw.', 
+'Purr...', 
+'...']
 
 DEFAULT_ROOM = "Street"
 
@@ -152,6 +157,8 @@ NO_ALIASES = {'no', 'n', 'nope'}
 ANSWER_A = {'a', 'A'}
 ANSWER_B = {'b', 'B'}
 ANSWER_C = {'c', 'C'}
+ANSWER_D = {'d', 'D'}
+ANSWER_E = {'e', 'E'}
 
 # 'buy' strings
 BUY_NOT_IN_ROOM = "That doesn't seem to be something you can buy here."
@@ -213,6 +220,8 @@ HACK_SUCCESS_TURNSTILE = "You plug into the port and use the classic turnstile h
                          "should be able to pass through the area without paying now. "
 HACK_FAIL_FIRE_ALARM = "Looks like you might wanna stick to computers- the fire alarm has out smarted you. "
 HACK_SUCCESS_FIRE_ALARM = "Nice work. The alarm is hacked and school is out! "
+HACK_FAIL_HEAVY_DOOR = "Something has gone wrong- you should not have failed this challenge- get back in that loop!"
+HACK_SUCCESS_HEAVY_DOOR = "The heavy door is now open and you can come and go as you please."
 
 # 'help' strings
 HELP_HEADER_TEXT = "HELP"

@@ -4,5 +4,5 @@
   "short_description" : "A green circuit board",
   "default_location" : "Trash Can",
   "details" : "build computer",
-  "cost" : 60
+  "cost" : 0
 }

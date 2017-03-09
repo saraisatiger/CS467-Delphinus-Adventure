@@ -8,7 +8,8 @@
       {
         "name" : "Heavy Door",
         "description" : "A large metal structure which is probably gonna make you late for class. Psyc! You would never go to class.",
-        "hackable": false
+        "hackable": true,
+        "description_hacked" : "The door swings open freely now. Go as you please..."
       },
       {
         "name" : "Control Box",
