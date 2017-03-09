@@ -101,7 +101,7 @@ R_MULTI = [['acid burn']]
 FEATURES_ALIASES_ARRAYS = [R1_F, R2_F, R3_F, R4_F, R5_F, R6_F, R7_F, R8_F, R9_F, R10_F, R11_F, R12_F, R13_F, R14_F, R15_F, R16_F, R_MULTI]
 
 #propositions
-PREPOSITIONS = [ 'in front of', 'next to', 'on', 'in', 'onto', 'into', 'below', 'behind', 'above', 'over', 'about', 'with']
+PREPOSITIONS = [ 'in front of', 'next to', 'on', 'in', 'inside', 'onto', 'into', 'below', 'behind', 'above', 'over', 'about', 'with', 'around', 'off', 'up']
 
 CHEATCODE_LOSE = 'lose cheatcode'
 CHEATCODE_LOSE_ALIASES = ['cheatcode lose', 'mess with the best', 'lose cheatcode']
