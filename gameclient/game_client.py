@@ -987,7 +987,6 @@ class GameClient:
                     else:
                         message = "You're not sure how to use a fireball on that."
                 elif obj_label == "carcass":
-                    pass
                     # TODO: Once language parser passes back the preposition and target, we can pass it to below
                     target_feature = ""
                     if target_feature == "binary files":
@@ -1040,9 +1039,16 @@ class GameClient:
 
                 if room_feature is not None and is_valid_preposition is True:
                     if room_feature.get_name().lower() == "ledge":
-                        message = "You skate on the ledge, wow"
-                        logger.debug("Skated on the ledge succesfully")
+                        land_safely = self.rand_event.coin_flip()
+                        if land_safely is True:
+                            message = SKATE_SUCCESS_LEDGE_SAFELANDING
+                            self.gamestate.player.update_coolness(SKATE_LEDGE_COOLNESS_INCREASE)
+                        else:
+                            message = SKATE_SUCCESS_LEDGE_FALL
+                            self.gamestate.player.update_speed(SKATE_LEDGE_SPEED_LOSS)
+                        self.gamestate.set_current_room(self.gamestate.get_room_by_name("Street"))
                         skate_success = True
+
 
                     # Target must not be a feature in the room, they fail
                     else:
