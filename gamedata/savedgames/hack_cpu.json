@@ -13,9 +13,9 @@
       "Hacker Manual",
       "Skateboard",
       "Fireball",
-      "Bug Carcass",
-      "Launch Codes",
-      "Binary Files"
+      "Carcass",
+      "Code",
+      "Binary String"
    ],
    "current_room":"Data Tower",
    "prior_room":"Inside the Metaverse",
@@ -83,10 +83,10 @@
 
       ],
       "Encrypted Files":[
-
+         "Code"
       ],
       "Spaghetti Code":[
-
+         "Binary String"
       ],
       "Street":[
          "Crisp Cash",
