@@ -169,19 +169,6 @@ class Room:
     def remove_object_from_room(self, object):
         self.objects.remove(object)
 
-    # TODO: This method is never called as of 2-17-2017, commenting out. Can uncomment later if needed.
-    # def remove_object_from_room_by_name(self, object_name):
-    #     object_to_remove = self.get_object_by_name(object_name)
-    #     if object_to_remove is not None:
-    #         self.remove_object_from_room(object_to_remove)
-    #         return True
-    #     return False
-
-    # TODO: Deprecated. Delete if never used. --SSH
-    # def set_objects(self, object_list):
-        # Used by initialize_gamestate() method in GameState class
-        # self.objects = object_list
-
     def is_visited(self):
         return self.visited
 

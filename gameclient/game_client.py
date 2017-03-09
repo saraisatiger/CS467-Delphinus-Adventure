@@ -188,8 +188,6 @@ class GameClient:
             self.user_input = self.ui.user_prompt()
             self.send_command_to_parser()
 
-
-            # TODO: Refactor verb_*() methods to check the parser_error_message before proceeding
             # Conditionally handle each possible verb / command
             if self.command is LOOK:
                 # The verb_look() method is called at the top of each loop, so not explicitly called here
@@ -470,11 +468,11 @@ class GameClient:
 
                     elif cur_room_name == "inside the metaverse" and destination_room_name == "data tower":
                         has_fireball = self.gamestate.player.has_object_by_name(FIREBALL)
-                        has_bug_carcass = self.gamestate.player.has_object_by_name("carcass")  # TODO: Replace string with constant from language_words.py once defined
+                        has_bug_carcass = self.gamestate.player.has_object_by_name(CARCASS)
 
                         if has_fireball is False or has_bug_carcass is False:
                             go_success = False
-                            wprint("You need the fireball and bug carcass to proceed")  # TODO: Make better message to user?
+                            wprint("You need to have acquired the [fireball] and bug [carcass] to proceed! Better [look at] everything here before you leave.")
                             break
                         else:
                             go_success = True
@@ -845,19 +843,12 @@ class GameClient:
         return take_success
 
     def verb_talk(self, noun_name, noun_type):
-        # TODO: Parser doesn't return anything except that 'verb' : 'talk', eest is blank no matter what I type. Intended? Assuming not as there are two conversations in chat room
-        # For now, we just talk to whoever is in the room for logic testing purposes
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name().lower()
-        logger.debug("cur_room_name: " + cur_room_name)
         room_feature = cur_room.get_feature_by_name(noun_name)
 
         response = ""
         talk_success = False
-
-        logger.debug("Player used talk command.")
-
-        # TODO: Likely have to update this to check the current room to see if the target of the talk command is a feature in the room and use if/elif to update correct one
 
         if room_feature is not None:
             logger.debug("room_eature is not None")
@@ -1411,12 +1402,11 @@ class GameClient:
         Called when player looks at the 'bug' inside metaverse
         :return:
         '''
-        # TODO: Pull these out to the strings.py file as constants if desired
 
-        spider_defeated = self.gamestate.endgame_data['metaverse']['is_spider_defeated']
+        bug_defeated = self.gamestate.endgame_data['metaverse']['is_spider_defeated']
 
-        if spider_defeated is  True:
-            wprint("You've already squashed this bug.")
+        if bug_defeated is True:
+            wprint(MINIGAME_BUG_DONE)
             self.ui.wait_for_enter()
             return
 
@@ -1441,25 +1431,25 @@ class GameClient:
             if user_response in ANSWER_A:
                 wprint("The bug rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
                        "and ends up a dead spiddy on the floor. [carcass] is added to your inventory")
-                spider_defeated = True
+                bug_defeated = True
             elif user_response in ANSWER_B:
                 wprint("The bug quits its cocooning and throws a compiler error straight at your face, woah that is "
                        "gonna leave a nasty scar- you must look like, Rambo cool right now! Luckily you are able to break "
                        "free of the webbing, but you feel pretty dazed.")
                 self.gamestate.player.update_speed(BUG_SPEED_LOSS)
                 self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
-                spider_defeated = False
+                bug_defeated = False
             elif user_response in ANSWER_C:
                 wprint("You punch the bug in one of its many eyes, splooting out a bunch of green gunk and eye juices "
                        "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly "
                        "[carcass] in your inventory")
-                spider_defeated = True
+                bug_defeated = True
 
-            if spider_defeated is True:
+            if bug_defeated is True:
                 self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
                 self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
                 try:
-                    carcass = self.gamestate.get_object_by_name("Carcass") # TODO: replace string literal with constant from language_words.py once implemented
+                    carcass = self.gamestate.get_object_by_name(CARCASS)
                     self.gamestate.player.add_object_to_inventory(carcass)
                 except:
                     logger.debug("Unable to add [carcass] to player inventory, maybe the object doesn't exist yet?")
@@ -1528,7 +1518,7 @@ class GameClient:
                 self.gamestate.endgame_data['metaverse']['is_firewall_defeated'] = True
 
                 try:
-                    fireball = self.gamestate.get_object_by_name(FIREBALL)  # TODO: replace string literal with constant from language_words.py once implemented
+                    fireball = self.gamestate.get_object_by_name(FIREBALL)
                     self.gamestate.player.add_object_to_inventory(fireball)
                 except:
                     logger.debug("Unable to add [fireball] to inventory")
@@ -1648,7 +1638,7 @@ class GameClient:
             "decided to blow up the world! How 'bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
             "Sunday? Lol, yours truly, Mr. Robot")
             try:
-                binary_files = self.gamestate.get_object_by_name("Binary String")  # TODO: replace string literal with constant from language_words.py once implemented
+                binary_files = self.gamestate.get_object_by_name(BINARY_STRING)
                 self.gamestate.player.add_object_to_inventory(binary_files)
             except:
                 logger.debug("Unable to add binary string")
@@ -1782,7 +1772,7 @@ class GameClient:
                    "this heinous scheme if you wanna beat this punk CPU!")
 
             try:
-                launch_codes = self.gamestate.get_object_by_name("Code") # TODO: Update to string-literal from language_words.py once implemented
+                launch_codes = self.gamestate.get_object_by_name(CODE)
                 self.gamestate.player.add_object_to_inventory(launch_codes)
             except:
                 logger.debug("Unable to add launch codes from hack_launch_codes() method")

@@ -335,4 +335,5 @@ GAMEOVER_CHEAT_LOSE_MESSAGE = "Game too hard for you, script kiddie? L2Play, noo
 # 'exit' messages
 EXIT_MESSAGE = "Exiting the game, bye."
 
-
+# Other strings
+MINIGAME_BUG_DONE = "You've already squashed this bug."
