@@ -1675,7 +1675,7 @@ class GameClient:
             elif user_response in ANSWER_C:
                 if self.gamestate.player.has_object_by_name(SURGE):
                     wprint("You poor the neon green liquid energy over the lock. It bubbles and fizzes eating "
-                            "through the structure like acid. Saddly, most of the lock is still intact and you "
+                            "through the structure like acid. Sadly, most of the lock is still intact and you "
                             "are really questioning your dietary choices.")
                     surge = self.gamestate.player.inventory.get_object_by_name(SURGE)
                     self.gamestate.player.remove_object_from_inventory(surge)
@@ -1700,7 +1700,7 @@ class GameClient:
                         user_response = self.ui.user_prompt().lower()
 
                     if user_response in ANSWER_A:
-                        wprint("The pigeon recieves your greetings in a most formal manner, nodding its head three times. "
+                        wprint("The pigeon receives your greetings in a most formal manner, nodding its head three times. "
                                 "The bird then assists you with your predicament, peeking open the door lock with its beak. "
                                 "It then flies away as it is a very busy bird. ")
                         hack_success = True
