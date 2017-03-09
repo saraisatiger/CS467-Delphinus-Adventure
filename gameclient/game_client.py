@@ -1035,7 +1035,7 @@ class GameClient:
             # Special handling skate targets
             if noun_name is not None and preposition is not None:
                 # Check if the preposition is valid and find a reference, if any, to the "target" the player input
-                is_valid_preposition = self.is_valid_skate_preposition(noun_name, preposition)
+                is_valid_preposition = self.is_valid_preposition_for_target(noun_name, preposition)
                 room_feature = cur_room.get_feature_by_name(noun_name)
 
                 if room_feature is not None and is_valid_preposition is True:
@@ -1886,7 +1886,7 @@ class GameClient:
         response = conversation_list[msg_index]
         return response
 
-    def is_valid_skate_preposition(self, target_name, preposition):
+    def is_valid_preposition_for_target(self, target_name, preposition):
         if target_name == "ledge":
             if preposition.lower() in {'on', 'onto', 'over', 'around', 'off'}:
                 return True
