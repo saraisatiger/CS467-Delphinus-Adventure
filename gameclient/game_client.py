@@ -214,7 +214,7 @@ class GameClient:
             elif self.command is BUY:
                 self.verb_buy(self.verb_noun_name)
             elif self.command is SKATE:
-                self.verb_skate()
+                self.verb_skate(self.verb_noun_name, self.verb_noun_type, self.verb_preposition)
             elif self.command is SPRAYPAINT:
                 self.verb_spraypaint(self.extras)
             elif self.command is TALK:
@@ -1019,17 +1019,44 @@ class GameClient:
         self.ui.wait_for_enter()
         return use_success
 
-    def verb_skate(self):
+    def verb_skate(self, noun_name, noun_type, preposition):
         '''
         TODO: Finish implementing this function ((SSH))
         :return:
         '''
         skate_success = False
 
+        if noun_name == '':
+            noun_name = None
+
         if self.gamestate.player.can_skateboard() is True:
-            message = SKATE_SUCCESS
-        else:
-            message = SKATE_FAILURE_NO_SKILL
+            cur_room = self.gamestate.get_current_room()
+
+            # Special handling skate targets
+            if noun_name is not None and preposition is not None:
+                is_valid_preposition = self.is_valid_skate_preposition(preposition)
+                room_feature = cur_room.get_feature_by_name(noun_name)
+                if room_feature is not None and is_valid_preposition is True:
+                    if room_feature.get_name().lower() == "ledge":
+                        message = "You skate on the ledge, wow"
+                        logger.debug("Skated on the ledge succesfully")
+                        skate_success = True
+                    else:
+                        message = SKATE_FAIL_INVALID_TARGET
+                elif is_valid_preposition is False:
+                    message = "You cannot quite figure out how to skate in such a way."
+                else:
+                    message = SKATE_FAIL_INVALID_TARGET
+
+            # Generic skate command
+            else:
+                message = SKATE_SUCCESS
+                skate_success = True
+        else: # player does note have skatek skill
+            message = SKATE_FAIL_NO_SKILL
+
+        if skate_success is True:
+            self.gamestate.update_time_left(SKATE_COST)
 
         wprint(message)
         self.ui.wait_for_enter()
@@ -1852,3 +1879,8 @@ class GameClient:
             self.gamestate.talk_indices[index_lookup] += 1
         response = conversation_list[msg_index]
         return response
+
+    def is_valid_skate_preposition(self, preposition):
+        if preposition.lower() in {'on', 'onto', 'over', 'around', 'off'}:
+            return True
+        return False

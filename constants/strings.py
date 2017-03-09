@@ -282,7 +282,8 @@ SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED = "This room is already painted."
 
 # 'skate' strings
 SKATE_SUCCESS = "You skate successfully."
-SKATE_FAILURE_NO_SKILL = "You need to practice with a [Skateboard] before you can skate around!"
+SKATE_FAIL_NO_SKILL = "You need to practice with a [Skateboard] before you can skate around!"
+SKATE_FAIL_INVALID_TARGET = "You cannot skate on that."
 SPRAYPAINT_FAIL_CAUGHT = "You've been spotted by the Po-Po! Too late to run, they've seen your face."
 
 # 'steal' strings
