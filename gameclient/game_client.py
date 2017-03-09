@@ -92,9 +92,12 @@ class GameClient:
                 if exit_code is GAMEOVER_FORFEIT:
                     wprint("Game over: Forfeit")
                 elif exit_code is GAMEOVER_WIN:
-                    wprint("Game over: Player won")
+                    wprint("Game over: You won!")
+                    self.command = NEW_GAME
+                    self.ui.wait_for_enter()
+                    continue
                 elif exit_code is GAMEOVER_LOSE:
-                    wprint("Game over: Player lost")
+                    wprint("Game over, man, GAME OVER! (RIP Bill Paxton, 1955-2017)")
                 elif exit_code is GAMEOVER_SAVE:
                     self.save_game_menu()
                     wprint("Game over: Player saved game")
@@ -204,7 +207,7 @@ class GameClient:
             elif self.command is DROP:
                 self.verb_drop(self.verb_noun_name)
             elif self.command is GO:
-                self.verb_go(self.verb_noun_name, self.parser_error_message)
+                status = self.verb_go(self.verb_noun_name, self.parser_error_message)
             elif self.command is HACK:
                 self.verb_hack(self.verb_noun_name, self.verb_noun_type)
             elif self.command is STEAL:
@@ -418,11 +421,12 @@ class GameClient:
 
     def verb_go(self, destination, error_message):
         go_success = False
-
-        destination = destination.lower()
+        message = None
         destination_room_name = None
+        destination = destination.lower()
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name().lower()
+
 
         if destination is None or destination.isspace():
            message = GO_FAILURE_DESTINATION_MISSING
@@ -487,13 +491,26 @@ class GameClient:
                             go_success = False
                             message = "The heavy door is locked; maybe you should take a [look at] it or try and [hack] your way through?"
 
+                    elif cur_room_name == "data tower" and destination_room_name == "winners' pool":
+                        sentient_cpu = cur_room.get_feature_by_name("sentient cpu")
+                        if sentient_cpu.is_hacked() is True:
+                            go_success = True
+                            break
+                        else:
+                            go_success = False
+                            message = "One does not simply go to the Winners' Pool!"
+                            break
+
+                    elif cur_room_name == "winners' pool" and destination_room_name == "street":
+                        go_success = True
+                        return GAMEOVER_WIN
 
                     # Any room without special-handling / restrictions on movement is authorized to move, handle here
                     else:
                         go_success = True
                         break
                 else:
-                    message = GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX
+                    message = GO_FAILURE_PREFIX + destination + GO_FAILURE_SUFFIX
 
 
         if go_success is True:
@@ -509,11 +526,9 @@ class GameClient:
                 logger.debug(GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX)
                 message = GO_FAILURE_PREFIX + self.verb_noun_name + GO_FAILURE_SUFFIX
 
-
-
         wprint(message)
         self.ui.wait_for_enter()
-        return go_success
+        return GAME_CONTINUE # Return NONE unless player won the game
 
     def verb_hack(self, noun_name, noun_type):
         hack_success = False
