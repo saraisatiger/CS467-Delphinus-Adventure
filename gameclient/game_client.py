@@ -2042,13 +2042,10 @@ class GameClient:
         Work in progress
         :return:
         '''
-        inventory = []
-        code = self.gamestate.get_object_by_name("Code")
-        binary_string = self.gamestate.get_object_by_name("Binary String")
-        for inv_obj in self.gamestate.player.get_inventory_objects():
-            print(inv_obj.name)
-            inventory.append(inv_obj.name)
-        if code.name in inventory and binary_string.name in inventory:
+
+        player_has_code = self.gamestate.player.has_object_by_name(CODE)
+        player_has_binary_string = self.gamestate.player.has_object_by_name(BINARY_STRING)
+        if player_has_code is True and player_has_binary_string is True:
             wprint("All you do is SLAY! You dodge the sparks as they go flying past your head.")
             self.gamestate.player.update_coolness(100)
             return True
