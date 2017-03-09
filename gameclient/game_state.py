@@ -68,6 +68,8 @@ class GameState:
         self.is_trash_can_looted = False
         self.is_locker_open = False
         self.is_alarm_hacked = False
+        self.is_graphics_card_found = False
+        self.is_roof_heavy_door_open = False
         self.spraypaint_data = {}
         self.jailroom_data = {}
         self.endgame_data = {}
@@ -78,7 +80,8 @@ class GameState:
             'chat_creature' : 0,
             'sentient_cpu' : 0,
             'pool_acid' : 0,
-            'hall_teacher' : 0
+            'hall_teacher' : 0,
+            'cat' : 0
         }
 
     def load_rooms_and_objects_from_file(self):
