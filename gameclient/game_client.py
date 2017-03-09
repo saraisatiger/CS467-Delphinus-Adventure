@@ -437,7 +437,7 @@ class GameClient:
                 if connection.label.lower() == destination or connection.cardinal_direction.lower() == destination:
                     destination_room_name = connection.destination.lower()
 
-                    # Handle sub-way logic:
+                    # Special room-specific log
                     if cur_room_name == "subway":
                         # It's free to go back where you came from, so check that first
                         if destination_room_name.lower() == self.gamestate.get_prior_room().get_name().lower():
@@ -472,11 +472,21 @@ class GameClient:
 
                         if has_fireball is False or has_bug_carcass is False:
                             go_success = False
-                            wprint("You need to have acquired the [fireball] and bug [carcass] to proceed! Better [look at] everything here before you leave.")
+                            message = "You need to have acquired the [fireball] and bug [carcass] to proceed! Better [look at] everything here before you leave."
                             break
                         else:
                             go_success = True
                             break
+
+                    elif cur_room_name == "pool on the roof":
+                        heavy_door = cur_room.get_feature_by_name("heavy door")
+                        if heavy_door.is_hacked() is True:
+                            go_success = True
+                            break
+                        else:
+                            go_success = False
+                            message = "The heavy door is locked; maybe you should take a [look at] it or try and [hack] your way through?"
+
 
                     # Any room without special-handling / restrictions on movement is authorized to move, handle here
                     else:
@@ -1505,7 +1515,7 @@ class GameClient:
                 bug_defeated = False
             elif user_response in ANSWER_C:
                 wprint("You punch the bug in one of its many eyes, splooting out a bunch of green gunk and eye juices "
-                       "all over your sweet outfit- so uncool. Good news- it’s dead and you now have a gnarly "
+                       "all over your sweet outfit- so uncool. Good news- it's dead and you now have a gnarly "
                        "[carcass] in your inventory")
                 bug_defeated = True
 
@@ -1571,10 +1581,10 @@ class GameClient:
             elif user_response in ANSWER_C:
                 wprint("You rush at the firewall, a wiry teen with nothing to lose. Fists flailing you beat back the "
                        "monstrous flame making a tunnel right to the Data Tower. Berserkering with rage, "
-                       "your brutality knows no mercy when you notice a real cute lil’ ball of fire cowering from "
+                       "your brutality knows no mercy when you notice a real cute lil' ball of fire cowering from "
                        "your wraith as your scorched body pummels through the flames- this is gonna leave some pretty "
                        "sick scars. What the heck you think, scooping the little [fireball] up and depositing him in "
-                       "your backpack. Isn’t his fault his relatives are super bogus.")
+                       "your backpack. Isn't his fault his relatives are super bogus.")
                 self.gamestate.player.update_coolness(FIREWALL_COOLNESS_COST)
                 firewall_defeated = True
 
@@ -1668,7 +1678,7 @@ class GameClient:
                 else:
                     wprint("You don\'t have any lock picks. Do you even go here?")
             elif user_response in ANSWER_B:
-                if self.gamestate.player.has_object_by_name(SKATEBOARD):
+                if self.gamestate.player.has_object_by_name(SKATEBOARD) or self.gamestate.player.can_skateboard():
                     wprint("You pry, push and prod, but this door is not opening.")
                 else:
                     wprint("You don\'t own a skateboard. Learn some skills, yo.")
@@ -1807,7 +1817,7 @@ class GameClient:
 
         if user_response in ANSWER_A:
             wprint("You got it! Love those crazy catz. You grab the [binary string] giving it a quick read before "
-            "shoving it in your backpack. It say:  ‘Dear diary, this is Mr. Robot. How are you? I am fine. I have a "
+            "shoving it in your backpack. It say:  'Dear diary, this is Mr. Robot. How are you? I am fine. I have a "
             "secret?! Wanna know??? Of course you do, you are my best friend. Well, as president of EvilCorp Bank I "
             "decided to blow up the world! How 'bout dat? I have some nuclear launch codes I plan to use, oh idk maybe "
             "Sunday? Lol, yours truly, Mr. Robot")
@@ -1823,7 +1833,7 @@ class GameClient:
             hack_success = False
         elif user_response in ANSWER_C:
             # TODO: Find a way so that the player can't keep hacking and getting this answer to increase coolness forever
-            wprint("Grandma does love you- cause like you are the coolest, but this isn’t the right answer")
+            wprint("Grandma does love you- cause like you are the coolest, but this isn't the right answer")
             self.gamestate.player.update_coolness(BINARY_FILES_COOLNESS_INCREASE)
             hack_success = False
 
@@ -1838,7 +1848,7 @@ class GameClient:
         hack_success = False
 
         wprint("You turn your hacking expertise to the oozing pile of corrupted files, hacking here and there to try "
-               "and make some sense of the mess- finally a user prompt: ‘WaN7 7o play gaM3 t1NY huuuuMan?’ [y/n]")
+               "and make some sense of the mess- finally a user prompt: 'WaN7 7o play gaM3 t1NY huuuuMan?' [y/n]")
 
         user_response = self.ui.user_prompt().lower()
 
@@ -1853,8 +1863,8 @@ class GameClient:
             player_wins_spin = self.rand_event.coin_flip()
 
             if player_wins_spin is True:
-                wprint("The wheel starts to slow and almost lands on ‘LiFe7ime SuPPly o’ F1ShStickz’ but makes it one "
-                "more tik and lands on ‘1 Fr33 [Surge].’ Eh, that works for you")
+                wprint("The wheel starts to slow and almost lands on 'LiFe7ime SuPPly o' F1ShStickz' but makes it one "
+                "more tik and lands on '1 Fr33 [Surge].' Eh, that works for you")
                 try:
                     surge = self.gamestate.get_object_by_name(SURGE)
                     self.gamestate.player.add_object_to_inventory(surge)
@@ -1862,8 +1872,8 @@ class GameClient:
                     logger.debug("Unable to add surge from hack_corrupted_files() method")
 
             elif player_wins_spin is False:
-                wprint("The wheel gets off to a good start and then quickly loses speed, landing on ‘i StteAL ur "
-                       "MoNey’ - oh no, better check your cash fund")
+                wprint("The wheel gets off to a good start and then quickly loses speed, landing on 'i StteAL ur "
+                       "MoNey' - oh no, better check your cash fund")
                 old_cash = self.gamestate.player.get_cash()
                 cash_loss = int(-1 * old_cash * CORRUPTED_FILE_CASH_PERCENT_LOSS)
                 self.gamestate.player.update_cash(cash_loss)
@@ -1889,7 +1899,7 @@ class GameClient:
         hack_success = True
 
         wprint("Your eyes glaze over with adorableness… so much fluff. You had something important to do, "
-               "but you can’t quite remember what. Do you want to keep watching [y/n]") 
+               "but you can't quite remember what. Do you want to keep watching [y/n]") 
 
         user_response = self.ui.user_prompt().lower()
 
@@ -1899,13 +1909,13 @@ class GameClient:
 
         if user_response in YES_ALIASES:
             wprint("You stare into the video screen giggling intermittently. Time seems to stop and you drool a bit. "
-                   "Eventually you pass out on the floor for awhile. When you wake up you are pretty certain you’ve "
-                   "missed at least a week’s worth of classes.")
+                   "Eventually you pass out on the floor for awhile. When you wake up you are pretty certain you've "
+                   "missed at least a week's worth of classes.")
             self.gamestate.player.update_speed(CAT_VIDEO_SPEED_COST)
             hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
 
         else:  # Must have responded 'no'
-            wprint("This is the hardest thing you’ve ever done. You scrunch up your face and turn your back on the "
+            wprint("This is the hardest thing you've ever done. You scrunch up your face and turn your back on the "
                    "plethora of precious moments. A single tear falls down your battle hardened cheek, but you know "
                    "this was the right choice.")
             hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
@@ -1924,9 +1934,9 @@ class GameClient:
                "some code flash up creating a wall between you and the code, just as you expected there is going to "
                "be some decrypting to do. The code reads:")
         print("Cr# 0v3 rRid 3")
-        print("\tA: Easy peasy, that means ‘Crashtag Oven Thrashers’ they are like the best punk bank ever.")
-        print("\tB: Well doh, that’s ‘Creators Riddance 3’ almost the coolest video game.")
-        print("\tC: Woah, they must be trying to frame you- that spells ‘Crash Override’ your super cool hacker handle!!!")
+        print("\tA: Easy peasy, that means 'Crashtag Oven Thrashers' they are like the best punk bank ever.")
+        print("\tB: Well doh, that's 'Creators Riddance 3' almost the coolest video game.")
+        print("\tC: Woah, they must be trying to frame you- that spells 'Crash Override' your super cool hacker handle!!!")
         print("Enter [a/b/c]")
 
         user_response = self.ui.user_prompt()
@@ -1937,7 +1947,7 @@ class GameClient:
 
         if user_response in ANSWER_A or user_response in ANSWER_B:
             wprint("You enter the code with confidence. Just as you enter the last character a shockwave hits you "
-                   "like a nasty pop quiz. Guess that isn’t the right answer")
+                   "like a nasty pop quiz. Guess that isn't the right answer")
             hack_success = False
             self.gamestate.player.update_speed(HACK_LAUNCH_CODE_COST)
         elif user_response in ANSWER_C:
@@ -2008,7 +2018,7 @@ class GameClient:
         return message
 
     def use_fireball_on_launch_codes(self, fireball_object, launch_codes_feature):
-        message = "Oh that doesn’t look good, these are gonna be pretty hard to hack..."
+        message = "Oh that doesn't look good, these are gonna be pretty hard to hack..."
         self.gamestate.player.remove_object_from_inventory(fireball_object)
         return message
 
