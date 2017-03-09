@@ -218,7 +218,7 @@ class GameClient:
             elif self.command is TALK:
                 self.verb_talk(self.verb_noun_name, self.verb_noun_type)
             elif self.command is USE:
-                self.verb_use(self.verb_noun_name, self.verb_noun_type)
+                self.verb_use(self.verb_noun_name, self.verb_noun_type, self.verb_preposition, self.extras)
             elif self.command is HELP:
                 self.verb_help(self.verb_noun_name, self.verb_noun_type)
             elif self.command is LOAD_GAME:
@@ -888,11 +888,18 @@ class GameClient:
         self.ui.wait_for_enter()
         return talk_success
 
-    def verb_use(self, noun_name, noun_type):
+    def verb_use(self, noun_name, noun_type, preposition, extras):
         use_success = True
         current_room_name = self.gamestate.get_current_room().get_name().lower()
         noun_name = noun_name.lower()
         message = "This should never print. Check verb_use() logic"
+        try:
+            logger.debug(str(extras[0]['name']))
+            target_feature = extras[0]['name']
+            logger.debug("****target_feature = " + str(target_feature))
+        except:
+            target_feature = None
+            logger.debug("Setting target_feature to None??? WHY!")
 
         # Special 'use' case, 'use computer'. It's not a literal object that can be used, just the verbiage we chose
         if noun_name == "computer":
@@ -907,10 +914,14 @@ class GameClient:
                     self.gamestate.endgame_data['computer_room']['is_operable'] = True
                     message = "You boot up the new laptop and jack into the nearest RJ-45 port you can find. Time to Hack!"
                 else: # Player must have the rest of the parts they needed, instead
-                    message = "You have what you need to repair your computer! Time to install the components... A [Floppy Disk], a [Graphics Card], and a [RAM Chip] are spread out upon your portable anti-static mat!"
+                    message = "You have what you need to repair your computer! Time to install the components... A [" \
+                              "Floppy Disk], a [Graphics Card], and a [RAM Chip] are spread out upon your portable " \
+                              "anti-static mat! "
 
             else:
-                message = "You don't have everything you need to fix your computer. Your [Floppy Disk] is toast, your [Graphics Card] is burned up, and the [RAM Chip] is corrupted! Or, you could just go buy a [New Laptop]!"
+                message = "You don't have everything you need to fix your computer. Your [Floppy Disk] is toast, " \
+                          "your [Graphics Card] is burned up, and the [RAM Chip] is corrupted! Or, you could just go " \
+                          "buy a [New Laptop]! "
 
         elif noun_type == NOUN_TYPE_FEATURE:
             message = "You cannot use that."
@@ -965,32 +976,32 @@ class GameClient:
 
                 # TODO: TEST LOGIC BETWEEN HERE AND TODO END COMMENT AFTER PARSER SUPPORTS
                 elif obj_label == FIREBALL.lower():
-                    # TODO: Once language parser passes back the preposition and target, we can pass it to below
-                    target_feature = ""
-                    if target_feature == "binary files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_binary_files)
+                    if target_feature is None:
+                        message = "Use it on what?!"
+                    elif target_feature == "binary files":
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_binary_files)
                     elif target_feature == "corrupted files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_corrupted_files)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_corrupted_files)
                     elif target_feature == "cat videos from the internet":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_cat_videos)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_cat_videos)
                     elif target_feature == "nuclear launch codes":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_launch_codes)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_fireball_on_launch_codes)
                     else:
                         message = "You're not sure how to use a fireball on that."
                 elif obj_label == "carcass":
                     # TODO: Once language parser passes back the preposition and target, we can pass it to below
-                    target_feature = ""
-                    if target_feature == "binary files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
+                    if target_feature is None:
+                        message, use_success = "Use it on what?!"
+                    elif target_feature == "binary files":
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
                     elif target_feature == "corrupted files":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_corrupted_files)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_corrupted_files)
                     elif target_feature == "cat videos from the internet":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_cat_videos)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_cat_videos)
                     elif target_feature == "nuclear launch codes":
-                        self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_launch_codes)
+                        message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_launch_codes)
                     else:
                         message = "You're not sure how to use a bug carcass in such a way."
-                # TODO: TEST METHODS BETWEEN HERE AND TODO START COMMENT AFTER PARSER SUPPORTS
 
                 else:
                     logger.debug("Not implemented: use " + used_object.get_name())
@@ -1782,6 +1793,29 @@ class GameClient:
         self.ui.wait_for_enter()
         return hack_success
 
+    def use_bug_carcass_on_binary_files(self, bug_carcass_object, binary_files_feature):
+        message = "Why did that seem like a good idea? Those are gonna be really hard to hack now."
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
+
+    def use_bug_carcass_on_cat_videos(self, bug_carcass_object, cat_videos_feature):
+        message = ("Eww… the cats seem to like the dead bug. They offer gratitude in the form of some tasty "
+               "[hackersnacks]- this makes sense as those tasty treats are rumored to just be repackaged kibble")
+        snacks = self.gamestate.get_object_by_name(HACKERSNACKS)
+        self.gamestate.player.add_object_to_inventory(snacks)
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
+
+    def use_bug_carcass_on_corrupted_files(self, bug_carcass_object, corrupted_files_feature):
+        message = "Eww… I think they are making friends"
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
+
+    def use_bug_carcass_on_launch_codes(self, bug_carcass_object, corrupted_files_feature):
+        message = "This does nothing... and is weird."
+        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
+
     def use_fireball_on_binary_files(self, fireball_object, binary_files_feature):
         '''
         Untested method. Should be called by game client with language parser tells us that this is the response,
@@ -1791,44 +1825,29 @@ class GameClient:
 
         :return:
         '''
-        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
+        message = "Why did that seem like a good idea? Those are gonna be really hard to hack now."
         self.gamestate.player.remove_object_from_inventory(fireball_object)
         self.gamestate.player.update_speed(FIREBALL_ON_BINARY_SPEED_COST)
-
-    def use_bug_carcass_on_binary_files(self, bug_carcass_object, binary_files_feature):
-        wprint("Why did that seem like a good idea? Those are gonna be really hard to hack now.")
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
-
-    def use_bug_carcass_on_cat_videos(self, bug_carcass_object, cat_videos_feature):
-        wprint("Eww… the cats seem to like the dead bug. They offer gratitude in the form of some tasty "
-               "[hackersnacks]- this makes sense as those tasty treats are rumored to just be repackaged kibble")
-        snacks = self.gamestate.get_object_by_name(HACKERSNACKS)
-        self.gamestate.player.add_object_to_inventory(snacks)
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
-
-    def use_bug_carcass_on_corrupted_files(self, bug_carcass_object, corrupted_files_feature):
-        wprint("Eww… I think they are making friends")
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
-
-    def use_bug_carcass_on_launch_codes(self, bug_carcass_object, corrupted_files_feature):
-        wprint("This does nothing... and is weird.")
-        self.gamestate.player.remove_object_from_inventory(bug_carcass_object)
+        return message
 
     def use_fireball_on_corrupted_files(self, fireball_object, corrupted_files_feature):
-        wprint("The files splutter up in a mess of flames - they are so not getting a prom date.")
+        message = "The files splutter up in a mess of flames - they are so not getting a prom date."
         self.gamestate.player.remove_object_from_inventory(fireball_object)
+        return message
 
     def use_fireball_on_cat_videos(self, fireball_object, cat_videos_feature):
-        wprint("You monster! The internet is angry and you spend like half your cash stash trying to change your identity.")
+        # TODO: Work with Niza -- the alia
+        message = "You monster! The internet is angry and you spend like half your cash stash trying to change your identity."
         old_cash = self.gamestate.player.get_cash()
         cash_loss = int(-1 * old_cash * CAT_VIDEO_CASH_PERCENT_LOSS)
         self.gamestate.player.update_cash(cash_loss)
-        # logger.debug("Player is losing " + str(cash_loss) + " cash out of their total of " + str(old_cash))
         self.gamestate.player.remove_object_from_inventory(fireball_object)
+        return message
 
     def use_fireball_on_launch_codes(self, fireball_object, launch_codes_feature):
-        wprint("Oh that doesn’t look good, these are gonna be pretty hard to hack...")
+        message = "Oh that doesn’t look good, these are gonna be pretty hard to hack..."
         self.gamestate.player.remove_object_from_inventory(fireball_object)
+        return message
 
     def use_object_on_feature(self, object_name, feature_name, success_function):
         '''
@@ -1843,17 +1862,16 @@ class GameClient:
         object_used = self.gamestate.player.inventory.get_object_by_name(object_name)
 
         if object_used is None:
-            wprint("You don't have a " + object_name + " that you can use.")
+            message = "You don't have a " + object_name + " that you can use."
 
         elif target_feature is None:
-            wprint("You see no ["+ feature_name + "] here to target with the [" + object_used.get_name() + "].")
+            message = "You see no ["+ feature_name + "] here to target with the [" + object_used.get_name() + "]."
 
         else:
-            success_function(target_feature, object_used)
+            message = success_function(object_used, target_feature)
             success = True
 
-        self.ui.wait_for_enter()
-        return success
+        return message, success
 
 
     def hack_sentient_cpu(self):

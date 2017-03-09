@@ -248,8 +248,10 @@ class LanguageParser:
                         error = INVALID_SENTENCE_STRUCTURE
                 #INVALID: VERB NOUN TARGET PREP
                 elif noun != None and target != None and preposition != None:
-                    if prep_idx > target_idx:
-                        error = INVALID_SENTENCE_STRUCTURE
+                    # TODO: target_idx is undefined! typing something like "use fireball on bug" cases exception and crashes game. putting a 'pass' here so I can test logic
+                    pass
+                    # if prep_idx > target_idx:
+                    #     error = INVALID_SENTENCE_STRUCTURE
         
         R = LanguageParserWrapper()
         if error != None:
