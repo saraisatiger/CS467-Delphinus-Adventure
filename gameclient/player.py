@@ -100,9 +100,8 @@ class Player:
 
     def has_object_by_name(self, object_name):
         '''
-        Used in a few different
-        :param object_name:
-        :return:
+        :param object_name: Name of an object
+        :return: True if the object is in player's inventory, false otherwise
         '''
         player_inventory_objects = self.inventory.objects
         for inventory_object in player_inventory_objects:
@@ -111,7 +110,9 @@ class Player:
         return False
 
     def has_computer_parts(self):
-
+        '''
+        :return: True if player has a new computer or all of the parts they need, False otherwise
+        '''
         if self.has_object_by_name(NEW_LAPTOP) is True:
             return True
         elif    self.has_ram() is True and \
@@ -124,7 +125,6 @@ class Player:
     def has_ram(self):
         has_ram = self.has_object_by_name(RAM) or self.has_object_by_name(ACMERAM)
         return has_ram
-
 
 
 class Inventory:

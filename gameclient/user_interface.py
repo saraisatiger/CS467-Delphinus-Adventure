@@ -74,7 +74,6 @@ class UserInterface:
         self.clear_screen()
         self.print_introduction()
 
-
     def print_splash_screen_load_game(self):
         self.clear_screen()
         wprint(LOAD_GAME_SPLASH)
