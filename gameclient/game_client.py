@@ -559,6 +559,7 @@ class GameClient:
                                 hacking_detected_by_police = False
                                 if self.gamestate.jailroom_data['cell_unlocked'] is True:
                                     message = HACK_SUCCESS_JAIL_COMPUTER
+                                    feature.set_is_hacked(False)
                                     self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
                                     self.gamestate.initialize_jailroom_data()
                                     hack_success = True
@@ -651,7 +652,8 @@ class GameClient:
 
         if hack_success is True:
             try:
-                feature.set_is_hacked(True)
+                if feature_name != "unattended police desktop":
+                    feature.set_is_hacked(True)
             except:
                 logger.debug("hack_success is True but failed to call feature.set_is_hacked(True)")
 
