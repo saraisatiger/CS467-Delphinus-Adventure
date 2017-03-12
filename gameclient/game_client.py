@@ -1130,7 +1130,7 @@ class GameClient:
             command_extra_first = command_extras[0]
             spraypaint_message = command_extra_first['name']
         except:
-            wprint("Hmm, the language parser didn't send back the string, maybe you're confusing the software.")
+            spraypaint_message = None
 
         spraypaint_success = False
         spraypaint_detected_by_police = False
@@ -1138,7 +1138,7 @@ class GameClient:
         cur_room = self.gamestate.get_current_room()
         cur_room_name = cur_room.get_name()
 
-        if self.gamestate.player.can_spraypaint():
+        if self.gamestate.player.can_spraypaint() and spraypaint_message is not None:
             if cur_room.is_virtual_space() is False:
                 # Check of room is already painted
                 is_cur_room_painted = self.gamestate.is_room_spray_painted_by_name(cur_room_name)
@@ -1154,6 +1154,8 @@ class GameClient:
                     interface_message = SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED
             else:
                 interface_message = SPRAYPAINT_FAIL_VIRTUAL_SPACE
+        elif self.gamestate.player.can_spraypaint() and spraypaint_message is None:
+            interface_message = SPRAYPAINT_FAIL_NO_MESSAGE
         else:
             interface_message = SPRAYPAINT_FAIL_NO_SKILL
 
