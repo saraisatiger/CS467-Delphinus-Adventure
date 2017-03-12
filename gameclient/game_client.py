@@ -747,7 +747,9 @@ class GameClient:
         looked_at_leet = False
         looked_at_control_box = False
 
-        if room_feature is not None:
+        if noun_name.isspace() or noun_name is None or noun_name == '':
+            description = LOOK_AT_NO_TARGET
+        elif room_feature is not None:
             try:
                 description = room_feature.get_description()
                 room_feature_name = room_feature.get_name().lower()

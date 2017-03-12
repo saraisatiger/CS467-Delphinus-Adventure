@@ -276,6 +276,7 @@ NO_INTERESTING_FEATURES_MESSAGE = "You see nothing else worth checking out."
 
 # 'Look at' strings
 LOOK_AT_NOT_SEEN = "You do not see that here."
+LOOK_AT_NO_TARGET = "You look at... nothing. And see... well, nothing."
 LOOK_AT_TRASH_CAN_ALREADY_LOOTED = "You already dug through the trash can. There's nothing else worth taking."
 LOOK_AT_TRASH_CAN_PROMPT = "Do you want to dig deeper in the trash? You might get messy. (Y)es or (N)o."
 LOOK_AT_TRASH_SEARCHED = "You dig deeper into the trash and stain your shirt with mustard from an old hot dog. How " \
