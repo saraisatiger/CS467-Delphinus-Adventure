@@ -411,7 +411,10 @@ class GameClient:
                 wprint(DROP_SUCCESS_PREFIX + self.verb_noun_name + DROP_SUCCESS_SUFFIX)
                 drop_success = True
             else:
-                wprint(DROP_FAILURE_PREFIX + self.verb_noun_name + DROP_FAILURE_SUFFIX)
+                if self.verb_noun_name.isspace() or object_name == '' or object_name is None:
+                    wprint(DROP_FAILURE_UNKNOWN_THING)
+                else:
+                    wprint(DROP_FAILURE_PREFIX + object_name + DROP_FAILURE_SUFFIX)
 
         if drop_success:
             self.gamestate.update_time_left(DROP_COST)
