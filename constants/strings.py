@@ -287,6 +287,7 @@ LOOK_AT_TRASH_NOT_SEARCHED = "You see a partially eaten hot dog and a partially 
 # 'spraypaint' strings
 SPRAYPAINT_FAIL_NO_SKILL = "You need to [use cans of SuperSprayPaint] before you can try to spraypaint. Need to make " \
                            "sure that stuff works, ya dig it?. "
+SPRAYPAINT_FAIL_NO_MESSAGE = "You really should think about what it is you want to write with this paint and, like, type that out!"
 SPRAYPAINT_FAIL_VIRTUAL_SPACE = "You cannot spraypaint on the internet, you know better than that!"
 SPRAYPAINT_ROOM_SUCCESS = "You spraypaint the room with your message. You should take a [look]!"
 SPRAYPAINT_ROOM_FAIL_ALREADY_PAINTED = "This room is already painted."
