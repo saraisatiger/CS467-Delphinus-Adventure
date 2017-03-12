@@ -80,12 +80,12 @@ class LanguageParser:
         # check for cheat codes    
         for alias in CHEATCODE_LOSE_ALIASES:
             if alias in command:
-                verb  = CHEAT_LOSE
+                verb  = CHEATCODE_LOSE
                 cheat = True
         
         for alias in CHEATCODE_WIN_ALIASES:
             if alias in command:
-                verb = CHEAT_WIN
+                verb = CHEATCODE_WIN
                 cheat = True
                 
 
