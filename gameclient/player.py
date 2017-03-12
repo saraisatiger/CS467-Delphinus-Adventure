@@ -49,12 +49,17 @@ class Player:
 
     def update_cash(self, cash_change):
         self.cash += int(cash_change)
+        if self.cash < 0:
+            self.cash = 0
         if cash_change > 0:
             change_direction = "increased"
         else:
             change_direction = "decreased"
             cash_change = int(-1 * cash_change)
-        wprint("Your [Cash] " + change_direction + " by " + str(cash_change) +".")
+        if self.cash > 0:
+            wprint("Your [Cash] " + change_direction + " by " + str(cash_change) +".")
+        else:
+            wprint("You've used up all your [Cash]. If only there were an ATM you could [hack] or something!")
 
     def update_speed(self, speed_change):
         self.speed += int(speed_change)

@@ -301,6 +301,10 @@ SKATE_SUCCESS_LEDGE_FALL = "You try to do a kick-flip off the roof but somewhere
                            "that'll slow you down. "
 SKATE_FAIL_NO_SKILL = "You need to practice with a [Skateboard] before you can skate around!"
 SKATE_FAIL_INVALID_TARGET = "You cannot skate on that."
+SKATE_FAIL_CAUGHT_GUARDRAILS = "You ignored the signs and got caught... ouch. Expensive fine, too, if you can afford it!"
+SKATE_SUCCESS_GUARDRAILS = "You fought the law, and the law lost. Skating on those [Guardrails] felt hella cool!"
+SKATE_PAWNSHOP_SHELVES = "You skate on the shelving, but the owner kicks you out. Cool, I guess?"
+SKATE_ARCADE_RAMP = "You skate up the ramp and snatch a [Surge] out of the unsuspecting hands of some dweeb wearing a Mario vs. Donkey Kong T-Shirt. N00b!"
 SPRAYPAINT_FAIL_CAUGHT = "You've been spotted by the Po-Po! Too late to run, they've seen your face."
 
 # 'steal' strings

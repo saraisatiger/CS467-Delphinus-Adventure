@@ -1070,12 +1070,14 @@ class GameClient:
         :return:
         '''
         skate_success = False
+        avoid_police = True
 
-        if noun_name == '':
+        if noun_name == '' or noun_name.isspace() is True:
             noun_name = None
 
         if self.gamestate.player.can_skateboard() is True:
             cur_room = self.gamestate.get_current_room()
+            cur_room_name = cur_room.get_name()
 
             # Special handling skate targets
             if noun_name is not None and preposition is not None:
@@ -1084,7 +1086,10 @@ class GameClient:
                 room_feature = cur_room.get_feature_by_name(noun_name)
 
                 if room_feature is not None and is_valid_preposition is True:
-                    if room_feature.get_name().lower() == "ledge":
+                    feature_name = room_feature.get_name().lower()
+
+                    if feature_name == "ledge":
+                        # Can't get caught on the roof, but not safe to skate off a ledge
                         land_safely = self.rand_event.coin_flip()
                         if land_safely is True:
                             message = SKATE_SUCCESS_LEDGE_SAFELANDING
@@ -1095,6 +1100,27 @@ class GameClient:
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("Street"))
                         skate_success = True
 
+                    if feature_name == "guardrails":
+                        avoid_police = self.rand_event.coin_flip()
+                        if avoid_police is False:
+                            message = SKATE_FAIL_CAUGHT_GUARDRAILS
+                            self.gamestate.player.update_cash(SKATE_CAUGHT_GUARDRAILS_COST)
+                        else:
+                            message = SKATE_SUCCESS_GUARDRAILS
+                            self.gamestate.player.update_coolness(SKATE_GUARDRAILS_COOLNESS_INCREASE)
+                            skate_success = True
+
+                    if feature_name == "ramp":
+                        # Not illegal here!
+                        message = SKATE_ARCADE_RAMP
+                        self.gamestate.player.add_object_to_inventory(self.gamestate.get_object_by_name("surge"))
+                        skate_success = True
+
+                    if feature_name == "shelves":
+                        message = SKATE_PAWNSHOP_SHELVES
+                        self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
+                        self.gamestate.player.update_coolness(SKATE_ON_SHELVES_COOLNESS)
+                        skate_success = True
 
                     # Target must not be a feature in the room, they fail
                     else:
@@ -1115,6 +1141,11 @@ class GameClient:
 
         if skate_success is True:
             self.gamestate.update_time_left(SKATE_COST)
+        try:
+            if avoid_police is False:
+                self.go_to_jail()
+        except:
+            pass
 
         wprint(message)
         self.ui.wait_for_enter()
@@ -2091,9 +2122,12 @@ class GameClient:
         :param preposition:  The actual preposition user typed
         :return: True if its a valid preposition for that particular target
         '''
-        if target_name == "ledge":
-            if preposition.lower() in {'on', 'onto', 'over', 'around', 'off'}:
+        preposition = preposition.lower()
+
+        if target_name == "ledge" or target_name == "guardrails" or target_name == "ramp" or target_name == "shelves":
+            if preposition in {'on', 'onto', 'over', 'around', 'off'}:
                 return True
             return False
+
         else:
             return False
