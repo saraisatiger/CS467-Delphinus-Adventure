@@ -228,28 +228,30 @@ HELP_HEADER_TEXT = "HELP"
 HELP_HEADER_TEXT_WIDTH = int((TEXT_WIDTH-(len(HELP_HEADER_TEXT)))/2)
 HELP_HEADER = "=" * HELP_HEADER_TEXT_WIDTH + HELP_HEADER_TEXT + "=" * HELP_HEADER_TEXT_WIDTH + "\n"
 HELP_MESSAGE = [
-    "Type in a command. Valid commands are:",
-    "* newgame:  Starts a new game when at the main menu",
-    "* loadgame:             Load a saved game",
-    "* savegame:             Save a game in progress",
-    "* quit:                 Exit back to main menu or the program if already there",
-    "* help:                 Prints this help message. Some hints can be found using 'help <object or feature'",
-    "* look:                 Look around again for more details.",
-    "* look at <something>:  Looks at an object or feature",
-    "* go <direction>:       Go to the direction or area that you indicate.",
-    "* take <object>:        Take an object in the current room.",
-    "* drop <object>:        Drop an object in the current location. You can't drop items when you're inside the network.",
-    "* buy <object>:         Some objects cost money and cannot be taken.",
-    "* steal <object>:       Sometimes you don't have enough money to buy an object.",
-    "* inventory             Look at all of the items youv'e collected so far.",
-    "* hack <feature>        Try and hack a feature in the room. Not everything can be hacked, and you need to learn how to hack first.",
-    "* spraypaint <feature>  If you have the necessary tools, you can paint the town red.",
-    "* skate:                Skate around. Pretty cool!"
-    "* use <something>       Everything has a purpose! Well, not everything..."
+    "def h3ll0_w0rlD // f0unD th3s3 sw33T h4ck1ng c0des 4 IRL 1n th3 [Hacker Manual]!!",
+    "* newgame         def newgame(): starts a new game;",
+    "* loadgame        def loadgame(): loads a game;",
+    "* savegame        saved_your_game_session = savegame(gamestate)",
+    "* quit            def quit(): if Playing: goto MainMenu, else: exit_game()",
+    "* help            // you're reading it now. Comments save lives??",
+    "* look            def look(): print_long_description();",
+    "* look at <x>     def look_at(x): print_object_desciption();",
+    "* go <x>          go(x): move_player_to(x);",
+    "* take <x>        def take(x): if x.is_free(): Player.give(x);",
+    "* drop <x>        drop(x): put_object_in_room(x, current_room);",
+    "* buy <x>         buy(x): if x.cost > 0 && Player.cash > x.cost: Player.cash -= x.cost, Player.give(x)",
+    "* steal <x>       buy(x): if x.cost > 0: Player.try_to_steal(x)",
+    "* inventory       def inventory(): Player.print_items()",
+    "* hack <x>        if Player.can_hack(): Player.try_hack(x)",
+    "* spraypaint <x>  if Player.can_paint(): Player.leave_message(x)",
+    "* talk <x>        def talk(x): Player.talk_to(x); X.talk_to(Player)",
+    "* skate:          If Player.use_skateboard(): Player.can_skate() = True. // Careful around ledges!",
+    "* use <x>         Def use(x): If Player.has(x): x.activate()",
+    "* cheatcodes?     If Player.command in MESS_WITH_THE_BEST: Player.die_like_the_rest() else: pass;"
 ]
 
 
-HELP_FEATURE_GENERIC = " is a feature of the room. 'Look at' it to learn more."
+HELP_FEATURE_GENERIC = " is a feature of the room. [Look at] it, [hack] it, [skate on] it, [talk] to it, or [use] something [on] it!"
 HELP_OBJECT_GENERIC = " is an object. You can 'look at' an object and you can 'use' an object if it's in your 'inventory'."
 
 # 'hints' strings (context-sensitive hints)
