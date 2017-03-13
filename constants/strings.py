@@ -204,6 +204,8 @@ HACK_FAIL_ALREADY_HACKED = "You've already hacked that."
 HACK_FAIL_CAUGHT = "You were caught hacking the system!"
 HACK_FAIL_IN_CELL = "You need to get out of the cell before you can hack on that terminal."
 HACK_FAIL_NONSENSE = "What a bunch of nonsense. That's not something you can hack, at least, not here and now."
+HACK_SUCCESS_OFFICE_DESKTOP = "Nice hack- this is one for the yearbook!"
+HACK_FAIL_OFFICE_DESKTOP = "This hack was amature at best- hit the books"
 HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your " \
                    "account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww. "
 HACK_SUCCESS_BINARY_FILES = "You hacked the binary files!"

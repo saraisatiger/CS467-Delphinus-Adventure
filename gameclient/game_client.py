@@ -576,6 +576,13 @@ class GameClient:
                                 else:
                                     message = HACK_FAIL_BINARY_FILES
 
+                            elif feature_name == "Office Desktop".lower():
+                                hack_success = self.hack_office_desktop()
+                                if hack_success is True:
+                                    message = HACK_SUCCESS_OFFICE_DESKTOP
+                                else:
+                                    message = HACK_FAIL_OFFICE_DESKTOP
+
                             elif feature_name == "Heavy Door".lower():
                                 hack_success = self.hack_heavy_door()
                                 if hack_success is True:
@@ -921,7 +928,7 @@ class GameClient:
                 response = self.get_talk_response_from_array(HALL_TEACHER_TEXT, 'hall_teacher')
                 talk_success = True
             else:
-			
+            
                 response = TALK_FAIL_NOT_HERE
                 
         elif noun_name == ORANGE_CAT and self.gamestate.player.has_object_by_name(ORANGE_CAT):
@@ -1857,7 +1864,43 @@ class GameClient:
 
         self.ui.wait_for_enter()
         return hack_success
-            
+
+    def hack_office_desktop(self):
+        '''
+        Logic specific to the user trying to hack the desktop
+        :return: True if the hack succeeds, false otherwise.
+        '''
+        hack_success = False
+
+        wprint("The password is... \"password\" seriously this couldn\'t be any easier. You change the screensaver"
+                "to some hilarious daning hampsters and then look for something else to do. Not much time before"
+                "you decide to: ")
+        print("\tA: Change your grades to all A\'s- this semester should be easy")
+        print("\tB: Check out Acid Burn\'s permanent record... for um, research?")
+        print("\tC: Play solitaire")
+        print("Enter [a/b/c]")
+
+        user_response = self.ui.user_prompt()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A:
+            wprint("With a quick click your dubious marks become a spotless schoolastic history- this will leave time" 
+                    "for... other matters.")
+            self.gamestate.player.update_speed(OFFICE_DESKTOP_SPEED_INCREASE)
+            hack_success = True
+        elif user_response in ANSWER_B:
+            wprint("Acid Burn is sitting right there- just ask, don\'t stalk. Never stalk.")
+            self.gamestate.player.update_coolness(OFFICE_DESKTOP_COOLNESS_DECREASE)
+        elif user_response in ANSWER_C:
+            wprint("You lose several brain cells in a mindless game of computer card. Acid Burn notices. This isn\'t good.")
+            self.gamestate.player.update_coolness(OFFICE_DESKTOP_COOLNESS_DECREASE)
+
+        self.ui.wait_for_enter()
+        return hack_success
+    
     def hack_binary_files(self):
         '''
         Logic specific to the user trying to hack the binary files
