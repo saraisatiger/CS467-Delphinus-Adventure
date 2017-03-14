@@ -940,7 +940,6 @@ class GameClient:
                 response = self.get_talk_response_from_array(SUBWAY_PHONEBOOTH_TEXT, 'subway_phonebooth')
                 talk_success = True
             else:
-            
                 response = TALK_FAIL_NOT_HERE
                 
         elif noun_name == ORANGE_CAT and self.gamestate.player.has_object_by_name(ORANGE_CAT):
@@ -948,6 +947,7 @@ class GameClient:
 
         if talk_success is True:
             self.gamestate.update_time_left(TALK_COST)
+            response = room_feature.get_name() + " says: '" + response + "'"
 
         wprint(response)
         self.ui.wait_for_enter()
@@ -1682,6 +1682,7 @@ class GameClient:
     def leet_translator(self):
         '''
         Logic for when a player uses the 'look at leet translator' command in the correct room
+        Method created by Sara
         '''
         leet_speak = (('a', '4'), ('b', '6'), ('c', '('), ('d', '[)'), ('e', '3'),
                       ('f', ']]='), ('g', '&'), ('h', '#'), ('i', '!'), ('j', ',|'),
@@ -1726,11 +1727,13 @@ class GameClient:
                 wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
         else:
             wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
+        self.ui.wait_for_enter()
 
     def hack_heavy_door(self):
         '''
         Logic specific to the user trying to hack the heavey door
         :return: True- this hack must succeed or a player could get trapped.
+        Method created by Niza
         '''
         pigeon_left = False
         hack_success = False
@@ -1841,6 +1844,7 @@ class GameClient:
         '''
         Logic specific to the user trying to hack the fire alarm
         :return: True if the hack succeeds, false otherwise.
+        Method created by Niza
         '''
         hack_success = False
 
@@ -1881,6 +1885,7 @@ class GameClient:
         '''
         Logic specific to the user trying to hack the desktop
         :return: True if the hack succeeds, false otherwise.
+        Method created by Niza
         '''
         hack_success = False
 
@@ -2185,7 +2190,7 @@ class GameClient:
         preposition = preposition.lower()
 
         if target_name == "ledge" or target_name == "guardrails" or target_name == "ramp" or target_name == "shelves":
-            if preposition in {'on', 'onto', 'over', 'around', 'off'}:
+            if preposition in {'on', 'onto', 'over', 'around', 'off', 'on'}:
                 return True
             return False
 
