@@ -98,7 +98,10 @@ class GameState:
             'sentient_cpu' : 0,
             'pool_acid' : 0,
             'hall_teacher' : 0,
-            'cat' : 0
+            'cat' : 0,
+            'jail_policeofficer' : 0,
+            'evilcorpbank_securityofficer' : 0,
+            'subway_phonebooth' : 0
         }
 
     def load_rooms_and_objects_from_file(self):
