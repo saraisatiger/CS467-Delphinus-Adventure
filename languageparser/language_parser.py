@@ -35,7 +35,7 @@ class LanguageParser:
 
     def parse_command(self, command):
         
-        # Go through list of words to parse out words accourding to type and order
+        # Go through list of words to parse out words according to type and order
         
         #***Valid Structures***
         # VERB
@@ -197,14 +197,14 @@ class LanguageParser:
                         words_sublist_string = ' '.join(words_sublist)
                         words_sublist_string = ''.join(ch for ch in words_sublist_string if ch not in string.punctuation)
                         if words_sublist_string == obj_alias:
-                            # only save  the first occurance of object or feature
+                            # only save  the first occurrence of object or feature
                             if noun == None:
                                 # the alias arrays always store the base word at index 0
                                 noun = str(obj_alias_array[0])
                                 noun_is = 'object'
                                 #last index is the last index of the last noun or target we found
                                 noun_idx = last_idx = idx + num_words_in_alias - 1 
-                            # second occurance will be the target and cannot also be the noun
+                            # second occurrence will be the target and cannot also be the noun
                             elif target == None and noun != str(obj_alias_array[0]):
                                 target = str(obj_alias_array[0])
                                 target_is = 'object'

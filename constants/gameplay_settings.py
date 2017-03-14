@@ -29,7 +29,7 @@ TALK_COST = -15
 USE_COST = -25
 DOOR_COST = 5
 
-# Speed boosts from various activites
+# Speed boosts from various activities
 HACK_LIGHT_SPEED_CHANGE = 4
 SKATEBOARD_SPEED_INCREASE = 2
 SNACK_SPEED_INCREASE = 1

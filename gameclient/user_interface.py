@@ -3,7 +3,7 @@
 # Team Members: Sara Hashem, Shawn Hillyer, Niza Volair
 
 # user_interface.py
-# Description: UserInterface functions for basic termina IO
+# Description: UserInterface functions for basic terminal IO
 # Principal Author of this file per Project plan: Shawn Hillyer
 
 # CITATIONS

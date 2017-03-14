@@ -10,7 +10,7 @@
 # CITATIONS
 # CITE: None
 
-#room destinaitions and aliases
+#room destininations and aliases
 R1 = ['street']
 R2 = ['evilcorp bank', 'evil corp', 'evil bank', 'evilcorp', 'bank']
 R3 = ['arcade']

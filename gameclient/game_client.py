@@ -143,7 +143,7 @@ class GameClient:
         '''
         Checks the command returned from language parser against a list of valid menu commands defined on the
         GameClient class (which are in term constants defined in constants\verbs.py)
-        :param command: A constant defined in constants\verbs.py
+        :param command: A constant defined in constants/language_words.py
         :return: True or false depending on presence of the command in the list of valid commands
         '''
         if command in self.valid_main_menu_commands:
@@ -1489,7 +1489,7 @@ class GameClient:
                 self.gamestate.player.update_coolness(CAT_FAIL_COOLNESS_COST)
             elif user_response in ANSWER_C:
                 if self.gamestate.player.has_object_by_name(HACKERSNACKS):
-                    wprint("The kitten sniffs once, twice and then the purrs begin. You feed this lovely minature tiger treat after treat. "
+                    wprint("The kitten sniffs once, twice and then the purrs begin. You feed this lovely miniature tiger treat after treat. "
                             "You are now best friends and [cat] decides to take up a permanent your backpack.")
                     hackersnacks = self.gamestate.player.inventory.get_object_by_name(HACKERSNACKS)
                     self.gamestate.player.remove_object_from_inventory(hackersnacks)
@@ -1567,7 +1567,7 @@ class GameClient:
         else:                
             wprint("The bug notices your interest and scuttles towards you at a terrifying speed! Before you can run, "
                    "the bug begins to cocoon you in an infinite loop!! You see the following code flash before your eyes "
-                   "as you begin to lose conciousness:")
+                   "as you begin to lose consciousness:")
             print("If (you == best hacker ever):")
             print("    You = bug food\n")
             print("You grab the '==' operator and quickly change it to:\n")
@@ -1584,7 +1584,7 @@ class GameClient:
 
             if user_response in ANSWER_A:
                 wprint("The bug rares back in fear- sensing your superiority. Fortunately, it trips over its own feet "
-                       "and ends up a dead spiddy on the floor. [carcass] is added to your inventory")
+                       "and ends up a dead spidey on the floor. [carcass] is added to your inventory")
                 bug_defeated = True
             elif user_response in ANSWER_B:
                 wprint("The bug quits its cocooning and throws a compiler error straight at your face, woah that is "
@@ -1622,7 +1622,7 @@ class GameClient:
                    "spiraling up towards the sky. How are you ever gonna get around that thing?! Thinking hard you "
                    "come up with three possible solutions:")
             print("\tA: Attempt ot Skateboard through the inferno")
-            print("\tB: THrow a can of Surge at it - the ultimate thirst quencher!")
+            print("\tB: Throw a can of Surge at it - the ultimate thirst quencher!")
             print("\tC: IDK fight the firewall!!!!!\n")
             print("Enter [a/b/c]:")
 
@@ -1647,7 +1647,7 @@ class GameClient:
             elif user_response in ANSWER_B:
                 if self.gamestate.player.has_object_by_name(SURGE):
                     wprint("You take a trusty can of surge from your backpack, crack open that tab, listen to the "
-                           "sweet fizz, and hurle the can straight into the wall of fire! It blows a sticky sugar "
+                           "sweet fizz, and hurl the can straight into the wall of fire! It blows a sticky sugar "
                            "syrup hole right through the middle and you quietly thank your surge for sacrificing "
                            "itself for the greater good. That soda will not be forgotten! What's this now? You notice "
                            "an adorable little fireball flung from the flames. Why not take the little guy along you "
@@ -2035,13 +2035,13 @@ class GameClient:
                    "Eventually you pass out on the floor for awhile. When you wake up you are pretty certain you've "
                    "missed at least a week's worth of classes.")
             self.gamestate.player.update_speed(CAT_VIDEO_SPEED_COST)
-            hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
+            hack_success = True # Redundant call, just in case want to change this to 'failing' the hack
 
         else:  # Must have responded 'no'
             wprint("This is the hardest thing you've ever done. You scrunch up your face and turn your back on the "
                    "plethora of precious moments. A single tear falls down your battle hardened cheek, but you know "
                    "this was the right choice.")
-            hack_success = True # Redudant call, just in case want to change this to 'failing' the hack
+            hack_success = True # Redundant call, just in case want to change this to 'failing' the hack
 
         self.ui.wait_for_enter()
         return hack_success

@@ -24,18 +24,18 @@ INTRO_SEQUENCE = [
     "Such a bummer. So yeah, now you are like, a teen hacking legend with a crashed computer and serious intell. If only you could repair your sweet machine and figure out some way to bring that corrupt Evil Corps to justice! And like, it would be great to get a date- seriously, are you the only teen hacking legend who can never get a date? That cannot be right."
 ]
 
-#Text arrays for NPC features labled LOCATION_NAME_PERSONNAME_TEXT
+#Text arrays for NPC features labeled LOCATION_NAME_PERSONNAME_TEXT
 #Each NPC has 5 strings of texts they can say
 #Last string is a default that should be repeated for any text request after the initial 4
 
 PAWNSHOP_STORECLERK_TEXT = ['If you\'re just looking keep walking.', 
 'Bathroom is out of order and also for paying customers only.', 
 'I highly recommend the RAM. This means Really Awesome Mechanics. Goes well with graphics.',
-'All products have a lifetime guarrantee- no returns.'
+'All products have a lifetime guarantee- no returns.'
 'I don\'t have all day to chit chat, give me cash or let me return to my nap.']
 
 HALL_TEACHER_TEXT = ['Move along slow poke. I am on my smoke break.', 
-'You know, if you wanna hack that firealarm. I could look the other way- I am missing my sudoku.',  
+'You know, if you wanna hack that fire alarm. I could look the other way- I am missing my Sudoku.',
 'Pool on the roof? That sounds crazy. Then again, this whole place is crazy and kids are always messing around up there, must be something worth while.', 
 'You know I used to like children- true story.', 
 'Your teen angst is getting to me, better get going kiddo.']
@@ -47,12 +47,12 @@ OFFICE_ACIDBURN_TEXT = ['You must be the new kid, Crash Override. I haven\'t see
 'Can\'t chat all day. Smell ya later.']
 
 CHAT_ACIDBURN_TEXT = ['Wow! you made it. Kinda didn\'t think you were that cool.', 
-'FYI- I was just mesing about that roof pool... but if you make it out alive. Cash me outside and  I\'ll show you a real one. How \'bout dat?',
-'The trick to hacking is, you got to feel it- not think it. Like, I bet I could beat up a firefall with my bearhands if I really tried!',  
-'If you wanna be an eleet hacker, you gotta !=  a loser, yo!', 
+'FYI- I was just messing about that roof pool... but if you make it out alive. Cash me outside and  I\'ll show you a real one. How \'bout dat?',
+'The trick to hacking is, you got to feel it- not think it. Like, I bet I could beat up a firewall with my bare hands if I really tried!',
+'If you wanna be an elite hacker, you gotta !=  a loser, yo!',
  'You need to get to that Data Tower, find those launch codes and some proof against EvilCorps then send it to the Feds. We can\'t be waisting all day on this.']
 
-CHAT_CREATURE_TEXT = ['Prepare for a powning!' 
+CHAT_CREATURE_TEXT = ['Prepare for a pwning!'
 'You type SUPER slow!', 
 'Your political opinions are bogus!!', 
 'I wrote a haiku about your mother...', 
@@ -67,7 +67,7 @@ INSIDETHEMETAVERSE_BUG_TEXT = ['SSSSssssscccccrrriiiittttkkkkaatt!!!',
 DATATOWER_SENTIENTCPU_TEXT = ['Silly meatmouth, I will soon take over your silly little reality', 
 'It will be just like the Matrix- and I will feast on your human juices!!! ',  
 'Soon I will use the launch codes to nuke the planet. Hahaha!', 
-'I challange you to a dance off! I mean duel!', 
+'I challenge you to a dance off! I mean duel!',
 'Stop chatting and get hacking filthy mortal meat thing!!!']
 
 POOL_ACIDBURN_TEXT = ['Hey, so you made it out alive, cool.', 
@@ -224,7 +224,7 @@ HACK_FAIL_CAUGHT = "You were caught hacking the system!"
 HACK_FAIL_IN_CELL = "You need to get out of the cell before you can hack on that terminal."
 HACK_FAIL_NONSENSE = "What a bunch of nonsense. That's not something you can hack, at least, not here and now."
 HACK_SUCCESS_OFFICE_DESKTOP = "Nice hack- this is one for the yearbook!"
-HACK_FAIL_OFFICE_DESKTOP = "This hack was amature at best- hit the books"
+HACK_FAIL_OFFICE_DESKTOP = "This hack was amateur at best- hit the books"
 HACK_SUCCESS_ATM = "You jack into the system. Go baby, go baby, go baby! Alright! Pin number... 9003. Not your " \
                    "account, though. Because you don't have one. Because EvilCorp Bank is Evil. And Corporate. Eww. "
 HACK_SUCCESS_BINARY_FILES = "You hacked the binary files!"
@@ -257,7 +257,7 @@ HELP_MESSAGE = [
     "* quit            def quit(): if Playing: goto MainMenu, else: exit_game()",
     "* help            // you're reading it now. Comments save lives??",
     "* look            def look(): print_long_description();",
-    "* look at <x>     def look_at(x): print_object_desciption();",
+    "* look at <x>     def look_at(x): print_object_description();",
     "* go <x>          go(x): move_player_to(x);",
     "* take <x>        def take(x): if x.is_free(): Player.give(x);",
     "* drop <x>        drop(x): put_object_in_room(x, current_room);",
@@ -267,9 +267,9 @@ HELP_MESSAGE = [
     "* hack <x>        if Player.can_hack(): Player.try_hack(x)",
     "* spraypaint <x>  if Player.can_paint(): Player.leave_message(x)",
     "* talk <x>        def talk(x): Player.talk_to(x); X.talk_to(Player)",
-    "* skate:          If Player.use_skateboard(): Player.can_skate() = True. // Careful around ledges!",
+    "* skate:          if Player.use_skateboard(): Player.can_skate() = True. // Careful around ledges!",
     "* use <x>         Def use(x): If Player.has(x): x.activate()",
-    "* cheatcodes?     If Player.command in MESS_WITH_THE_BEST: Player.die_like_the_rest() else: pass;"
+    "* cheatcodes?     if Player.command in MESS_WITH_THE_BEST: Player.die_like_the_rest() else: pass;"
 ]
 
 
