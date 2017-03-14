@@ -940,7 +940,6 @@ class GameClient:
                 response = self.get_talk_response_from_array(SUBWAY_PHONEBOOTH_TEXT, 'subway_phonebooth')
                 talk_success = True
             else:
-            
                 response = TALK_FAIL_NOT_HERE
                 
         elif noun_name == ORANGE_CAT and self.gamestate.player.has_object_by_name(ORANGE_CAT):
@@ -948,6 +947,7 @@ class GameClient:
 
         if talk_success is True:
             self.gamestate.update_time_left(TALK_COST)
+            response = room_feature.get_name() + " says: '" + response + "'"
 
         wprint(response)
         self.ui.wait_for_enter()
