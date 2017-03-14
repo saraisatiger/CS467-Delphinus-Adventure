@@ -76,6 +76,25 @@ POOL_ACIDBURN_TEXT = ['Hey, so you made it out alive, cool.',
 'I think I might take you to prom...', 
 'Less talking more smooching!']
 
+SUBWAY_PHONEBOOTH_TEXT = ['Hello? Hello! Is Neo there?!', 
+'This is Morpheus, it is urgent that I speak with Neo at once!',  
+'Life as you know it is a lie!', 
+'You can become trapped inside a virtual world! Be warned!!!', 
+'There is no time- save us from evil!']
+
+EVILCORPBANK_SECURITYOFFICER_TEXT = ['What do you want? I\'m on break.', 
+'If you\'d like I could just break you instead.',  
+'You know they don\'t even give kids lollipops at this bank? Not even stickers.', 
+'I\'m a evil person sure- but these corporate clowns scare even me.', 
+'I\'d move along if I were a punk kid like you.']
+
+JAIL_POLICEOFFICER_TEXT = ['You know I don\'t even make minimum wage?', 
+'I actually just got outta jail. I understand your situation.',  
+'You know I got seven hungry cats to feed? Ain\'t easy.', 
+'Maybe we could help each other out...', 
+'No reason to stick around here gabbing with me all day.']
+
+
 CAT_TEXT = ['Meow.', 
 'Meow?',  
 'Rarw.', 

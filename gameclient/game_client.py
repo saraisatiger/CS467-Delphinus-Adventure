@@ -192,13 +192,16 @@ class GameClient:
             self.send_command_to_parser()
 
             # Conditionally handle each possible verb / command
-            if self.command is LOOK:
+            if self.command is LOOK :
+                if ((self.verb_preposition == "in" or self.verb_preposition == "inside" or self.verb_preposition == "into") and (self.verb_noun_name == "control box" or self.verb_noun_name == "locker" or self.verb_noun_name == "trash can")):
+                    self.command = LOOK_AT
+            if self.command is LOOK :
                 # The verb_look() method is called at the top of each loop, so not explicitly called here
                 print_long_description = True
                 self.gamestate.update_time_left(LOOK_COST)
                 self.ui.clear_screen()
             # Verbs
-            elif self.command is LOOK_AT:
+            elif self.command is LOOK_AT :
                 self.verb_look_at(self.verb_noun_name, self.verb_noun_type)
             elif self.command is INVENTORY:
                 self.verb_inventory()
@@ -926,6 +929,15 @@ class GameClient:
                 talk_success = True
             elif feature_name == "Teacher".lower() and cur_room_name == "Hall".lower():
                 response = self.get_talk_response_from_array(HALL_TEACHER_TEXT, 'hall_teacher')
+                talk_success = True
+            elif feature_name == "Police Officer".lower() and cur_room_name == "Jail".lower():
+                response = self.get_talk_response_from_array(JAIL_POLICEOFFICER_TEXT, 'jail_policeofficer')
+                talk_success = True
+            elif feature_name == "Security Officer".lower() and cur_room_name == "EvilCorp Bank".lower():
+                response = self.get_talk_response_from_array(EVILCORPBANK_SECURITYOFFICER_TEXT, 'evilcorpbank_securityofficer')
+                talk_success = True
+            elif feature_name == "Phone Booth".lower() and cur_room_name == "Subway".lower():
+                response = self.get_talk_response_from_array(SUBWAY_PHONEBOOTH_TEXT, 'subway_phonebooth')
                 talk_success = True
             else:
             
