@@ -1726,6 +1726,7 @@ class GameClient:
                 wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
         else:
             wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
+        self.ui.wait_for_enter()
 
     def hack_heavy_door(self):
         '''
