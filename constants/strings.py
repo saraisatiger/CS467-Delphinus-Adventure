@@ -30,8 +30,8 @@ INTRO_SEQUENCE = [
 
 PAWNSHOP_STORECLERK_TEXT = ['If you\'re just looking keep walking.', 
 'Bathroom is out of order and also for paying customers only.', 
-'If highly recommend the RAM. This means Really Awesome Mechanics. Goes well with graphics.', 
-'All products have a lifetime gaurantee- no returns.' 
+'I highly recommend the RAM. This means Really Awesome Mechanics. Goes well with graphics.',
+'All products have a lifetime guarrantee- no returns.'
 'I don\'t have all day to chit chat, give me cash or let me return to my nap.']
 
 HALL_TEACHER_TEXT = ['Move along slow poke. I am on my smoke break.', 
@@ -85,7 +85,7 @@ SUBWAY_PHONEBOOTH_TEXT = ['Hello? Hello! Is Neo there?!',
 EVILCORPBANK_SECURITYOFFICER_TEXT = ['What do you want? I\'m on break.', 
 'If you\'d like I could just break you instead.',  
 'You know they don\'t even give kids lollipops at this bank? Not even stickers.', 
-'I\'m a evil person sure- but these corporate clowns scare even me.', 
+'I\'m an evil person sure- but these corporate clowns scare even me.',
 'I\'d move along if I were a punk kid like you.']
 
 JAIL_POLICEOFFICER_TEXT = ['You know I don\'t even make minimum wage?', 
