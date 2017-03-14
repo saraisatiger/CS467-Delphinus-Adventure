@@ -2173,7 +2173,7 @@ class GameClient:
         preposition = preposition.lower()
 
         if target_name == "ledge" or target_name == "guardrails" or target_name == "ramp" or target_name == "shelves":
-            if preposition in {'on', 'onto', 'over', 'around', 'off'}:
+            if preposition in {'on', 'onto', 'over', 'around', 'off', 'on'}:
                 return True
             return False
 
