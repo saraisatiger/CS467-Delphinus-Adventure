@@ -1684,17 +1684,15 @@ class GameClient:
         Logic for when a player uses the 'look at leet translator' command in the correct room
         Method created by Sara
         '''
-        leet_speak = (('a', '4'), ('b', '6'), ('c', '('), ('d', '[)'), ('e', '3'),
-                      ('f', ']]='), ('g', '&'), ('h', '#'), ('i', '!'), ('j', ',|'),
-                      ('k', ']{'), ('l', '7'), ('m', '(V)'), ('n', '(\)'), ('o', '()'),
-                      ('p', '[]D'), ('q', '(,)'), ('r', 'R'), ('s', '$'), ('t', "']'"),
-                      ('u', '(_)'), ('v', '\/'), ('w', "'//"), ('x', '%'), ('y', "'/"),
-                      ('z', '"/_'))
-        # wprint(LEET_ENTER_TRANSLATOR_PROMPT)
+        leet_speak = (('a', '4'), ('c', 'C'), ('e', '3'), ('g', '9'), ('h', 'H'), ('i', '!'),
+                      ('k', 'K'), ('n', 'N'), ('o', 'O'), ('p', 'P'), ('r', 'R'), ('s', '$'),
+                      ('t', '7'), ('v', 'V'), ('x', 'X'), ('z', '2'))
         wprint("Enter 1337 Translator? (Y)es or (N)o?")
-        confirm = self.ui.user_prompt().lower()
-        if confirm in YES_ALIASES:
-            # wprint(LEET_TRANSLATE_PROMPT)
+        start_leet = self.ui.user_prompt().lower()
+        while start_leet not in YES_ALIASES and start_leet not in NO_ALIASES:
+            wprint(INVALID_PROMPT_RESPONSE)
+            start_leet = self.ui.user_prompt().lower()
+        if start_leet in YES_ALIASES:
             self.gamestate.player.update_coolness(20)
             repeat = False
             wprint("Entering 1337 Translator... (Enter 'quit' to exit)")
@@ -1707,6 +1705,9 @@ class GameClient:
                 wprint(translation)
                 wprint("Wanna go again? (Y)es or (N)o?")
                 confirm = self.ui.user_prompt().lower()
+                while confirm not in YES_ALIASES and confirm not in NO_ALIASES:
+                    wprint(INVALID_PROMPT_RESPONSE)
+                    confirm = self.ui.user_prompt().lower()
                 if confirm in YES_ALIASES:
                     repeat = True
                     while repeat:
@@ -1722,11 +1723,11 @@ class GameClient:
                             confirm = self.ui.user_prompt().lower()
                             if confirm not in YES_ALIASES:
                                 repeat = False
-                                wprint("()]{, 6'/&... (That's 'OK, bye' for you n00bs!)")
+                                wprint("L473R H473r... (That's 'Later hater...' for you n00b$!)")
             else:
-                wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
+                wprint("L473R H473r... (That's 'Later hater...' for you n00b$!)")
         else:
-            wprint("()]{, 6'/&... (That's 'OK, bye...' for you n00bs!)")
+            wprint("L473R H473r... (That's 'Later hater...' for you n00b$!)")
         self.ui.wait_for_enter()
 
     def hack_heavy_door(self):
@@ -2046,25 +2047,64 @@ class GameClient:
         self.ui.wait_for_enter()
         return hack_success
 
-    # These methods are more complex 'hack' logic that are called by verb_hack()
     def hack_sentient_cpu(self):
         '''
-        Work in progress
+        Called when player attempts to hack Sentient CPU
         :return:
         '''
 
         player_has_code = self.gamestate.player.has_object_by_name(CODE)
         player_has_binary_string = self.gamestate.player.has_object_by_name(BINARY_STRING)
+        hack_success = False
         if player_has_code is True and player_has_binary_string is True:
-            wprint("All you do is SLAY! You dodge the sparks as they go flying past your head.")
-            self.gamestate.player.update_coolness(100)
-            return True
+            hack_success = self.minigame_cpu()
+            if hack_success:
+                wprint("All you do is SLAY! You dodge the sparks as they go flying past your head.")
+                self.gamestate.player.update_coolness(100)
+                return True
+            return False
         else:
             wprint(
                 "Your best hacking efforts have failed you! If only there were some items you could use against this evil machine...")
             self.gamestate.player.update_speed(-10)
             self.gamestate.player.update_coolness(-10)
             return False
+
+    def minigame_cpu(self):
+        wprint(
+            "You find yourself in a swarm of green glowing code snippets."
+            "\'Puny organism!\' bellows the digital beasty. \'Your slow mind is no match for my processing might!\'\n"
+            "Quick! Find the code snippet to terminate any Python program: \n")
+
+        print("\tA: Python.please_stop()")
+        print("\tB: sys.exit()")
+        print("\tC: program == done.now()\n")
+        print("Enter [a/b/c]:")
+
+        user_response = self.ui.user_prompt().lower()
+
+        while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+            wprint(INVALID_PROMPT_RESPONSE)
+            user_response = self.ui.user_prompt().lower()
+
+        if user_response in ANSWER_A:
+            wprint(
+                "How polite, but I\'m pretty sure Python doesn\'t care how nicely you ask it..."
+            )
+            return False
+
+        elif user_response in ANSWER_B:
+            wprint(
+                "Dang kid! You sure know you\'re stuff!"
+            )
+            return True
+        elif user_response in ANSWER_C:
+            wprint(
+                "Even though you might be done, this program is gonna keep chugging along..."
+            )
+            return False
+
+        self.ui.wait_for_enter()
 
     def hack_launch_codes(self):
         '''
