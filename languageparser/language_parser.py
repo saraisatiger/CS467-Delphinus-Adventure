@@ -49,7 +49,7 @@ class LanguageParser:
             error = INVALID_EMPTY
             
         #save a copy of original in case we need for spraypaint
-        sprayCommand = command;
+        sprayCommand = command
         
         #otherwise capitalization doesn't matter
         command = command.lower().lstrip()

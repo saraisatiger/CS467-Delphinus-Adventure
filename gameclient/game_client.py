@@ -1062,7 +1062,7 @@ class GameClient:
                         message = "You're not sure how to use a fireball on that."
                 elif obj_label == "carcass":
                     if target_feature is None:
-                        message, use_success = "Use it on what?!"
+                        message, use_success = "Use it on what?!", False
                     elif target_feature == "binary files":
                         message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
                     elif target_feature == "corrupted files":
@@ -1542,7 +1542,7 @@ class GameClient:
             elif user_response in ANSWER_B:
                 wprint("Pop, bop, Bloop! The box begins to emit loud beeping noises and you have to hit it a couple times to make it quit. Try a different switch?")
             elif user_response in ANSWER_C:
-                self.gamestate.is_graphics_card_found == True
+                self.gamestate.is_graphics_card_found = True
                 wprint("Squueek, splutter, splat! The box starts shaking and a few parts pop out- you collect a useful looking [graphics card]. nice work")
                 try:
                     graphics_card = self.gamestate.get_object_by_name(GRAPHICS_CARD) 
