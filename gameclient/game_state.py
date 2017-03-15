@@ -210,7 +210,8 @@ class GameState:
         self.initialize_jailroom_data() # Makes sure dictionary clear
         self.jailroom_data = save_data.get_jailroom_data()
         self.initialize_endgame_data()
-        self.endgame_data = save_data.get_endgame_data()
+        if save_data.get_endgame_data() is not None:
+            self.endgame_data = save_data.get_endgame_data()
 
     def game_status(self):
         '''

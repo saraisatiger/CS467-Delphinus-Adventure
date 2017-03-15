@@ -1062,7 +1062,7 @@ class GameClient:
                         message = "You're not sure how to use a fireball on that."
                 elif obj_label == "carcass":
                     if target_feature is None:
-                        message, use_success = "Use it on what?!"
+                        message, use_success = "Use it on what?!", False
                     elif target_feature == "binary files":
                         message, use_success = self.use_object_on_feature(obj_label, target_feature, self.use_bug_carcass_on_binary_files)
                     elif target_feature == "corrupted files":
@@ -1127,7 +1127,7 @@ class GameClient:
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("Street"))
                         skate_success = True
 
-                    if feature_name == "guardrails":
+                    elif feature_name == "guardrails":
                         avoid_police = self.rand_event.coin_flip()
                         if avoid_police is False:
                             message = SKATE_FAIL_CAUGHT_GUARDRAILS
@@ -1137,13 +1137,13 @@ class GameClient:
                             self.gamestate.player.update_coolness(SKATE_GUARDRAILS_COOLNESS_INCREASE)
                             skate_success = True
 
-                    if feature_name == "ramp":
+                    elif feature_name == "ramp":
                         # Not illegal here!
                         message = SKATE_ARCADE_RAMP
                         self.gamestate.player.add_object_to_inventory(self.gamestate.get_object_by_name("surge"))
                         skate_success = True
 
-                    if feature_name == "shelves":
+                    elif feature_name == "shelves":
                         message = SKATE_PAWNSHOP_SHELVES
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
                         self.gamestate.player.update_coolness(SKATE_ON_SHELVES_COOLNESS)
@@ -1542,7 +1542,7 @@ class GameClient:
             elif user_response in ANSWER_B:
                 wprint("Pop, bop, Bloop! The box begins to emit loud beeping noises and you have to hit it a couple times to make it quit. Try a different switch?")
             elif user_response in ANSWER_C:
-                self.gamestate.is_graphics_card_found == True
+                self.gamestate.is_graphics_card_found = True
                 wprint("Squueek, splutter, splat! The box starts shaking and a few parts pop out- you collect a useful looking [graphics card]. nice work")
                 try:
                     graphics_card = self.gamestate.get_object_by_name(GRAPHICS_CARD) 

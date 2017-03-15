@@ -97,7 +97,6 @@ class UserInterface:
         has_spraypaint_skill = info['spraypaint_skill']
 
         if has_hack_skill is False and has_skate_skill is False and has_spraypaint_skill is False:
-            # logger.debug(has_hack_skill + has_spraypaint_skill + has_skate_skill)
             skills_row_text += STATUS_NO_SKILLS
         if has_hack_skill is True:
             skills_row_text +=  "hack\t"
