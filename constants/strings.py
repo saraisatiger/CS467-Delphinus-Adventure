@@ -41,7 +41,7 @@ HALL_TEACHER_TEXT = ['Move along slow poke. I am on my smoke break.',
 'Your teen angst is getting to me, better get going kiddo.']
 
 OFFICE_ACIDBURN_TEXT = ['You must be the new kid, Crash Override. I haven\'t seen you around here before...', 
-'I heard hack. You should know, I\'m the best hacker in this little galaxy.',  
+'I heard you hack. You should know, I\'m the best hacker in this little galaxy.',  
 'I\'ve been trying to take down EvilCorps for awhile, those corporate clones are the worst. Word is they\'ve been messing with you too- we should work together to stop them.', 
 'There is a pool up on the roof of this school, lots of hackers hang out there. You might find some evidence there.', 
 'Can\'t chat all day. Smell ya later.']
@@ -128,10 +128,10 @@ INVALID_PROMPT_RESPONSE = "What? Try that again..."
 # Status header strings
 STATUS_HEADER_BAR = "=" * TEXT_WIDTH
 STATUS_HEADER_LOCATION_LABEL = "\t[LOCATION]\t"
-STATUS_HEADER_SPEED_LABEL = "\t[SPEED]\t\t"
+STATUS_HEADER_SPEED_LABEL = "\t[SPEED]\    t"
 STATUS_HEADER_COOLNESS_LABEL = "\t[COOLNESS]\t"
-STATUS_HEADER_TIME_LABEL = "\t\t[TIME]\t"
-STATUS_HEADER_CASH_LABEL = "\t\t[CASH]\t"
+STATUS_HEADER_TIME_LABEL = "\    t[TIME]\t"
+STATUS_HEADER_CASH_LABEL = "\    t[CASH]\t"
 STATUS_HEADER_SKILLS_LABEL = "\t[SKILLS]\t"
 STATUS_NO_SKILLS = "Nothing marketable!"
 

@@ -6,7 +6,7 @@
   "virtual_space" : false,
   "room_features" : [
       {
-        "name" : "School wide Intercom Mic",
+        "name" : "School Intercom Mic",
         "description" : "\"Attention students! School is closed for the rest of the year!\" jk jk",
         "hackable": false
       },

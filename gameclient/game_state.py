@@ -101,7 +101,8 @@ class GameState:
             'cat' : 0,
             'jail_policeofficer' : 0,
             'evilcorpbank_securityofficer' : 0,
-            'subway_phonebooth' : 0
+            'subway_phonebooth' : 0,
+            'chat_bug' : 0
         }
 
     def load_rooms_and_objects_from_file(self):

@@ -193,7 +193,7 @@ class GameClient:
 
             # Conditionally handle each possible verb / command
             if self.command is LOOK :
-                if ((self.verb_preposition == "in" or self.verb_preposition == "inside" or self.verb_preposition == "into") and (self.verb_noun_name == "control box" or self.verb_noun_name == "locker" or self.verb_noun_name == "trash can")):
+                if ((self.verb_preposition == "in" or self.verb_preposition == "inside" or self.verb_preposition == "into") and (self.verb_noun_name == "control box" or self.verb_noun_name == "locker" or self.verb_noun_name == "trash can" or self.verb_noun_name == "panel")):
                     self.command = LOOK_AT
             if self.command is LOOK :
                 # The verb_look() method is called at the top of each loop, so not explicitly called here
@@ -939,6 +939,9 @@ class GameClient:
             elif feature_name == "Phone Booth".lower() and cur_room_name == "Subway".lower():
                 response = self.get_talk_response_from_array(SUBWAY_PHONEBOOTH_TEXT, 'subway_phonebooth')
                 talk_success = True
+            elif feature_name == "Bug".lower() and cur_room_name == "Inside the Metaverse".lower():
+                response = self.get_talk_response_from_array(INSIDETHEMETAVERSE_BUG_TEXT, 'chat_bug')
+                talk_success = True
             else:
                 response = TALK_FAIL_NOT_HERE
                 
@@ -1650,7 +1653,7 @@ class GameClient:
                            "sweet fizz, and hurl the can straight into the wall of fire! It blows a sticky sugar "
                            "syrup hole right through the middle and you quietly thank your surge for sacrificing "
                            "itself for the greater good. That soda will not be forgotten! What's this now? You notice "
-                           "an adorable little fireball flung from the flames. Why not take the little guy along you "
+                           "an adorable little [fireball] flung from the flames. Why not take the little guy along you "
                            "think, stashing him in your backpack.")
                     firewall_defeated = True
                     surge = self.gamestate.player.inventory.get_object_by_name(SURGE)
@@ -1866,7 +1869,7 @@ class GameClient:
         if user_response in ANSWER_A:
             wprint("Your hand gets shocked- ow! Kids are comming out of every door and it looks like that teacher "
                     "has decided to pretend to care and give you a stern talking to... this is gonna take some time...")
-            self.gamestate.player.update_coolness(FIREALARM_SPEED_DECREASE)
+            self.gamestate.player.update_speed(FIREALARM_SPEED_DECREASE)
             hack_success = False
         elif user_response in ANSWER_B:
             wprint("Purple is the right choice! Woohoo a shower of sprinkles rains down on your head and sirens start " 

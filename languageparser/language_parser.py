@@ -25,10 +25,7 @@ logger = logging.getLogger(__name__)
 
 class LanguageParser:
 
-    '''
-        TODO:
 
-    '''
     def __init__(self):
         logger.debug("Language Parser initialized")
 
@@ -47,11 +44,6 @@ class LanguageParser:
         #**********************
         
         # Note: we are using 'TARGET' to mean 'object of the preposition' to avoid confusion with objects
-        
-        # TODO: Deal with punctuation accounting for it in messages
-        
-        # STRETCH GOAL (finished): account for NEGATIONS
-        # STRETCH GOAL (finished): account for other word sentence structure
         
         if command == '':
             error = INVALID_EMPTY
@@ -162,9 +154,7 @@ class LanguageParser:
                 for word in words:
                     if word in NEGATIONS:
                         error = INVALID_NEGATION
-    
-        #TODO: possibly add TALK to special verbs
-        
+            
 
         # SUBJECT or PREPOSTION check: the model is VERB-> (PREPOSITION ANY SUBSEQUENT LOCATION) + NOUN-> TARGET
         if error == None and cheat == None and verb_is_special == False:
@@ -246,12 +236,6 @@ class LanguageParser:
                 if noun != None and preposition != None and target == None:
                     if prep_idx > noun_idx:
                         error = INVALID_SENTENCE_STRUCTURE
-                #INVALID: VERB NOUN TARGET PREP
-                elif noun != None and target != None and preposition != None:
-                    # TODO: target_idx is undefined! typing something like "use fireball on bug" cases exception and crashes game. putting a 'pass' here so I can test logic
-                    pass
-                    # if prep_idx > target_idx:
-                    #     error = INVALID_SENTENCE_STRUCTURE
         
         R = LanguageParserWrapper()
         if error != None:
@@ -272,8 +256,6 @@ class LanguageParser:
             
         if target != None:
             R.set_extra(str(target), str(target_is))
-            
-        logger.debug("Parser returning: \n" + str(R))
-        
+
 
         return R
