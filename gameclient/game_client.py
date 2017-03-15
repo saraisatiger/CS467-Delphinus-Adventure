@@ -1127,7 +1127,7 @@ class GameClient:
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("Street"))
                         skate_success = True
 
-                    if feature_name == "guardrails":
+                    elif feature_name == "guardrails":
                         avoid_police = self.rand_event.coin_flip()
                         if avoid_police is False:
                             message = SKATE_FAIL_CAUGHT_GUARDRAILS
@@ -1137,13 +1137,13 @@ class GameClient:
                             self.gamestate.player.update_coolness(SKATE_GUARDRAILS_COOLNESS_INCREASE)
                             skate_success = True
 
-                    if feature_name == "ramp":
+                    elif feature_name == "ramp":
                         # Not illegal here!
                         message = SKATE_ARCADE_RAMP
                         self.gamestate.player.add_object_to_inventory(self.gamestate.get_object_by_name("surge"))
                         skate_success = True
 
-                    if feature_name == "shelves":
+                    elif feature_name == "shelves":
                         message = SKATE_PAWNSHOP_SHELVES
                         self.gamestate.set_current_room(self.gamestate.get_room_by_name("street"))
                         self.gamestate.player.update_coolness(SKATE_ON_SHELVES_COOLNESS)
