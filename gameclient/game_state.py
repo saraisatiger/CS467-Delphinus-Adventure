@@ -210,7 +210,7 @@ class GameState:
         self.initialize_jailroom_data() # Makes sure dictionary clear
         self.jailroom_data = save_data.get_jailroom_data()
         self.initialize_endgame_data()
-        # self.endgame_data = save_data.get_endgame_data() # TODO: Have Sara build this into SaveGame
+        self.endgame_data = save_data.get_endgame_data()
 
     def game_status(self):
         '''
@@ -304,6 +304,9 @@ class GameState:
 
     def get_jailroom_data(self):
         return self.jailroom_data
+
+    def get_endgame_data(self):
+        return self.endgame_data
 
     def is_room_spray_painted_by_name(self, room_name):
         '''
