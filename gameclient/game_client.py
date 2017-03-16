@@ -930,7 +930,7 @@ class GameClient:
                 response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'chat_creature')
                 talk_success = True
             elif feature_name == "Sentient CPU".lower() and cur_room_name == "Data Tower".lower():
-                response = self.get_talk_response_from_array(PAWNSHOP_STORECLERK_TEXT, 'sentient_cpu')
+                response = self.get_talk_response_from_array(DATATOWER_SENTIENTCPU_TEXT, 'sentient_cpu')
                 talk_success = True
             elif feature_name == "Teacher".lower() and cur_room_name == "Hall".lower():
                 response = self.get_talk_response_from_array(HALL_TEACHER_TEXT, 'hall_teacher')
