@@ -759,6 +759,7 @@ class GameClient:
         looked_at_firewall = False
         looked_at_leet = False
         looked_at_control_box = False
+        looked_at_death = False
 
         if noun_name.isspace() or noun_name is None or noun_name == '':
             description = LOOK_AT_NO_TARGET
@@ -781,6 +782,8 @@ class GameClient:
                     looked_at_leet = True
                 elif room_feature_name == "control box":
                     looked_at_control_box = True
+                elif room_feature_name == "death to the patriarchy":
+                    looked_at_death = True
             except:
                 logger.debug("verb_look_at(): room_feature.get_description() exception")
                 description = "Uh oh, something has gone wrong. Contact the developer!"
@@ -827,6 +830,8 @@ class GameClient:
             self.leet_translator()
         elif looked_at_control_box is True:
             self.minigame_controlbox()
+        elif looked_at_death is True:
+            self.minigame_death()
 
     def verb_quit(self, message):
         '''
@@ -1523,7 +1528,7 @@ class GameClient:
         '''
         Called when player looks in/inside the 'control box' inside pool on the roof
         '''
-        if self.gamestate.is_graphics_card_found == False:
+        if self.gamestate.is_graphics_card_found is False:
             wprint("You crack open the control box thinking it might have some useful parts for that busted laptop of yours. "
                     "Inside are several switches labeled in sharpie. Which one do you flip first? ")
             print("\tA: The one labeled \'Charmansplainer\'")
@@ -1553,7 +1558,47 @@ class GameClient:
             wprint("You\'ve searched this well enough- better get going with preventing that nuclear apocalypse.")
         
         self.ui.wait_for_enter() 
-            
+
+    def minigame_death(self):
+        '''
+        Logic specific to the user trying to hack the death to patriarchy
+        :return: True if the hack succeeds, false otherwise.
+        Method created by Niza
+        '''
+        if self.gamestate.is_game_played is False:
+
+            wprint("This sleek machine flashes neon lights and blares techno music- so inviting. You can\'t resist "
+                    "playing just one game before getting back to saving the world. You flex your fingers and get "
+                    "to gaming! You blaze through the first 87 levels- then notice the clock, it is well past time "
+                    "you should be saving the world. What do you do?")
+            print("\tA: Game on! The world can wait...")
+            print("\tB: Keep playing- just a few more levels won\'t be an issue.")
+            print("\tC: Not like you\'ll be any less awesome at video games tomorrow- get on with saving the world.")
+            print("Enter [a/b/c]")
+
+            user_response = self.ui.user_prompt()
+
+            while user_response not in ANSWER_A and user_response not in ANSWER_B and user_response not in ANSWER_C:
+                wprint(INVALID_PROMPT_RESPONSE)
+                user_response = self.ui.user_prompt().lower()
+
+            if user_response in ANSWER_A:
+                wprint("You play until your thumbs go numb. That was a little more time than you intended...")
+                self.gamestate.player.update_speed(GAME_SPEED_DECREASE)
+            elif user_response in ANSWER_B:
+                wprint("You get to the last level only to realize you are out of quarters! Such a waste!!")
+                self.gamestate.player.update_speed(GAME_SPEED_DECREASE)
+            elif user_response in ANSWER_C:
+                wprint("A sigh of awe comes from your loyal fans as they stare in wonder at such a legend "
+                        "leaving a game this close to victory. No time to waste on signing autographs. You "
+                        "have a mission!")
+                self.gamestate.player.update_speed(GAME_SPEED_INCREASE)
+                self.gamestate.is_game_played = True
+        else:
+            wprint("Looks like the game is being played by a rambunctious third grader- probably too sticky to "
+                    "get in a good game now anyway. ")
+        self.ui.wait_for_enter()
+
     def minigame_bug(self):
         '''
         Called when player looks at the 'bug' inside metaverse
@@ -1604,7 +1649,6 @@ class GameClient:
 
             if bug_defeated is True:
                 self.gamestate.endgame_data['metaverse']['is_spider_defeated'] = True
-                self.gamestate.player.update_coolness(BUG_COOLNESS_LOSS)
                 try:
                     carcass = self.gamestate.get_object_by_name(CARCASS)
                     self.gamestate.player.add_object_to_inventory(carcass)
@@ -1668,7 +1712,6 @@ class GameClient:
                        "your wraith as your scorched body pummels through the flames- this is gonna leave some pretty "
                        "sick scars. What the heck you think, scooping the little [fireball] up and depositing him in "
                        "your backpack. Isn't his fault his relatives are super bogus.")
-                self.gamestate.player.update_coolness(FIREWALL_COOLNESS_COST)
                 firewall_defeated = True
 
             if firewall_defeated is True:

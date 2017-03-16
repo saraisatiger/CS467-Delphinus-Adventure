@@ -26,7 +26,7 @@
     {
       "label": "Hall",
       "cardinal_direction": "South",
-      "description": "the trap door leading back to the Hall.",
+      "description": "the heavy door leading back to the Hall.",
       "destination": "Hall"
     }
   ]

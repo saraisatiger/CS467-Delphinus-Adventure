@@ -19,15 +19,10 @@ from fileio.object import *
 from debug.debug import *
 import string
 
-logger = logging.getLogger(__name__)
 
 
 
 class LanguageParser:
-
-
-    def __init__(self):
-        logger.debug("Language Parser initialized")
 
 
     def parse_command(self, command):

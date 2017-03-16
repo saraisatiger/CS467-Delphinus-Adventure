@@ -85,6 +85,7 @@ class GameState:
         self.is_trash_can_looted = False
         self.is_locker_open = False
         self.is_graphics_card_found = False
+        self.is_game_played = False
         self.spraypaint_data = {}
         self.jailroom_data = {}
         self.endgame_data = {}
@@ -378,8 +379,8 @@ class GameState:
                         self.player.add_object_to_inventory(game_object)
                     except:
                         logger.debug("place_objects_in_rooms() failed to place " + game_object.get_name() + " in inventory")
-                if object_location == "trash can":
-                    pass # it's manually 'yanked' in the 'search_trash_can()' method
+                if object_location == "special":
+                    pass # not in a room
                 else:
                     try:
                         room = self.get_room_by_name(object_location)

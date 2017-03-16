@@ -59,7 +59,7 @@ class RandomEventGenerator:
 
     def coin_flip(self):
         num = random.randint(1,100)
-        logger.debug("coin flip value: " + str(num))
+        #logger.debug("coin flip value: " + str(num))
         if num <= 50:
             return True
         return False
