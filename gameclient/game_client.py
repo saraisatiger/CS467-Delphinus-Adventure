@@ -2141,7 +2141,7 @@ class GameClient:
 
         elif user_response in ANSWER_B:
             wprint(
-                "Dang kid! You sure know you\'re stuff!"
+                "Dang kid! You sure know your stuff!"
             )
             return True
         elif user_response in ANSWER_C:
@@ -2276,7 +2276,7 @@ class GameClient:
         preposition = preposition.lower()
 
         if target_name == "ledge" or target_name == "guardrails" or target_name == "ramp" or target_name == "shelves":
-            if preposition in {'on', 'onto', 'over', 'around', 'off', 'on'}:
+            if preposition in {'on', 'onto', 'over', 'around', 'off', 'up'}:
                 return True
             return False
 
