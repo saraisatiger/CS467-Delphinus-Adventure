@@ -1080,8 +1080,8 @@ class GameClient:
                         message = "You're not sure how to use a bug carcass in such a way."
 
                 else:
-                    logger.debug("Not implemented: use " + used_object.get_name())
-                    message = ("You used something that the game doesn't know what to do with, please tell your local dev!")
+                    # logger.debug("Not implemented: use " + used_object.get_name())
+                    message = ("You can't figure out how to use that directly. Hm. Maybe you should just hang on to it.")
                     use_success = False
             else:
                 message = USE_FAIL_UNUSABLE
